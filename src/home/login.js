@@ -46,7 +46,7 @@ export default class Login extends Component {
                 </View>
                 <View style={styles.bottomview}>
                     <TouchableOpacity onPress={() => {
-                        DropDownHolder.alert('info', '', 'b');
+                        DropDownHolder.alert('用户名或密码错误', '', 'error');
                     }}>
                         <View style={styles.buttonview}>
                             <Text style={styles.logintext}>登 录</Text>

@@ -20,6 +20,16 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+
+<meta-data android:name="PUSH_APPID" android:value="FdcAQSDYcF9P0BERwINh74"/>
+<meta-data android:name="PUSH_APPKEY" android:value="B6XmJYZ9kvAKDGqgf0Ykz3"/>
+<meta-data android:name="PUSH_APPSECRET" android:value="MfnoEzzkvL7ejae5YwPRpA"/>
+
+
+<meta-data android:name="PUSH_APPID" android:value="FdcAQSDYcF9P0BERwINh74"/>
+<meta-data android:name="PUSH_APPKEY" android:value="B6XmJYZ9kvAKDGqgf0Ykz3"/>
+<meta-data android:name="PUSH_APPSECRET" android:value="MfnoEzzkvL7ejae5YwPRpA"/>
+
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
 
