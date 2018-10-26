@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Text, TouchableOpacity, View, StatusBar, AlertIOS } from 'react-native';
-import PropTypes from 'prop-types';
 import { QRScannerView } from 'ac-qrcode';
 import { ImageButton, TitleBar } from "../components/";
 import Styles from './styles/wechat';
@@ -52,7 +51,7 @@ export default class QRCode extends Component {
                     <ImageButton
                         style={Styles.image_bottom_menu}
                         source={Images.ic_wechat_scan_book}
-                        onPress={() => this.props.navigation.goBack()}
+                        onPress={() => { }}
                     />
                     <Text
                         style={Styles.text_bottom_menu_item}
@@ -102,7 +101,9 @@ export default class QRCode extends Component {
             cornerBorderWidth={2}
             onScanResultReceived={this.barcodeReceived.bind(this)}
             renderTopBarView={() => this.renderTitleBar()}
-
-            renderBottomMenuView={() => this.renderMenu()} />)
+            //renderTopBarView={() => { }}
+            renderBottomMenuView={() => this.renderMenu()}
+        //renderBottomMenuView={() => { }}
+        />)
     }
 }

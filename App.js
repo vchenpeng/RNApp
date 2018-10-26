@@ -41,7 +41,7 @@ export default class App extends React.Component {
     array[1] = "is"
     array[2] = "array"
     getuiBridge.sendText(2, '传过来的字符', array);
-    getuiBridge.setBadge(10);
+    getuiBridge.setBadge(9);
   }
   updateComponentInfo() {
     Getui.clientId((param) => {

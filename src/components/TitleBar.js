@@ -4,24 +4,24 @@
  * Desc:
  */
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { StyleSheet, Text, View, TouchableOpacity, AlertIOS } from 'react-native';
-
 import { Images } from '../resource/'
 import ImageButton from "./ImageButton";
-
+import NavigationService from '../navigationService';
 
 export default class TitleBar extends Component {
 
     static propTypes = {
-        leftTitle: React.PropTypes.string,
-        leftIcon: React.PropTypes.number,
-        rightIcon: React.PropTypes.number,
-        rightTitle: React.PropTypes.string,
-        leftIconPress: React.PropTypes.func,
-        rightIconPress: React.PropTypes.func,
-        bgColor: React.PropTypes.string,
-        titleColor: React.PropTypes.string,
-        paddingTop: React.PropTypes.string
+        leftTitle: PropTypes.string,
+        leftIcon: PropTypes.number,
+        rightIcon: PropTypes.number,
+        rightTitle: PropTypes.string,
+        leftIconPress: PropTypes.func,
+        rightIconPress: PropTypes.func,
+        bgColor: PropTypes.string,
+        titleColor: PropTypes.string,
+        paddingTop: PropTypes.string
     };
 
     static defaultProps = {
@@ -31,12 +31,12 @@ export default class TitleBar extends Component {
 
     render() {
         return (
-            <View style={[styles.view_header_container, { backgroundColor: this.props.bgColor, opacity: 0.9, height: 64, paddingTop: 20 }]}>
+            <View style={[styles.view_header_container, { backgroundColor: this.props.bgColor, opacity: 0.6, height: 64, paddingTop: 20 }]}>
                 <ImageButton
                     style={{ width: 25, height: 25, marginLeft: 10, marginRight: 10 }}
                     source={this.props.leftIcon}
                     onPress={() => {
-                        AlertIOS.alert('9988776');
+                        NavigationService.back();
                     }}
                 />
                 <Text style={[styles.text_title, { color: this.props.titleColor, textAlign: "center" }]}>{this.props.leftTitle}</Text>
