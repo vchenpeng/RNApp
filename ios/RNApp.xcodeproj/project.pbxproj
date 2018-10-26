@@ -77,7 +77,7 @@
 		FF5FCC2A9F0A450F96CCDD2C /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AF21342F4648433694286A34 /* Feather.ttf */; };
 		FFBEF0272180D57D0007BA8E /* bundle in Resources */ = {isa = PBXBuildFile; fileRef = FFBEF0262180D57D0007BA8E /* bundle */; };
 		FFBEF02921814E030007BA8E /* build in Resources */ = {isa = PBXBuildFile; fileRef = FFBEF02821814E030007BA8E /* build */; };
-		FFBEF02D218170D90007BA8E /* GetuiBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = FFBEF02C218170D80007BA8E /* GetuiBridge.m */; };
+		FFBEF02D218170D90007BA8E /* MainBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = FFBEF02C218170D80007BA8E /* MainBridge.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -470,8 +470,8 @@
 		FFBEF0262180D57D0007BA8E /* bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bundle; sourceTree = "<group>"; };
 		FFBEF02821814E030007BA8E /* build */ = {isa = PBXFileReference; lastKnownFileType = folder; path = build; sourceTree = "<group>"; };
 		FFBEF02A218160100007BA8E /* RNApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = RNApp.entitlements; path = RNApp/RNApp.entitlements; sourceTree = "<group>"; };
-		FFBEF02B218170750007BA8E /* GetuiBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GetuiBridge.h; path = RNApp/GetuiBridge.h; sourceTree = "<group>"; };
-		FFBEF02C218170D80007BA8E /* GetuiBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GetuiBridge.m; path = RNApp/GetuiBridge.m; sourceTree = "<group>"; };
+		FFBEF02B218170750007BA8E /* MainBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainBridge.h; path = RNApp/MainBridge.h; sourceTree = "<group>"; };
+		FFBEF02C218170D80007BA8E /* MainBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainBridge.m; path = RNApp/MainBridge.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -642,8 +642,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				FFBEF02B218170750007BA8E /* GetuiBridge.h */,
-				FFBEF02C218170D80007BA8E /* GetuiBridge.m */,
+				FFBEF02B218170750007BA8E /* MainBridge.h */,
+				FFBEF02C218170D80007BA8E /* MainBridge.m */,
 			);
 			name = RNApp;
 			sourceTree = "<group>";
@@ -950,6 +950,9 @@
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 4JPJ685ZG8;
 						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
 							com.apple.Push = {
 								enabled = 1;
 							};
@@ -1458,7 +1461,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FFBEF02D218170D90007BA8E /* GetuiBridge.m in Sources */,
+				FFBEF02D218170D90007BA8E /* MainBridge.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
-#import "GetuiBridge.h"
+#import "MainBridge.h"
 
 @implementation GetuiBridge
 RCT_EXPORT_MODULE();
@@ -18,6 +18,8 @@ RCT_REMAP_METHOD(sendText, num:(nonnull NSNumber *)num str:(NSString *)str arr:(
 }
 RCT_REMAP_METHOD(setBadge, num:(NSInteger)num)
 {
-  [[UIApplication sharedApplication] setApplicationIconBadgeNumber:num];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:num];
+  });
 }
 @end
