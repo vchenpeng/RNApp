@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/AntDesign";
 import { createStackNavigator, CardStackStyleInterpolator } from 'react-navigation';
 import QRCode from "./home/qrcode";
 import Tabs from "./home/tabs";
+import Web from "./home/web";
 import Login from "./home/login";
 import TouchID from 'react-native-touch-id';
 
@@ -47,7 +48,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                 </View>)
             };
             break;
-        case "Web":
+        case "Market":
             navigationOptions = {
                 headerTitle: "行情",
                 headerRight: (<View>
@@ -99,6 +100,14 @@ var RootStackNavigator = createStackNavigator({
                 header: null
             }
         }
+    },
+    Web: {
+        screen: Web,
+        // navigationOptions: ({ navigation }) => {
+        //     return {
+
+        //     }
+        // }
     },
     Login: {
         screen: Login

@@ -3,7 +3,7 @@ import { AppRegistry, View, StatusBar, Image, AlertIOS } from "react-native";
 import React from "react";
 
 import Home from "./index";
-import Web from "./web";
+import Market from "./market";
 import Explore from "./explore";
 import Mine from "./mine";
 
@@ -20,8 +20,8 @@ export default createBottomTabNavigator({
             )
         }
     },
-    Web: {
-        screen: Web,
+    Market: {
+        screen: Market,
         navigationOptions: {
             tabBarLabel: '行情',
             tabBarIcon: ({ focused, tintColor }) => (

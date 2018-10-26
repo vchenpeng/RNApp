@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import {
-    Text, View, StatusBar, FlatList, TouchableOpacity
+    Text, View, StatusBar, FlatList, TouchableOpacity, Dimensions
 } from 'react-native';
 import NavigationService from '../navigationService';
-import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view2';
+import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
-import DropDownHolder from '../DropDownHolder'
+import DropDownHolder from '../DropDownHolder';
 
 export default class Explore extends Component {
     static navigationOptions = ((props) => {
@@ -55,10 +55,11 @@ export default class Explore extends Component {
     renderRow({ item }) {
         return (
             <TouchableOpacity onPress={() => {
-                DropDownHolder.alert(item.title, '', 'info');
+                //DropDownHolder.alert(item.title, '', 'info');
+                NavigationService.navigate("Web", { url: item.extra.topic_url });
             }} >
                 <ListItem
-                    style={{ borderBottomWidth: 0, backgroundColor: 'red', borderBottomWidth: 9 }}
+                    style={{ borderBottomWidth: 0 }}
                     wrapperStyle={{ height: 50 }}
                     contentContainerStyle={{ padding: 0, margin: 0 }}
                     containerStyle={{ backgroundColor: '#fff', padding: 0, margin: 0 }}
@@ -97,7 +98,8 @@ export default class Explore extends Component {
                     }
                     }
                 />
-            </View>))
+            </View>));
+        var { height, width } = Dimensions.get('window');
         return (<View style={{ flex: 1 }}>
             <ScrollableTabView
                 style={{ marginTop: 0 }}

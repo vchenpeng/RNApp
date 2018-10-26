@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, TouchableOpacity, View, Alert, SafeAreaView } from 'react-native';
 import { QRScannerView } from 'ac-qrcode';
+import NavigationService from '../navigationService';
 import { ImageButton, TitleBar } from "../components/";
 import Styles from './styles/wechat';
 import { Constants, Images, Colors } from "../resource/";
@@ -87,19 +88,20 @@ export default class QRCode extends Component {
     }
     barcodeReceived(e) {
         if (this.state.isScanning) {
-            this.setState({ isScanning: false });
-            Alert.alert(
-                '扫码内容',
-                JSON.stringify(e),
-                [
-                    {
-                        text: '好', onPress: () => {
-                            this.setState({ isScanning: true });
-                        }
-                    }
-                ],
-                { cancelable: false }
-            )
+            //this.setState({ isScanning: false });
+            // Alert.alert(
+            //     '扫码内容',
+            //     JSON.stringify(e),
+            //     [
+            //         {
+            //             text: '好', onPress: () => {
+            //                 this.setState({ isScanning: true });
+            //             }
+            //         }
+            //     ],
+            //     { cancelable: false }
+            // );
+            NavigationService.navigate("Web", { url: e.data });
             switch (e.type) {
                 case "org.ios.QRCode":
                     break;

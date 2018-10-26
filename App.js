@@ -46,7 +46,7 @@ export default class App extends React.Component {
   updateComponentInfo() {
     Getui.clientId((param) => {
       this.setState({ 'clientId': param });
-      DropDownHolder.alert('个推clientId', param);
+      //DropDownHolder.alert('个推clientId', param);
     })
 
     Getui.version((param) => {
