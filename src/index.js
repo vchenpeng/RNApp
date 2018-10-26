@@ -4,7 +4,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
 import { createStackNavigator, CardStackStyleInterpolator } from 'react-navigation';
-//import QRCode from "./home/qrcode";
+import QRCode from "./home/qrcode";
 import Tabs from "./home/tabs";
 import Login from "./home/login";
 import TouchID from 'react-native-touch-id';
@@ -91,15 +91,15 @@ var RootStackNavigator = createStackNavigator({
     Main: {
         screen: Tabs
     },
-    // QRCode: {
-    //     screen: QRCode,
-    //     navigationOptions: ({ navigation }) => {
-    //         return {
-    //             tabBarVisible: false,
-    //             header: null
-    //         }
-    //     }
-    // },
+    QRCode: {
+        screen: QRCode,
+        navigationOptions: ({ navigation }) => {
+            return {
+                tabBarVisible: false,
+                header: null
+            }
+        }
+    },
     Login: {
         screen: Login
     }

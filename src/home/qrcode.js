@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Text, TouchableOpacity, View, StatusBar, AlertIOS } from 'react-native';
 import PropTypes from 'prop-types';
-//import { QRScannerView } from 'ac-qrcode';
+import { QRScannerView } from 'ac-qrcode';
 import { ImageButton, TitleBar } from "../components/";
 import Styles from './styles/wechat';
 import { Constants, Images, Colors } from "../resource/";
