@@ -75,7 +75,6 @@
 		F911BB88C0BE413A8EC14CB8 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AF1DF968F3D40D8B9088F05 /* libc++.tbd */; };
 		FC237F62A1134BB1B99514A0 /* PushKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD20ECC517454546982D9582 /* PushKit.framework */; };
 		FF5FCC2A9F0A450F96CCDD2C /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AF21342F4648433694286A34 /* Feather.ttf */; };
-		FF7A8B902182D2A300FEF3E6 /* build in Resources */ = {isa = PBXBuildFile; fileRef = FF7A8B8F2182D2A300FEF3E6 /* build */; };
 		FFBEF0272180D57D0007BA8E /* bundle in Resources */ = {isa = PBXBuildFile; fileRef = FFBEF0262180D57D0007BA8E /* bundle */; };
 		FFBEF02D218170D90007BA8E /* MainBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = FFBEF02C218170D80007BA8E /* MainBridge.m */; };
 /* End PBXBuildFile section */
@@ -467,7 +466,6 @@
 		F76BD331383F40B593D11AE9 /* CoreFoundation.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		FC900178045B43A4889B7EB9 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		FDD5021374424EB48F74FA05 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
-		FF7A8B8F2182D2A300FEF3E6 /* build */ = {isa = PBXFileReference; lastKnownFileType = folder; path = build; sourceTree = "<group>"; };
 		FFBEF0262180D57D0007BA8E /* bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bundle; sourceTree = "<group>"; };
 		FFBEF02A218160100007BA8E /* RNApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = RNApp.entitlements; path = RNApp/RNApp.entitlements; sourceTree = "<group>"; };
 		FFBEF02B218170750007BA8E /* MainBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainBridge.h; path = RNApp/MainBridge.h; sourceTree = "<group>"; };
@@ -632,7 +630,6 @@
 		13B07FAE1A68108700A75B9A /* RNApp */ = {
 			isa = PBXGroup;
 			children = (
-				FF7A8B8F2182D2A300FEF3E6 /* build */,
 				FFBEF02A218160100007BA8E /* RNApp.entitlements */,
 				FFBEF0262180D57D0007BA8E /* bundle */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
@@ -1380,7 +1377,6 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				FF7A8B902182D2A300FEF3E6 /* build in Resources */,
 				2B6BF1BF4F4F49B1B393538C /* AntDesign.ttf in Resources */,
 				5212A01F28DC45D9A8865E15 /* Entypo.ttf in Resources */,
 				79CF9B11923243C4979A3402 /* EvilIcons.ttf in Resources */,

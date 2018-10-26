@@ -5,7 +5,7 @@
  */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { StyleSheet, Text, View, TouchableOpacity, AlertIOS } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, AlertIOS, SafeAreaView } from 'react-native';
 import { Images } from '../resource/'
 import ImageButton from "./ImageButton";
 import NavigationService from '../navigationService';
@@ -31,17 +31,19 @@ export default class TitleBar extends Component {
 
     render() {
         return (
-            <View style={[styles.view_header_container, { backgroundColor: this.props.bgColor, opacity: 0.6, height: 64, paddingTop: 20 }]}>
-                <ImageButton
-                    style={{ width: 25, height: 25, marginLeft: 10, marginRight: 10 }}
-                    source={this.props.leftIcon}
-                    onPress={() => {
-                        NavigationService.back();
-                    }}
-                />
-                <Text style={[styles.text_title, { color: this.props.titleColor, textAlign: "center" }]}>{this.props.leftTitle}</Text>
-                {this._renderRight()}
-            </View>
+            <SafeAreaView style={{ backgroundColor: this.props.bgColor, opacity: 0.8 }}>
+                <View style={[styles.view_header_container, { backgroundColor: this.props.bgColor, height: 44 }]}>
+                    <ImageButton
+                        style={{ width: 25, height: 25, marginLeft: 10, marginRight: 10 }}
+                        source={this.props.leftIcon}
+                        onPress={() => {
+                            NavigationService.back();
+                        }}
+                    />
+                    <Text style={[styles.text_title, { color: this.props.titleColor, textAlign: "center" }]}>{this.props.leftTitle}</Text>
+                    {this._renderRight()}
+                </View>
+            </SafeAreaView>
         )
     }
 
@@ -68,7 +70,7 @@ export default class TitleBar extends Component {
 
 const styles = StyleSheet.create({
     view_header_container: {
-        height: 84,
+        height: 44,
         backgroundColor: 'white',
         flexDirection: 'row',
         alignItems: 'center'

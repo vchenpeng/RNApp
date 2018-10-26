@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, TouchableOpacity, View, StatusBar, AlertIOS } from 'react-native';
+import { Text, TouchableOpacity, View, Alert, SafeAreaView } from 'react-native';
 import { QRScannerView } from 'ac-qrcode';
 import { ImageButton, TitleBar } from "../components/";
 import Styles from './styles/wechat';
@@ -14,14 +14,16 @@ export default class QRCode extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            isScanning: false
         };
         this.renderTitleBar.bind(this);
         this.renderMenu.bind(this);
         this.barcodeReceived.bind(this);
     }
     componentDidMount() {
-        //this.props.navigation.goBack();
+        this.setState({
+            isScanning: true
+        });
     }
     renderTitleBar() {
         return (
@@ -84,26 +86,47 @@ export default class QRCode extends Component {
         )
     }
     barcodeReceived(e) {
-
+        if (this.state.isScanning) {
+            this.setState({ isScanning: false });
+            Alert.alert(
+                '扫码内容',
+                JSON.stringify(e),
+                [
+                    {
+                        text: '好', onPress: () => {
+                            this.setState({ isScanning: true });
+                        }
+                    }
+                ],
+                { cancelable: false }
+            )
+            switch (e.type) {
+                case "org.ios.QRCode":
+                    break;
+                default:
+                    break;
+            }
+        } else {
+        }
     }
 
     render() {
-        return (<QRScannerView
-            bottomMenuStyle={{ height: 100, backgroundColor: Colors.black_393A3F, opacity: 1 }}
-            hintText="将二维码/条码放入框内，即可自动扫描"
-            hintTextPosition={180}
-            hintTextStyle={{ color: '#fff', fontSize: 12, backgroundColor: 'transparent' }}
-            maskColor={Colors.black_0000004D}
-            borderWidth={0}
-            iscorneroffset={false}
-            cornerOffsetSize={0}
-            scanBarAnimateTime={3000}
-            cornerBorderWidth={2}
-            onScanResultReceived={this.barcodeReceived.bind(this)}
-            renderTopBarView={() => this.renderTitleBar()}
-            //renderTopBarView={() => { }}
-            renderBottomMenuView={() => this.renderMenu()}
-        //renderBottomMenuView={() => { }}
-        />)
+        return (
+            <QRScannerView
+                bottomMenuStyle={{ height: 100, backgroundColor: Colors.black_393A3F, opacity: 1 }}
+                hintText="将二维码/条码放入框内，即可自动扫描"
+                hintTextPosition={180}
+                hintTextStyle={{ color: '#fff', fontSize: 12, backgroundColor: 'transparent' }}
+                maskColor={Colors.black_0000004D}
+                borderWidth={0}
+                iscorneroffset={false}
+                cornerOffsetSize={0}
+                scanBarAnimateTime={3000}
+                cornerBorderWidth={2}
+                onScanResultReceived={this.barcodeReceived.bind(this)}
+                renderTopBarView={() => this.renderTitleBar()}
+                renderBottomMenuView={() => this.renderMenu()}
+            />
+        )
     }
 }
