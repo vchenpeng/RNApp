@@ -13,7 +13,7 @@ export default class Home extends Component {
         };
     }
     componentDidMount() {
-        //DropDownHolder.alert('标题一', '我是内容我是内容我是内容我是内容我是内容', 'info');
+        DropDownHolder.alert('标题二', '我是内容我是内容我是内容我是内容我是内容', 'info');
     }
 
 

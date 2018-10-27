@@ -8,14 +8,15 @@
 
 import React, { Component } from "react";
 import {
-  View, StatusBar, Image, Alert, TouchableOpacity, Text, NativeAppEventEmitter, NativeModules
+  View, StatusBar, Image, AppState, Alert, TouchableOpacity, Text, NativeAppEventEmitter, NativeModules
 } from "react-native";
 import RootStackNavigator from "./src/index"
 import NavigationService from './src/navigationService';
 import DropdownAlert from 'react-native-dropdownalert';
 import DropDownHolder from './src/DropDownHolder';
 import SplashScreen from 'react-native-splash-screen';
-import Getui from 'react-native-getui'
+import Getui from 'react-native-getui';
+import codePush from 'react-native-code-push'
 
 export default class App extends React.Component {
   constructor(props) {
@@ -41,7 +42,11 @@ export default class App extends React.Component {
     array[1] = "is"
     array[2] = "array"
     getuiBridge.sendText(2, '传过来的字符', array);
-    getuiBridge.setBadge(9);
+    getuiBridge.setBadge(0);
+
+    AppState.addEventListener("change", (newState) => {
+      newState === "active" && codePush.sync();
+    });
   }
   updateComponentInfo() {
     Getui.clientId((param) => {
@@ -112,7 +117,7 @@ NativeAppEventEmitter.addListener(
     //Android的消息类型为payload 透传消息 或者 cmd消息
     switch (notification.type) {
       case "cid":
-        Alert.alert('初始化获取到cid', JSON.stringify(notification))
+        Alert.alert('22初始化获取到cid', JSON.stringify(notification))
         break;
       case 'payload':
         Alert.alert('payload 消息通知', JSON.stringify(notification))

@@ -15,7 +15,7 @@ import DropDownHolder from '../DropDownHolder'
 export default class Login extends Component {
     static navigationOptions = ((props) => {
         return {
-            headerTitle: '登录',
+            headerTitle: '登录xin',
             header: null,
             headerRight: (<View>
                 <TouchableOpacity onPress={() => {
@@ -46,7 +46,7 @@ export default class Login extends Component {
                 </View>
                 <View style={styles.bottomview}>
                     <TouchableOpacity onPress={() => {
-                        DropDownHolder.alert('用户名或密码错误', '', 'error');
+                        DropDownHolder.alert('用户名或密码错误哦', '', 'error');
                     }}>
                         <View style={styles.buttonview}>
                             <Text style={styles.logintext}>登 录</Text>
