@@ -56,16 +56,16 @@ export default class Explore extends Component {
         return (
             <TouchableOpacity onPress={() => {
                 //DropDownHolder.alert(item.title, '', 'info');
-                NavigationService.navigate("Web", { url: item.extra.topic_url });
+                NavigationService.navigate("Web", { url: item.extra.topic_url, title: item.title });
             }} >
                 <ListItem
-                    style={{ borderBottomWidth: 0 }}
+                    style={{}}
+                    bottomDivider={false}
                     wrapperStyle={{ height: 50 }}
                     contentContainerStyle={{ padding: 0, margin: 0 }}
-                    containerStyle={{ backgroundColor: '#fff', padding: 0, margin: 0 }}
+                    containerStyle={{ backgroundColor: '#fff', padding: 0, margin: 0, borderBottomColor: '#eee' }}
                     titleStyle={{ fontSize: 16, flexShrink: 1 }}
                     titleContainerStyle={{
-                        backgroundColor: '#fff',
                         height: 25,
                         justifyContent: "center"
                     }}

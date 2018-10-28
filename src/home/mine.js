@@ -60,7 +60,7 @@ export default class Mine extends Component {
         return (
             <TouchableOpacity onPress={() => console.log()} >
                 <CheckBox
-                    title='Click Here yo'
+                    title='Click Here 啦🌶'
                     checked={false}
                 />
                 <ListItem
