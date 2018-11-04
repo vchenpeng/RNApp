@@ -2,13 +2,17 @@ import React, { Component } from "react";
 import {
     View, AlertIOS, TouchableOpacity
 } from "react-native";
+import TouchID from 'react-native-touch-id';
 import Icon from "react-native-vector-icons/AntDesign";
 import { createStackNavigator, CardStackStyleInterpolator } from 'react-navigation';
-import QRCode from "./home/qrcode";
-import Tabs from "./home/tabs";
-import Web from "./home/web";
-import Login from "./home/login";
-import TouchID from 'react-native-touch-id';
+import NavigationService from './utils/navigationService';
+import { Colors } from './resource';
+import QRCode from "./pages/QrCode";
+import Tabs from "./pages/Tabs";
+import Web from "./pages/Web";
+import Login from "./pages/Login";
+import MarketDetail from "./pages/MarketDetail";
+import Test from "./pages/Test";
 
 Tabs.navigationOptions = ({ navigation }) => {
     let { routeName } = navigation.state.routes[navigation.state.index];
@@ -17,6 +21,7 @@ Tabs.navigationOptions = ({ navigation }) => {
         case "Home":
             navigationOptions = {
                 headerTitle: "首页",
+                header: null,
                 headerLeft: (<View>
                     <TouchableOpacity onPress={() => {
                         navigation.navigate('QRCode');
@@ -26,7 +31,6 @@ Tabs.navigationOptions = ({ navigation }) => {
                 </View>),
                 headerRight: (<View>
                     <TouchableOpacity onPress={() => {
-                        //navigation.navigate('Login');
                         const optionalConfigObject = {
                             title: "Authentication Required", // Android
                             color: "#e00606", // Android
@@ -53,7 +57,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                 headerTitle: "行情",
                 headerRight: (<View>
                     <TouchableOpacity onPress={() => {
-
+                        NavigationService.navigate("Test", { url: "https://720yun.com/t/f6ejeseysn2?scene_id=16754202" });
                     }} >
                         <Icon name='dotchart' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
@@ -102,12 +106,13 @@ var RootStackNavigator = createStackNavigator({
         }
     },
     Web: {
-        screen: Web,
-        // navigationOptions: ({ navigation }) => {
-        //     return {
-
-        //     }
-        // }
+        screen: Web
+    },
+    MarketDetail: {
+        screen: MarketDetail
+    },
+    Test: {
+        screen: Test
     },
     Login: {
         screen: Login
@@ -128,8 +133,7 @@ var RootStackNavigator = createStackNavigator({
             headerTintColor: '#fff',
             headerMode: "card",
             gesturesEnabled: true,
-            //headerStyle: { backgroundColor: '#376fff', borderBottomWidth: 0 },
-            headerStyle: { backgroundColor: '#FAA732', borderBottomWidth: 0 },
+            headerStyle: { backgroundColor: Colors.theme_color, borderBottomWidth: 0 },
             headerBackTitle: '返回',
             headerTruncatedBackTitle: '返回'
         }

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Text, Image, View, StyleSheet, FlatList, WebView, Alert, TouchableOpacity } from 'react-native';
+import { Text, Image, View, StyleSheet, Clipboard, WebView, Alert, TouchableOpacity } from 'react-native';
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
 import Icon from "react-native-vector-icons/AntDesign";
-import NavigationService from '../navigationService';
+import NavigationService from '../utils/navigationService';
 
 export default class Web extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -12,9 +12,10 @@ export default class Web extends Component {
             headerRight: (<View>
                 <TouchableOpacity onPress={() => {
                     let url = params.url;
-                    Alert.alert('网页标题', url);
+                    Clipboard.setString(url);
+                    Alert.alert('地址', url);
                 }} >
-                    <Icon name='sync' size={24} color='white' style={{ marginRight: 15 }} />
+                    <Icon name='setting' size={24} color='white' style={{ marginRight: 15 }} />
                 </TouchableOpacity>
             </View>)
         }

@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import { StyleSheet, Text, View, TouchableOpacity, AlertIOS, SafeAreaView } from 'react-native';
 import { Images } from '../resource/'
 import ImageButton from "./ImageButton";
-import NavigationService from '../navigationService';
+import NavigationService from '../utils/navigationService';
 
 export default class TitleBar extends Component {
 
@@ -65,7 +65,6 @@ export default class TitleBar extends Component {
             )
         }
     }
-
 }
 
 const styles = StyleSheet.create({

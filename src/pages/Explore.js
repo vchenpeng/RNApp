@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import {
     Text, View, StatusBar, FlatList, TouchableOpacity, Dimensions
 } from 'react-native';
-import NavigationService from '../navigationService';
+import NavigationService from '../utils/navigationService';
 import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
-import DropDownHolder from '../DropDownHolder';
+import DropDownHolder from '../utils/DropDownHolder';
+import { Colors } from '../resource';
 
 export default class Explore extends Component {
     static navigationOptions = ((props) => {
@@ -107,14 +108,15 @@ export default class Explore extends Component {
                 renderTabBar={() => (<ScrollableTabBar
                     style={{ borderBottomWidth: 0, height: 40, paddingVertical: 0 }}
                     textStyle={{ height: 40, paddingTop: 8, fontSize: 14 }}
-                    // tabsContainerStyle={{ height: 40, paddingTop: -10 }}
-                    activeTextColor="#FAA732"
+                    activeTextColor={Colors.theme_color}
+                    underlineWidth={15}
                     inactiveTextColor="#999" />)
                 }
                 tabBarBackgroundColor="#eee"
                 tabBarUnderlineStyle={{
-                    backgroundColor: "#FAA732", height: 2
+                    backgroundColor: Colors.theme_color, height: 2
                 }}
+                underlineWidth={10}
                 onChangeTab={(obj) => {
                     console.log('index:' + obj.i);
                 }}

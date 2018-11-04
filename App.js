@@ -11,9 +11,9 @@ import {
   View, StatusBar, Image, AppState, Alert, TouchableOpacity, Text, NativeAppEventEmitter, NativeModules
 } from "react-native";
 import RootStackNavigator from "./src/index"
-import NavigationService from './src/navigationService';
+import NavigationService from './src/utils/navigationService';
 import DropdownAlert from 'react-native-dropdownalert';
-import DropDownHolder from './src/DropDownHolder';
+import DropDownHolder from './src/utils/DropDownHolder';
 import SplashScreen from 'react-native-splash-screen';
 import Getui from 'react-native-getui';
 import codePush from 'react-native-code-push'
@@ -35,15 +35,15 @@ export default class App extends React.Component {
   componentDidMount() {
     SplashScreen.hide();
     this.updateComponentInfo();
-
-    let getuiBridge = NativeModules.GetuiBridge;
+    /*
+    let mainBridge = NativeModules.MainBridge;
     var array = new Array()
     array[0] = "this"
     array[1] = "is"
     array[2] = "array"
-    getuiBridge.sendText(2, '传过来的字符', array);
-    getuiBridge.setBadge(0);
-
+    mainBridge.sendText(2, '传过来的字符', array);
+    mainBridge.setBadge(0);
+    */
     AppState.addEventListener("change", (newState) => {
       newState === "active" && codePush.sync();
     });
@@ -51,7 +51,6 @@ export default class App extends React.Component {
   updateComponentInfo() {
     Getui.clientId((param) => {
       this.setState({ 'clientId': param });
-      //DropDownHolder.alert('个推clientId', param);
     })
 
     Getui.version((param) => {
@@ -96,9 +95,7 @@ export default class App extends React.Component {
           translucent={true}
           updateStatusBar={false}
           sensitivity={20}
-          renderImage={(a, b) => {
-            return null;
-          }}
+          renderImage={(a, b) => null}
           defaultTextContainer={{
             flex: 1,
             justifyContent: "center",
@@ -117,7 +114,7 @@ NativeAppEventEmitter.addListener(
     //Android的消息类型为payload 透传消息 或者 cmd消息
     switch (notification.type) {
       case "cid":
-        Alert.alert('22初始化获取到cid', JSON.stringify(notification))
+        Alert.alert('初始化获取到', JSON.stringify(notification))
         break;
       case 'payload':
         Alert.alert('payload 消息通知', JSON.stringify(notification))

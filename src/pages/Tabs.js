@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from "react-navigation";
 import { AppRegistry, View, StatusBar, Image, AlertIOS } from "react-native";
 import React from "react";
-
-import Home from "./index";
-import Market from "./market";
-import Explore from "./explore";
-import Mine from "./mine";
+import Home from "./Index";
+import Market from "./Market";
+import Explore from "./Explore";
+import Mine from "./Mine";
+import { Colors } from "../resource";
 
 export default createBottomTabNavigator({
     Home: {
@@ -66,7 +66,7 @@ export default createBottomTabNavigator({
         lazyLoad: true,
         backBehavior: 'none',
         tabBarOptions: {
-            activeTintColor: '#FAA732',
+            activeTintColor: Colors.theme_color,
             inactiveTintColor: '#999',
             showIcon: true,
             indicatorStyle: {
@@ -74,12 +74,17 @@ export default createBottomTabNavigator({
             },
             style: {
                 backgroundColor: '#fff',
-                height: 58,
-                paddingBottom: 5
+                height: 54,
+                paddingBottom: 5,
+                borderTopWidth: 0
+            },
+            iconStyle: {
+                width: 27, height: 27
             },
             labelStyle: {
-                fontSize: 12
-            },
+                fontSize: 10,
+                textAlign: "center"
+            }
         },
     });
 

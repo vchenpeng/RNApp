@@ -10,12 +10,12 @@ import {
     ScrollView
 } from 'react-native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import DropDownHolder from '../DropDownHolder'
+import DropDownHolder from '../utils/DropDownHolder'
 
 export default class Login extends Component {
     static navigationOptions = ((props) => {
         return {
-            headerTitle: '登录xin',
+            headerTitle: '登录',
             header: null,
             headerRight: (<View>
                 <TouchableOpacity onPress={() => {
@@ -31,7 +31,7 @@ export default class Login extends Component {
 
             <ScrollView style={[styles.container, {}]} scrollEnabled={false}>
                 <View style={styles.avatarview}>
-                    <Image source={require("../resource/imgs/avatar.jpg")} style={styles.avatarimage} />
+                    <Image source={require("../resource/qrcode/avatar.jpg")} style={styles.avatarimage} />
                 </View>
                 <View style={[styles.inputview, {}]}>
                     <TextInput keyboardType="number-pad" underlineColorAndroid='transparent' style={styles.textinput} placeholder='QQ号/手机号/邮箱' />
@@ -46,7 +46,7 @@ export default class Login extends Component {
                 </View>
                 <View style={styles.bottomview}>
                     <TouchableOpacity onPress={() => {
-                        DropDownHolder.alert('用户名或密码错误哦', '', 'error');
+                        DropDownHolder.alert('用户名或密码错误', '', 'error');
                     }}>
                         <View style={styles.buttonview}>
                             <Text style={styles.logintext}>登 录</Text>

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '../../resource/';
+import { Colors } from '../index';
 
 export default StyleSheet.create({
     image_bottom_menu: {

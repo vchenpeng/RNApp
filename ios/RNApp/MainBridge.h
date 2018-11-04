@@ -1,5 +1,5 @@
 //
-//  GetuiBridge.h
+//  MainBridge.h
 //  RNApp
 //
 //  Created by 陈鹏 on 2018/10/25.
@@ -8,5 +8,5 @@
 
 #import <Foundation/Foundation.h>
 #import <React/RCTBridgeModule.h>
-@interface GetuiBridge : NSObject <RCTBridgeModule>
+@interface MainBridge : NSObject <RCTBridgeModule>
 @end

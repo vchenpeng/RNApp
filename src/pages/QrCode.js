@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Text, TouchableOpacity, View, Alert, SafeAreaView } from 'react-native';
 import { QRScannerView } from 'ac-qrcode';
-import NavigationService from '../navigationService';
-import { ImageButton, TitleBar } from "../components/";
-import Styles from './styles/wechat';
-import { Constants, Images, Colors } from "../resource/";
+import NavigationService from '../utils/navigationService';
+import { ImageButton, TitleBar } from "../components";
+import Styles from '../resource/styles/wechat';
+import { Constants, Images, Colors } from "../resource";
 
 export default class QRCode extends Component {
     static navigationOptions = ({ navigation }) => ({
