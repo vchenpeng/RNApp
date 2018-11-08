@@ -4,13 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 #import "AppDelegate.h"
 #import <CodePush/CodePush.h>
-
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import "RNSplashScreen.h"
+
+//首先导入头文件信息
+#import <ifaddrs.h>
+#import <arpa/inet.h>
 
 @implementation AppDelegate
 
@@ -24,9 +26,17 @@
 
   [[RCTBundleURLProvider sharedSettings] setDefaults];
 #if DEBUG
-  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-  //jsCodeLocation = [CodePush bundleURL];
-  //[[RCTBundleURLProvider sharedSettings] setJsLocation:@"192.168.31.148"];
+  NSString *ip = [self getIPAddress];
+  NSLog(@">>>[当前环境IP]:%@", ip);
+  // Wifi环境
+  if([ip isEqualToString:@"0.0.0.0"]){
+    jsCodeLocation = [CodePush bundleURL];
+  }else{
+    BOOL isContain = [ip hasPrefix:@"192.168.1."];
+    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"192.168.1.13":@"192.168.31.150")];
+    
+    jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+  }
   //jsCodeLocation = [NSURL URLWithString:@"http://192.168.31.148:8081/index.ios.bundle?platform=ios&dev=true"];
 #else
   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"bundle/main" withExtension:@"jsbundle"];
@@ -123,5 +133,33 @@ NSString *msg = [NSString stringWithFormat:@"taskId=%@,messageId:%@,payloadMsg:%
 NSDictionary *userInfo = @{@"taskId":taskId,@"msgId":msgId,@"payloadMsg":payloadMsg,@"offLine":offLine?@"YES":@"NO"};
 [[NSNotificationCenter defaultCenter]postNotificationName:GT_DID_RECEIVE_REMOTE_NOTIFICATION object:@{@"type":@"payload",@"userInfo":userInfo}];
 NSLog(@">>[GTSdk ReceivePayload]:%@", msg);
+}
+
+//获取设备当前网络IP地址
+- (NSString *)getIPAddress {
+  NSString *address = @"0.0.0.0";
+  struct ifaddrs *interfaces = NULL;
+  struct ifaddrs *temp_addr = NULL;
+  int success = 0;
+  // retrieve the current interfaces - returns 0 on success
+  success = getifaddrs(&interfaces);
+  if (success == 0) {
+    // Loop through linked list of interfaces
+    temp_addr = interfaces;
+    while(temp_addr != NULL) {
+      if(temp_addr->ifa_addr->sa_family == AF_INET) {
+        // Check if interface is en0 which is the wifi connection on the iPhone
+        if([[NSString stringWithUTF8String:temp_addr->ifa_name] isEqualToString:@"en0"]) {
+          // Get NSString from C String
+          address = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
+        }
+      }
+      temp_addr = temp_addr->ifa_next;
+    }
+  }
+  // Free memory
+  freeifaddrs(interfaces);
+  return address;
+  
 }
 @end

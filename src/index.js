@@ -4,15 +4,16 @@ import {
 } from "react-native";
 import TouchID from 'react-native-touch-id';
 import Icon from "react-native-vector-icons/AntDesign";
-import { createStackNavigator, CardStackStyleInterpolator } from 'react-navigation';
+import { createStackNavigator, CardStackStyleInterpolator, createSwitchNavigator } from 'react-navigation';
 import NavigationService from './utils/navigationService';
 import { Colors } from './resource';
 import QRCode from "./pages/QrCode";
 import Tabs from "./pages/Tabs";
 import Web from "./pages/Web";
-import Login from "./pages/Login";
 import MarketDetail from "./pages/MarketDetail";
 import Test from "./pages/Test";
+import SignIn from "./pages/SignInScreen";
+import AuthLoading from "./pages/AuthLoadingScreen";
 
 Tabs.navigationOptions = ({ navigation }) => {
     let { routeName } = navigation.state.routes[navigation.state.index];
@@ -81,7 +82,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                 headerTitle: "我的",
                 headerRight: (<View>
                     <TouchableOpacity onPress={() => {
-                        navigation.navigate('Login');
+                        navigation.navigate('Auth');
                     }} >
                         <Icon name='mail' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
@@ -91,8 +92,28 @@ Tabs.navigationOptions = ({ navigation }) => {
     }
     return navigationOptions;
 };
+const AuthStack = createStackNavigator({ SignIn: SignIn }, {
+    navigationOptions: {
+        headerTitle: null,
+        headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '400',
+            alignSelf: 'center',
+            color: '#fff'
+        },
 
-var RootStackNavigator = createStackNavigator({
+        transitionConfig: () => ({
+            screenInterpolator: CardStackStyleInterpolator.forFade,
+        }),
+        headerTintColor: '#fff',
+        headerMode: "card",
+        gesturesEnabled: true,
+        headerStyle: { backgroundColor: Colors.theme_color, borderBottomWidth: 0 },
+        headerBackTitle: '返回7',
+        headerTruncatedBackTitle: '返回'
+    }
+});
+const RootStackNavigator = createStackNavigator({
     Main: {
         screen: Tabs
     },
@@ -113,9 +134,6 @@ var RootStackNavigator = createStackNavigator({
     },
     Test: {
         screen: Test
-    },
-    Login: {
-        screen: Login
     }
 }, {
         navigationOptions: {
@@ -138,5 +156,14 @@ var RootStackNavigator = createStackNavigator({
             headerTruncatedBackTitle: '返回'
         }
     });
-
-export default RootStackNavigator
+const SwitchNavigator = createSwitchNavigator(
+    {
+        AuthLoading: AuthLoading,
+        App: RootStackNavigator,
+        Auth: AuthStack,
+    },
+    {
+        initialRouteName: 'AuthLoading',
+    }
+);
+export default SwitchNavigator

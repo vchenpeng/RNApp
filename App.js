@@ -16,7 +16,7 @@ import DropdownAlert from 'react-native-dropdownalert';
 import DropDownHolder from './src/utils/DropDownHolder';
 import SplashScreen from 'react-native-splash-screen';
 import Getui from 'react-native-getui';
-import codePush from 'react-native-code-push'
+import codePush from 'react-native-code-push';
 
 export default class App extends React.Component {
   constructor(props) {

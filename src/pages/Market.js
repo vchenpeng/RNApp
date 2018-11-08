@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image, View, StyleSheet, FlatList, Dimensions, StatusBar, Alert, DatePickerIOS, TouchableOpacity } from 'react-native';
+import { Text, Image, View, StyleSheet, FlatList, Dimensions, StatusBar, Alert, TouchableOpacity, TouchableHighlight } from 'react-native';
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import NavigationService from '../utils/navigationService';
@@ -31,7 +31,7 @@ export default class Market extends Component {
                             vol: element[6],
                             icon_url: 'http://www.coin918.cc/Upload/coin/' + element[9]
                         };
-                        if (key == 'gath_usd') {
+                        if (key == 'gath_usd_') {
                             list.unshift(item);
                         } else {
                             list.push(item);
@@ -51,45 +51,50 @@ export default class Market extends Component {
 
     renderRow({ item }) {
         return (
-            <TouchableOpacity activeOpacity={1} onPress={() => {
-                NavigationService.navigate('MarketDetail', { title: item.name });
-            }} >
-                <ListItem
-                    style={[styles.item]}
-                    containerStyle={{
-                        backgroundColor: '#fff', padding: 0, margin: 0, borderBottomColor: '#eee',
-                        paddingTop: 10, paddingBottom: 10, paddingLeft: 10
-                    }}
-                    key={item.key}
-                    avatar={<Avatar
-                        width={40}
-                        height={40}
-                        avatarStyle={{ borderRadius: 0, backgroundColor: '#fff', margin: 20 }}
-                        source={item.icon_url && { uri: item.icon_url }}
+            <TouchableHighlight
+                activeOpacity={0.85}
+                underlayColor='#000'
+                onPress={() => {
+                    NavigationService.navigate('MarketDetail', { title: item.name, key: item.key });
+                }} >
+                <View style={{ backgroundColor: '#fff' }}>
+                    <ListItem
+                        style={[styles.item]}
+                        containerStyle={{
+                            backgroundColor: '#fff', padding: 0, margin: 0, borderBottomColor: '#eee',
+                            paddingTop: 10, paddingBottom: 10, paddingLeft: 10
+                        }}
+                        key={item.key}
+                        avatar={<Avatar
+                            width={40}
+                            height={40}
+                            avatarStyle={{ borderRadius: 0, backgroundColor: '#fff', margin: 20 }}
+                            source={item.icon_url && { uri: item.icon_url }}
+                            title={item.name}
+                        />}
+                        titleStyle={{ fontSize: 14 }}
+                        subtitleStyle={{ fontSize: 12 }}
+                        titleContainerStyle={{
+                            height: 20,
+                            width: 200,
+                            marginLeft: 10,
+                            justifyContent: "center"
+                        }}
+                        subtitleContainerStyle={{ justifyContent: "center", marginLeft: 10, height: 20 }}
                         title={item.name}
-                    />}
-                    titleStyle={{ fontSize: 14 }}
-                    subtitleStyle={{ fontSize: 12 }}
-                    titleContainerStyle={{
-                        height: 20,
-                        width: 200,
-                        marginLeft: 10,
-                        justifyContent: "center"
-                    }}
-                    subtitleContainerStyle={{ justifyContent: "center", marginLeft: 10, height: 20 }}
-                    title={item.name}
-                    subtitle={'$' + item.price.toFixed(4)}
-                    rightTitle={item.change > 0 ? '+' + item.change + '%' : item.change + '%'}
-                    rightTitleStyle={[{
-                        backgroundColor: '#d43f3a', paddingTop: 5, paddingBottom: 5, width: 50, color: '#fff', fontSize: 12, textAlign: "center",
-                    }, { backgroundColor: item.change > 0 ? '#d43f3a' : '#7ED321' }]}
-                    checkmark={false}
-                    chevron={false}
-                    rightAvatar={false}
-                    rightIcon={<View />}
-                    buttonGroup={null}
-                />
-            </TouchableOpacity>
+                        subtitle={'$' + item.price.toFixed(4)}
+                        rightTitle={item.change > 0 ? '+' + item.change + '%' : item.change + '%'}
+                        rightTitleStyle={[{
+                            backgroundColor: '#d43f3a', paddingTop: 5, paddingBottom: 5, width: 50, color: '#fff', fontSize: 12, textAlign: "center",
+                        }, { backgroundColor: item.change > 0 ? '#d43f3a' : '#7ED321' }]}
+                        checkmark={false}
+                        chevron={false}
+                        rightAvatar={false}
+                        rightIcon={<View />}
+                        buttonGroup={null}
+                    />
+                </View>
+            </TouchableHighlight>
         )
     }
     closeRow(rowMap, rowKey) {

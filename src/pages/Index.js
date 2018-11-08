@@ -1,5 +1,8 @@
-import React, { Component } from 'react';
-import { Text, Alert, Image, FlatList, View, StyleSheet, StatusBar, Dimensions, NativeModules, TouchableOpacity } from 'react-native';
+import React, { Component, PureComponent } from 'react';
+import {
+    Text, Alert, Image, FlatList, View, StyleSheet, StatusBar, SafeAreaView,
+    Dimensions, NativeModules, TouchableOpacity, ScrollView, RefreshControl
+} from 'react-native';
 import { Header, List, ListItem, Button, PricingCard, SearchBar, Avatar } from 'react-native-elements';
 import NavigationService from '../utils/navigationService';
 import DropDownHolder from '../utils/DropDownHolder';
@@ -7,22 +10,22 @@ import localStorage from '../utils/storage';
 import Swiper from 'react-native-swiper';
 import { Colors } from '../resource';
 
-export default class Home extends Component {
+export default class Home extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
             cacheSize: 0,
-            refreshing: false,
+            refreshing: false
         };
         this.clearCache.bind(this);
         this.getCacheSize.bind(this);
     }
     async componentDidMount() {
-        //DropDownHolder.alert('标题二', '我是内容我是内容我是内容我是内容我是内容', 'info');
+        DropDownHolder.alert('标题二', '我是内容我是内容我是内容我是内容我是内容', 'info');
         this.getCacheSize();
         this.fetchMarketList();
         //localStorage.save("chenpeng", { a: 12, b: 70 });
-        let value = await localStorage.load("chenpeng");
+        //let value = await localStorage.load("chenpeng");
         //Alert.alert(JSON.stringify(value));
     }
     getCacheSize() {
@@ -32,7 +35,6 @@ export default class Home extends Component {
                 console.warn(error);
             } else {
                 this.setState({
-                    //cacheSize: Math.round(events / (1024 * 1024))
                     cacheSize: (events / (1024 * 1024)).toFixed(2)
                 });
             }
@@ -134,41 +136,36 @@ export default class Home extends Component {
     }
     render() {
         let { height, width } = Dimensions.get('window');
-        return (<View style={{}}>
+        return (<ScrollView style={{ flex: 1, backgroundColor: '#fff' }}
+            refreshControl={
+                <RefreshControl refreshing={this.state.refreshing}
+                    onRefresh={() => {
+                        this.setState({ refreshing: true })
+                        this.fetchMarketList();
+                    }}
+                ></RefreshControl>}>
             <StatusBar barStyle="light-content" />
-            <View style={{ height: 200 }}>
-                <Swiper style={[styles.wrapper, {}]}
+            <View style={{ height: 110 }}>
+
+                <Swiper style={styles.wrapper}
+                    autoplay={true}
                     containerStyle={{ backgroundColor: Colors.theme_color }}
                     showsButtons={false}>
-                    <View style={styles.slide1}>
-                        <Text style={styles.text}>Hello Swiper</Text>
+                    <View style={[styles.slide1]}>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://www.coin918.cc/Upload/ad/5bda59a05c841.jpg' }}></Image>
                     </View>
                     <View style={styles.slide2}>
-                        <Text style={styles.text}>Beautiful</Text>
-                    </View>
-                    <View style={styles.slide3}>
-                        <Text style={styles.text}>And simple</Text>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://www.coin918.cc/Upload/ad/5bd6c521587c4.png' }}></Image>
                     </View>
                 </Swiper>
             </View>
-            <FlatList
-                removeClippedSubviews={false}
-                data={this.state.list}
-                renderItem={this.renderRow}
-                keyExtractor={(item, index) => index.toString()}
-                refreshing={this.state.refreshing}
-                onRefresh={() => {
-                    this.setState({ refreshing: true })
-                    this.fetchMarketList();
-                }}
-            />
-            {/* <SearchBar
+            <SearchBar
                 lightTheme
                 onChangeText={() => { }}
                 onClearText={() => { }}
                 icon={{ type: 'font-awesome', name: 'search' }}
-                placeholder='输入搜索关键字' />
-            <PricingCard
+                placeholder='请输入搜索关键字' />
+            {/* <PricingCard
                 color='#4f9deb'
                 title='缓存大小'
                 price={this.state.cacheSize + 'M'}
@@ -178,7 +175,14 @@ export default class Home extends Component {
                     this.clearCache();
                 }}
             /> */}
-        </View>)
+            <FlatList
+                style={{ width: width }}
+                removeClippedSubviews={false}
+                data={this.state.list}
+                renderItem={this.renderRow}
+                keyExtractor={(item, index) => index.toString()}
+            />
+        </ScrollView >)
     }
 };
 
@@ -189,8 +193,7 @@ const styles = StyleSheet.create({
     slide1: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#9DD6EB',
+        alignItems: 'center'
     },
     slide2: {
         flex: 1,

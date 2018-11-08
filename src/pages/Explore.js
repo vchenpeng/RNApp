@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Text, View, StatusBar, FlatList, TouchableOpacity, Dimensions
+    Text, View, StatusBar, FlatList, TouchableOpacity, Dimensions, ActivityIndicator
 } from 'react-native';
 import NavigationService from '../utils/navigationService';
 import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
@@ -16,6 +16,7 @@ export default class Explore extends Component {
     });
     constructor(props) {
         super(props);
+        const { navigation } = props;
         this.state = {
             refreshing: false,
             tabs: [
@@ -55,10 +56,13 @@ export default class Explore extends Component {
     }
     renderRow({ item }) {
         return (
-            <TouchableOpacity onPress={() => {
-                //DropDownHolder.alert(item.title, '', 'info');
-                NavigationService.navigate("Web", { url: item.extra.topic_url, title: item.title });
-            }} >
+            <TouchableOpacity
+                onPressIn={() => { }}
+                onPress={() => {
+                    //DropDownHolder.alert(item.title, '', 'info');
+                    NavigationService.navigate("Web", { url: item.extra.topic_url, title: item.title });
+                }}
+            >
                 <ListItem
                     style={{}}
                     bottomDivider={false}
@@ -98,6 +102,13 @@ export default class Explore extends Component {
                         this.fetchUserList(index);
                     }
                     }
+                    ListEmptyComponent={null}
+                    ListFooterComponent={() => {
+                        return <View style={{ alignItems: "center", padding: 20 }}>
+                            <ActivityIndicator />
+                        </View>
+                    }}
+
                 />
             </View>));
         var { height, width } = Dimensions.get('window');

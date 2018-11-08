@@ -6,7 +6,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 export default class Mine extends Component {
     //接收上一个页面传过来的title显示出来
     static navigationOptions = ({ navigation }) => ({
-        headerTitle: '首页',
+        headerTitle: '我的',
         headerTitleStyle: {
             fontSize: 18,
             fontWeight: '400',

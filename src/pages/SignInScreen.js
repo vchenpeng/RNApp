@@ -1,52 +1,99 @@
 import React, { Component } from 'react';
 import {
-    AppRegistry,
+    AsyncStorage,
     StyleSheet,
+    Alert,
     Text,
     Image,
     View,
     TextInput,
+    StatusBar,
     TouchableOpacity,
     ScrollView
 } from 'react-native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import DropDownHolder from '../utils/DropDownHolder'
+import DropDownHolder from '../utils/DropDownHolder';
+import TouchID from 'react-native-touch-id';
 
 export default class Login extends Component {
     static navigationOptions = ((props) => {
+        const { navigation } = props;
         return {
             headerTitle: '登录',
-            header: null,
+            // header: null,
             headerRight: (<View>
                 <TouchableOpacity onPress={() => {
-
+                    TouchID.isSupported()    //判断设备是否支持TouchID验证
+                        .then(success => {
+                            const optionalConfigObject = {
+                                title: "Authentication Required", // Android
+                                color: "#e00606", // Android
+                                sensorDescription: "Touch sensor", // Android
+                                cancelText: "Cancel", // Android
+                                fallbackLabel: "", // iOS (if empty, then label is hidden)
+                                unifiedErrors: false // use unified error messages (default false)
+                            };
+                            TouchID.authenticate('别怕，就是验证下是否是机主^_^', optionalConfigObject)
+                                .then(async success => {
+                                    await AsyncStorage.setItem('TOKEN', 'abc');
+                                    navigation.navigate('App');
+                                })
+                                .catch(error => {
+                                    AlertIOS.alert('验证失败');
+                                });
+                        })
+                        .catch(error => {
+                            //设备不支持TouchID验证后进行的操作
+                        });
                 }} >
                     <Icon name='fingerprint' size={24} color='white' style={{ marginRight: 10 }} />
                 </TouchableOpacity>
             </View>)
         }
     });
+    constructor(props) {
+        super(props);
+        this.state = {
+            account: '',
+            password: ''
+        }
+        this.signInAsync.bind(this);
+    }
+    signInAsync = async () => {
+        await AsyncStorage.setItem('TOKEN', this.state.password);
+        this.props.navigation.navigate('App');
+    }
     render() {
         return (
-
             <ScrollView style={[styles.container, {}]} scrollEnabled={false}>
+                <StatusBar barStyle="light-content" />
                 <View style={styles.avatarview}>
                     <Image source={require("../resource/qrcode/avatar.jpg")} style={styles.avatarimage} />
                 </View>
                 <View style={[styles.inputview, {}]}>
-                    <TextInput keyboardType="number-pad" underlineColorAndroid='transparent' style={styles.textinput} placeholder='QQ号/手机号/邮箱' />
+                    <TextInput keyboardType="number-pad" underlineColorAndroid='transparent'
+                        value={this.state.account}
+                        onChangeText={(text) => this.setState({ account: text })}
+                        style={styles.textinput} placeholder='QQ号/手机号/邮箱' />
                     <View style={styles.dividerview}>
                         <Text style={styles.divider}></Text>
                     </View>
                     <TextInput underlineColorAndroid='transparent'
                         returnKeyType="done"
+                        value={this.state.password}
+                        onChangeText={(text) => this.setState({ password: text })}
                         style={styles.textinput}
                         placeholder='密码'
                         secureTextEntry={true} />
                 </View>
                 <View style={styles.bottomview}>
-                    <TouchableOpacity onPress={() => {
-                        DropDownHolder.alert('用户名或密码错误', '', 'error');
+                    <TouchableOpacity onPress={async () => {
+                        if (this.state.account == '123' || this.state.password == '123') {
+                            this.signInAsync()
+                        } else {
+                            await AsyncStorage.setItem('TOKEN', this.state.password);
+                            DropDownHolder.alert('用户名或密码错误', '', 'error');
+                        }
                     }}>
                         <View style={styles.buttonview}>
                             <Text style={styles.logintext}>登 录</Text>
