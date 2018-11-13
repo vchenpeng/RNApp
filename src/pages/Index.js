@@ -21,7 +21,7 @@ export default class Home extends PureComponent {
         this.getCacheSize.bind(this);
     }
     async componentDidMount() {
-        DropDownHolder.alert('标题二', '我是内容我是内容我是内容我是内容我是内容', 'info');
+        //DropDownHolder.alert('标题二', '我是内容我是内容我是内容我是内容我是内容', 'info');
         this.getCacheSize();
         this.fetchMarketList();
         //localStorage.save("chenpeng", { a: 12, b: 70 });

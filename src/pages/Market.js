@@ -3,6 +3,7 @@ import { Text, Image, View, StyleSheet, FlatList, Dimensions, StatusBar, Alert, 
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import NavigationService from '../utils/navigationService';
+import i18n from '../utils/i18n';
 
 export default class Market extends Component {
 
@@ -85,7 +86,7 @@ export default class Market extends Component {
                         subtitle={'$' + item.price.toFixed(4)}
                         rightTitle={item.change > 0 ? '+' + item.change + '%' : item.change + '%'}
                         rightTitleStyle={[{
-                            backgroundColor: '#d43f3a', paddingTop: 5, paddingBottom: 5, width: 50, color: '#fff', fontSize: 12, textAlign: "center",
+                            backgroundColor: '#d43f3a', paddingTop: 5, paddingBottom: 5, width: 55, color: '#fff', fontSize: 12, textAlign: "center",
                         }, { backgroundColor: item.change > 0 ? '#d43f3a' : '#7ED321' }]}
                         checkmark={false}
                         chevron={false}

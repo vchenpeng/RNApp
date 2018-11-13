@@ -10,13 +10,15 @@ import React, { Component } from "react";
 import {
   View, StatusBar, Image, AppState, Alert, TouchableOpacity, Text, NativeAppEventEmitter, NativeModules
 } from "react-native";
-import RootStackNavigator from "./src/index"
+import RootStackNavigator from "./src/index";
 import NavigationService from './src/utils/navigationService';
 import DropdownAlert from 'react-native-dropdownalert';
 import DropDownHolder from './src/utils/DropDownHolder';
 import SplashScreen from 'react-native-splash-screen';
 import Getui from 'react-native-getui';
 import codePush from 'react-native-code-push';
+import RNLanguages from 'react-native-languages';
+import i18n from './src/utils/i18n'
 
 export default class App extends React.Component {
   constructor(props) {
@@ -24,12 +26,16 @@ export default class App extends React.Component {
     this.state = {
       clientId: '',
       version: '',
-      status: ''
+      status: '',
+      language: i18n.locale
     };
 
   }
   componentWillMount() {
     //this.updateComponentInfo();
+    RNLanguages.addEventListener('change', ({ language }) => {
+      Alert.alert(language + '*');
+    });
   }
 
   componentDidMount() {
@@ -47,6 +53,15 @@ export default class App extends React.Component {
     AppState.addEventListener("change", (newState) => {
       newState === "active" && codePush.sync();
     });
+
+    RNLanguages.language = 'zh-Hans';
+    // setInterval(() => {
+    //   let tmp = i18n.currentLocale();
+    //   let language = tmp == 'en' ? 'zh_CN' : 'en';
+    //   this.setState({
+    //     language: language
+    //   });
+    // }, 10000);
   }
   updateComponentInfo() {
     Getui.clientId((param) => {
@@ -74,9 +89,11 @@ export default class App extends React.Component {
     })
   }
   render() {
+    i18n.locale = this.state.language;
     return (
       <View style={{ flex: 1 }}>
         <RootStackNavigator
+          language={this.state.language}
           ref={navigatorRef => {
             NavigationService.setTopLevelNavigator(navigatorRef);
           }}
@@ -108,29 +125,27 @@ export default class App extends React.Component {
     );
   }
 };
-NativeAppEventEmitter.addListener(
-  'receiveRemoteNotification',
-  (notification) => {
-    //Android的消息类型为payload 透传消息 或者 cmd消息
-    switch (notification.type) {
-      case "cid":
-        Alert.alert('初始化获取到', JSON.stringify(notification))
-        break;
-      case 'payload':
-        Alert.alert('payload 消息通知', JSON.stringify(notification))
-        break
-      case 'cmd':
-        Alert.alert('cmd 消息通知', 'cmd action = ' + notification.cmd)
-        break
-      case 'notificationArrived':
-        Alert.alert('notificationArrived 通知到达', JSON.stringify(notification))
-        break
-      case 'notificationClicked':
-        Alert.alert('notificationArrived 通知点击', JSON.stringify(notification))
-        break
-      default:
-    }
+NativeAppEventEmitter.addListener('receiveRemoteNotification', (notification) => {
+  //Android的消息类型为payload 透传消息 或者 cmd消息
+  switch (notification.type) {
+    case "cid":
+      Alert.alert('初始化获取到', JSON.stringify(notification))
+      break;
+    case 'payload':
+      Alert.alert('payload 消息通知', JSON.stringify(notification))
+      break
+    case 'cmd':
+      Alert.alert('cmd 消息通知', 'cmd action = ' + notification.cmd)
+      break
+    case 'notificationArrived':
+      Alert.alert('notificationArrived 通知到达', JSON.stringify(notification))
+      break
+    case 'notificationClicked':
+      Alert.alert('notificationArrived 通知点击', JSON.stringify(notification))
+      break
+    default:
   }
+}
 );
 NativeAppEventEmitter.addListener('clickRemoteNotification', (notification) => {
   //Alert.alert('点击通知', JSON.stringify(notification))

@@ -3,6 +3,7 @@ package com.rnapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactcommunity.rnlanguages.RNLanguagesPackage;
 import com.getui.reactnativegetui.GetuiPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.rnfingerprint.FingerprintAuthPackage;
@@ -34,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNLanguagesPackage(),
             new GetuiPackage(),
             new SplashScreenReactPackage(),
             new FingerprintAuthPackage(),

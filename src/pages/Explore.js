@@ -20,11 +20,11 @@ export default class Explore extends Component {
         this.state = {
             refreshing: false,
             tabs: [
-                { name: 'www', text: '头条', list: [] },
-                { name: 'zhengce', text: '政策', list: [] },
-                { name: 'personage', text: '人物', list: [] },
-                { name: 'fenxishishuo', text: '行情', list: [] },
-                { name: 'capitalmarket', text: '投研', list: [] },
+                { name: 'www', text: '头条', list: [], status: 0 },
+                { name: 'zhengce', text: '政策', list: [], status: 0 },
+                { name: 'personage', text: '人物', list: [], status: 0 },
+                { name: 'fenxishishuo', text: '行情', list: [], status: 0 },
+                { name: 'capitalmarket', text: '投研', list: [], status: 0 },
                 { name: 'tech', text: '技术', list: [] }
             ],
             tab0: [],
@@ -104,9 +104,25 @@ export default class Explore extends Component {
                     }
                     ListEmptyComponent={null}
                     ListFooterComponent={() => {
-                        return <View style={{ alignItems: "center", padding: 20 }}>
-                            <ActivityIndicator />
-                        </View>
+                        let footer = null;
+                        switch (tab.status) {
+                            case 0:
+                                footer = (<View style={{ alignItems: "center", padding: 20 }}>
+                                    <Text>下拉加载更多</Text>
+                                </View>);
+                                break;
+                            case 1:
+                                footer = (<View style={{ alignItems: "center", padding: 20 }}>
+                                    <ActivityIndicator />
+                                </View>);
+                                break;
+                            case 2:
+                                footer = (<View style={{ alignItems: "center", padding: 20 }}>
+                                    <Text>没有更多内容</Text>
+                                </View>);
+                                break;
+                        }
+                        return footer;
                     }}
 
                 />

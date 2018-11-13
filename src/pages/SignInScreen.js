@@ -14,12 +14,13 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import DropDownHolder from '../utils/DropDownHolder';
 import TouchID from 'react-native-touch-id';
+import i18n from '../utils/i18n'
 
 export default class Login extends Component {
     static navigationOptions = ((props) => {
         const { navigation } = props;
         return {
-            headerTitle: '登录',
+            headerTitle: i18n.t('login'),
             // header: null,
             headerRight: (<View>
                 <TouchableOpacity onPress={() => {
