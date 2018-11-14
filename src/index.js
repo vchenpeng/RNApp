@@ -13,6 +13,7 @@ import MarketDetail from "./pages/MarketDetail";
 import Test from "./pages/Test";
 import SignIn from "./pages/SignInScreen";
 import Settings from './pages/Settings';
+import BLE from './pages/BLE';
 
 let RootStackNavigator = createStackNavigator({
     Main: {
@@ -47,6 +48,9 @@ let RootStackNavigator = createStackNavigator({
     },
     Settings: {
         screen: Settings
+    },
+    BLE: {
+        screen: BLE
     }
 }, {
         navigationOptions: {

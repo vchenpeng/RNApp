@@ -138,6 +138,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-ble-manager')
     compile project(':react-native-languages')
     compile project(':react-native-code-push')
     compile project(':react-native-getui')

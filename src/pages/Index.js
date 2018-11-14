@@ -89,7 +89,7 @@ export default class Home extends PureComponent {
     renderRow({ item }) {
         return (
             <TouchableOpacity activeOpacity={1} onPress={() => {
-                NavigationService.navigate('MarketDetail', { title: item.name });
+                NavigationService.navigate('BLE', { title: item.name });
             }} >
                 <ListItem
                     style={[styles.item]}
