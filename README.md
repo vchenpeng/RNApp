@@ -9,3 +9,4 @@
 Product > Scheme > Edit Scheme...中Build Configuration选项改成Release
 ```
 6.因为`react-native-scrollable-tab-view`的作者没有更新npmjs版本，所以此处用的另一个开发解决的版本，后期待原版本调整请切换一下。  
+7.
