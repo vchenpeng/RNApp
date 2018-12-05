@@ -14,6 +14,8 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 
+#import <ReactNativeNavigation/ReactNativeNavigation.h>
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -33,7 +35,7 @@
     jsCodeLocation = [CodePush bundleURL];
   }else{
     BOOL isContain = [ip hasPrefix:@"192.168.1."];
-    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"192.168.1.8":@"192.168.31.150")];
+    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"192.168.1.7":@"192.168.31.150")];
     
     jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
   }
@@ -42,7 +44,8 @@
   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"bundle/main" withExtension:@"jsbundle"];
 #endif
 
-  RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
+  [ReactNativeNavigation bootstrap:jsCodeLocation launchOptions:launchOptions];
+  /*RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                       moduleName:@"RNApp"
                                                initialProperties:nil
                                                    launchOptions:launchOptions];
@@ -52,9 +55,9 @@
   UIViewController *rootViewController = [UIViewController new];
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
-  [self.window makeKeyAndVisible];
+  [self.window makeKeyAndVisible];*/
+//  [RNSplashScreen show];
   
-  [RNSplashScreen show];
   return YES;
 }
 

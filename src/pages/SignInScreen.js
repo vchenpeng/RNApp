@@ -51,6 +51,17 @@ export default class Login extends Component {
             </View>)
         }
     });
+    static options(passProps) {
+        return {
+
+            // bottomTabs: {
+            //     visible: true,
+            //     animate: false, // Controls whether BottomTabs visibility changes should be animated
+            //     drawBehind: true,
+            //     backgroundColor: 'orange'
+            // }
+        }
+    }
     constructor(props) {
         super(props);
         this.state = {
