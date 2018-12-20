@@ -22,7 +22,7 @@ Tabs.navigationOptions = ({ navigation }) => {
         case "Home":
             navigationOptions = {
                 headerTitle: "首页",
-                header: null,
+                // header: null,
                 headerLeft: (<View>
                     <TouchableOpacity onPress={() => {
                         navigation.navigate('QRCode');

@@ -103,12 +103,11 @@ export default class Explore extends Component {
                     }
                     }
                     ListEmptyComponent={null}
-                    ListFooterComponent={() => {
-                        return <View style={{ alignItems: "center", padding: 20 }}>
-                            <ActivityIndicator />
-                        </View>
-                    }}
-
+                // ListFooterComponent={() => {
+                //     return <View style={{ alignItems: "center", padding: 20 }}>
+                //         <ActivityIndicator />
+                //     </View>
+                // }}
                 />
             </View>));
         var { height, width } = Dimensions.get('window');

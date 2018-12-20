@@ -136,7 +136,7 @@ export default class Home extends PureComponent {
     }
     render() {
         let { height, width } = Dimensions.get('window');
-        return (<ScrollView style={{ flex: 1, backgroundColor: '#fff' }}
+        return (<ScrollView style={{ flex: 1, backgroundColor: '#eee' }}
             refreshControl={
                 <RefreshControl refreshing={this.state.refreshing}
                     onRefresh={() => {
