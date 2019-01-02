@@ -65,7 +65,7 @@ export default class Login extends Component {
     }
     render() {
         return (
-            <ScrollView style={[styles.container, {}]} scrollEnabled={false}>
+            <ScrollView style={[styles.container, {}]} scrollEnabled={true}>
                 <StatusBar barStyle="light-content" />
                 <View style={styles.avatarview}>
                     <Image source={require("../resource/qrcode/avatar.jpg")} style={styles.avatarimage} />
@@ -146,7 +146,8 @@ const styles = {
     textinput: {
         flex: 1,
         fontSize: 16,
-        paddingLeft: 16
+        paddingLeft: 16,
+        paddingRight: 6
     },
     dividerview: {
         flexDirection: 'row',

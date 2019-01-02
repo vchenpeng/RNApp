@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image, View, StyleSheet, Clipboard, WebView, Alert, TouchableOpacity } from 'react-native';
+import { Text, SafeAreaView, View, StyleSheet, Clipboard, WebView, Alert, TouchableOpacity } from 'react-native';
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
 import Icon from "react-native-vector-icons/AntDesign";
 import NavigationService from '../utils/navigationService';
@@ -37,10 +37,11 @@ export default class Web extends Component {
 
     render() {
         const { navigation } = this.props;
-        return (<WebView
-            source={{ uri: this.state.url }}
-            onNavigationStateChange={this.onNavigationStateChange.bind(this)}
-        />)
+        return (<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+            <WebView
+                source={{ uri: this.state.url }}
+                onNavigationStateChange={this.onNavigationStateChange.bind(this)}
+            /></SafeAreaView>)
     }
 };
 const styles = StyleSheet.create({

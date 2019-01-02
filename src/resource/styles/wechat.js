@@ -3,17 +3,22 @@ import { Colors } from '../index';
 
 export default StyleSheet.create({
     image_bottom_menu: {
-        height: 46,
-        width: 46,
-        resizeMode: 'contain'
+        height: 50,
+        width: 50,
+        marginBottom: 10,
     },
-    view_bottom_menu_item: {
+    view_menu_container: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingTop: 20,
+        paddingBottom: 20
+    },
+    text_menu_title: {
+        color: 'white',
+        fontSize: 14
+    },
+    view_menu_item_container: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 16,
-    },
-    text_bottom_menu_item: {
-        color: Colors.white_fff,
-        marginTop: 8
     }
 })

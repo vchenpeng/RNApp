@@ -136,7 +136,9 @@ export default class Home extends PureComponent {
     }
     render() {
         let { height, width } = Dimensions.get('window');
+        let _scrollView = ScrollView;
         return (<ScrollView style={{ flex: 1, backgroundColor: '#eee' }}
+            ref={(scrollView) => _scrollView = scrollView}
             refreshControl={
                 <RefreshControl refreshing={this.state.refreshing}
                     onRefresh={() => {
@@ -145,14 +147,19 @@ export default class Home extends PureComponent {
                     }}
                 ></RefreshControl>}>
             <StatusBar barStyle="light-content" />
-            <View style={{ height: 110 }}>
+            <View style={{ height: 135 }}>
 
                 <Swiper style={styles.wrapper}
                     autoplay={true}
                     containerStyle={{ backgroundColor: Colors.theme_color }}
+                    dotStyle={{ bottom: -15, width: 10, height: 2, backgroundColor: "#fff", borderRadius: 0 }}
+                    activeDotStyle={{ bottom: -15, width: 10, height: 2, backgroundColor: Colors.theme_color, borderRadius: 0 }}
                     showsButtons={false}>
                     <View style={[styles.slide1]}>
                         <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://www.coin918.cc/Upload/ad/5bda59a05c841.jpg' }}></Image>
+                    </View>
+                    <View style={styles.slide2}>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://www.coin918.cc/Upload/ad/5bd6c521587c4.png' }}></Image>
                     </View>
                     <View style={styles.slide2}>
                         <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://www.coin918.cc/Upload/ad/5bd6c521587c4.png' }}></Image>
@@ -161,10 +168,17 @@ export default class Home extends PureComponent {
             </View>
             <SearchBar
                 lightTheme
-                onChangeText={() => { }}
+                onChangeText={() => {
+
+                }}
+
+                onFocus={() => { 
+                    //_scrollView.scrollTo({ x: 0, y: 135, animated: true }); 
+                }}
                 onClearText={() => { }}
+                returnKeyType='search'
                 icon={{ type: 'font-awesome', name: 'search' }}
-                placeholder='请输入搜索关键字' />
+                placeholder='请输入关键字' />
             {/* <PricingCard
                 color='#4f9deb'
                 title='缓存大小'

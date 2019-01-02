@@ -11,6 +11,7 @@ export default class ImageButton extends Component {
         return (
             <TouchableOpacity onPress={this.props.onPress}>
                 <Image
+                    resizeMode="cover"
                     style={this.props.style}
                     source={this.props.source}
                     onPress={this.props.onPress}

@@ -26,21 +26,25 @@ export default class TitleBar extends Component {
 
     static defaultProps = {
         leftIcon: '关闭',
-        bgColor: 'white'
+        bgColor: '#eee',
     };
 
     render() {
         return (
-            <SafeAreaView style={{ backgroundColor: this.props.bgColor, opacity: 0.8 }}>
-                <View style={[styles.view_header_container, { backgroundColor: this.props.bgColor, height: 44 }]}>
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={[styles.view_header_container, {}]}>
                     <ImageButton
-                        style={{ width: 25, height: 25, marginLeft: 10, marginRight: 10 }}
+                        style={{ width: 18, height: 35, marginLeft: 9, marginRight: 6 }}
                         source={this.props.leftIcon}
                         onPress={() => {
                             NavigationService.back();
                         }}
                     />
-                    <Text style={[styles.text_title, { color: this.props.titleColor, textAlign: "center" }]}>{this.props.leftTitle}</Text>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => {
+                        NavigationService.back();
+                    }}>
+                        <Text style={[styles.text_title, { color: this.props.titleColor, textAlign: "center" }]}>{this.props.leftTitle}</Text>
+                    </TouchableOpacity>
                     {this._renderRight()}
                 </View>
             </SafeAreaView>
@@ -70,9 +74,9 @@ export default class TitleBar extends Component {
 const styles = StyleSheet.create({
     view_header_container: {
         height: 44,
-        backgroundColor: 'white',
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        height: 44
     },
     image_header_left: {
         height: 24,
@@ -88,12 +92,13 @@ const styles = StyleSheet.create({
         right: 0,
     },
     text_right_title: {
-        color: '#000',
+        color: '#fff',
         position: 'absolute',
         right: 16,
+        fontSize: 17
     },
     text_title: {
         color: '#000',
-        fontSize: 18,
+        fontSize: 17,
     }
 })

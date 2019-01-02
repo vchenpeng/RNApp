@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import {
-    View, AlertIOS, TouchableOpacity
+    View, Text, AlertIOS, TouchableOpacity
 } from "react-native";
 import TouchID from 'react-native-touch-id';
 import Icon from "react-native-vector-icons/AntDesign";
+import EntypoIcon from "react-native-vector-icons/Entypo";
 import { createStackNavigator, CardStackStyleInterpolator, createSwitchNavigator } from 'react-navigation';
 import NavigationService from './utils/navigationService';
 import { Colors } from './resource';

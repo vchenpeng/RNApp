@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react';
 import { Text, TouchableOpacity, View, Alert, SafeAreaView } from 'react-native';
 import { QRScannerView } from 'ac-qrcode';
@@ -17,74 +18,14 @@ export default class QRCode extends Component {
         this.state = {
             isScanning: false
         };
-        this.renderTitleBar.bind(this);
-        this.renderMenu.bind(this);
+        // this.renderTitleBar.bind(this);
+        // this.renderMenu.bind(this);
         this.barcodeReceived.bind(this);
     }
     componentDidMount() {
         this.setState({
             isScanning: true
         });
-    }
-    renderTitleBar() {
-        return (
-            <TitleBar
-                titleColor={Colors.white_fff}
-                bgColor="#000"
-                title={Constants.string_title_wechat_scanner}
-                leftTitle="扫码"
-                leftIcon={Images.ic_wechat_back}
-                leftIconPress={() => this.props.navigation.goBack()}
-            />)
-    }
-    renderMenu() {
-        return (
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                <View style={Styles.view_bottom_menu_item}>
-                    <ImageButton
-                        style={Styles.image_bottom_menu}
-                        source={Images.ic_wechat_scan_hl}
-                    />
-                    <Text
-                        style={Styles.text_bottom_menu_item}
-                    >扫码</Text>
-                </View>
-
-                <View style={Styles.view_bottom_menu_item}>
-                    <ImageButton
-                        style={Styles.image_bottom_menu}
-                        source={Images.ic_wechat_scan_book}
-                        onPress={() => { }}
-                    />
-                    <Text
-                        style={Styles.text_bottom_menu_item}
-                    >封面</Text>
-                </View>
-
-
-                <View style={Styles.view_bottom_menu_item}>
-                    <ImageButton
-                        style={Styles.image_bottom_menu}
-                        source={Images.ic_wechat_scan_street}
-                    />
-                    <Text
-                        style={Styles.text_bottom_menu_item}
-                    >街景</Text>
-                </View>
-
-
-                <View style={Styles.view_bottom_menu_item}>
-                    <ImageButton
-                        style={Styles.image_bottom_menu}
-                        source={Images.ic_wechat_scan_word}
-                    />
-                    <Text
-                        style={Styles.text_bottom_menu_item}
-                    >翻译</Text>
-                </View>
-
-            </View>
-        )
     }
     barcodeReceived(e) {
         if (this.state.isScanning) {
@@ -111,24 +52,62 @@ export default class QRCode extends Component {
         } else {
         }
     }
-
     render() {
         return (
-            <QRScannerView
-                bottomMenuStyle={{ height: 100, backgroundColor: Colors.black_393A3F, opacity: 1 }}
-                hintText="将二维码/条码放入框内，即可自动扫描"
-                hintTextPosition={180}
-                hintTextStyle={{ color: '#fff', fontSize: 12, backgroundColor: 'transparent' }}
-                maskColor={Colors.black_0000004D}
-                borderWidth={0}
-                iscorneroffset={false}
+            < QRScannerView
+                bottomMenuStyle={{ backgroundColor: '#000', opacity: 0.85 }}
+
+                scanBarImage={Images.ic_scan_bar}
+                cornerColor="#fff"
                 cornerOffsetSize={0}
-                scanBarAnimateTime={3000}
-                cornerBorderWidth={2}
+                borderWidth={0}
+                hintText={'请扫描二维码或条形码'}
+                hintTextStyle={{ color: "#fff", fontSize: 16 }}
+                hintTextPosition={110}
+                maskColor={Colors.black_0000004D}
                 onScanResultReceived={this.barcodeReceived.bind(this)}
-                renderTopBarView={() => this.renderTitleBar()}
-                renderBottomMenuView={() => this.renderMenu()}
+                bottomMenuHeight={115}
+                renderTopBarView={() => {
+                    return (
+                        <TitleBar
+                            title={Constants.string_title_scanner_qrcode}
+                            leftIcon={Images.ic_back}
+                            leftTitle="返回"
+                            titleColor="#fff"
+                            rightTitle="帮助"
+                            leftIconPress={() => this.props.navigation.goBack()}
+                        />
+                    )
+                }}
+
+                renderBottomMenuView={() => this._renderMenu()}
             />
+        )
+    }
+
+    _renderMenu() {
+        return (
+            <View style={Styles.view_menu_container}>
+                <View style={Styles.view_menu_item_container}>
+                    <ImageButton
+                        style={Styles.image_bottom_menu}
+                        source={Images.ic_manual_input}
+                    />
+                    <Text
+                        style={Styles.text_menu_title}
+                    >手动输入</Text>
+                </View>
+
+                <View style={Styles.view_menu_item_container}>
+                    <ImageButton
+                        style={Styles.image_bottom_menu}
+                        source={Images.ic_light_off}
+                    />
+                    <Text
+                        style={Styles.text_menu_title}
+                    >手电筒</Text>
+                </View>
+            </View>
         )
     }
 }

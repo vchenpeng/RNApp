@@ -18,6 +18,8 @@ import SplashScreen from 'react-native-splash-screen';
 import Getui from 'react-native-getui';
 import codePush from 'react-native-code-push';
 
+import KeyboardManager, { PreviousNextView } from 'react-native-keyboard-manager';
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -47,6 +49,9 @@ export default class App extends React.Component {
     AppState.addEventListener("change", (newState) => {
       newState === "active" && codePush.sync();
     });
+
+    KeyboardManager.setKeyboardDistanceFromTextField(0);
+    KeyboardManager.setShouldToolbarUsesTextFieldTintColor(false);
   }
   updateComponentInfo() {
     Getui.clientId((param) => {

@@ -74,7 +74,7 @@ export default createBottomTabNavigator({
             },
             style: {
                 backgroundColor: '#fff',
-                height: 54,
+                height: 52,
                 paddingBottom: 5,
                 borderTopWidth: 0
             },
