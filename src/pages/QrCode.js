@@ -1,11 +1,12 @@
 
 import React, { Component } from 'react';
-import { Text, TouchableOpacity, View, Alert, SafeAreaView } from 'react-native';
+import { Text, TouchableOpacity, View, Alert, SafeAreaView, NativeModules } from 'react-native';
 import { QRScannerView } from 'ac-qrcode';
 import NavigationService from '../utils/navigationService';
 import { ImageButton, TitleBar } from "../components";
 import Styles from '../resource/styles/wechat';
 import { Constants, Images, Colors } from "../resource";
+import Orientation from 'react-native-orientation';
 
 export default class QRCode extends Component {
     static navigationOptions = ({ navigation }) => ({
@@ -22,10 +23,16 @@ export default class QRCode extends Component {
         // this.renderMenu.bind(this);
         this.barcodeReceived.bind(this);
     }
+    componentWillMount() {
+        Orientation.lockToPortrait();
+    }
     componentDidMount() {
         this.setState({
             isScanning: true
         });
+    }
+    componentWillUnmount() {
+        Orientation.unlockAllOrientations();
     }
     barcodeReceived(e) {
         if (this.state.isScanning) {
@@ -55,7 +62,7 @@ export default class QRCode extends Component {
     render() {
         return (
             < QRScannerView
-                bottomMenuStyle={{ backgroundColor: '#000', opacity: 0.85 }}
+                bottomMenuStyle={{ backgroundColor: '#000', opacity: 0.8 }}
 
                 scanBarImage={Images.ic_scan_bar}
                 cornerColor="#fff"
@@ -102,6 +109,10 @@ export default class QRCode extends Component {
                     <ImageButton
                         style={Styles.image_bottom_menu}
                         source={Images.ic_light_off}
+                        onPress={() => {
+                            Alert.alert("sdfsd");
+                            NativeModules.CameraManager.flashMode = "on";
+                        }}
                     />
                     <Text
                         style={Styles.text_menu_title}

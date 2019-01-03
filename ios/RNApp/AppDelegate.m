@@ -9,6 +9,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import "RNSplashScreen.h"
+#import "Orientation.h"
 
 //首先导入头文件信息
 #import <ifaddrs.h>
@@ -160,6 +161,9 @@ NSLog(@">>[GTSdk ReceivePayload]:%@", msg);
   // Free memory
   freeifaddrs(interfaces);
   return address;
-  
+}
+
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+  return [Orientation getOrientation];
 }
 @end
