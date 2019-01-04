@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Text, View, StatusBar, FlatList, TouchableOpacity, Dimensions, ActivityIndicator
+    Text, View, StatusBar, FlatList, TouchableOpacity, Dimensions, ActivityIndicator, NativeModules
 } from 'react-native';
 import NavigationService from '../utils/navigationService';
 import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
@@ -98,6 +98,7 @@ export default class Explore extends Component {
                     keyExtractor={(item, index) => index.toString()}
                     refreshing={this.state.refreshing}
                     onRefresh={() => {
+                        NativeModules.MainBridge.playSystemAudio(1100);
                         this.setState({ refreshing: true })
                         this.fetchUserList(index);
                     }

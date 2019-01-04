@@ -49,7 +49,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                                 AlertIOS.alert('验证失败');
                             });
                     }} >
-                        <Icon name='appstore-o' size={24} color='white' style={{ marginRight: 15 }} />
+                        <Icon name='taobao-square' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             };

@@ -17,6 +17,7 @@ import DropDownHolder from './src/utils/DropDownHolder';
 import SplashScreen from 'react-native-splash-screen';
 import Getui from 'react-native-getui';
 import codePush from 'react-native-code-push';
+import Orientation from 'react-native-orientation';
 
 import KeyboardManager, { PreviousNextView } from 'react-native-keyboard-manager';
 
@@ -32,6 +33,7 @@ export default class App extends React.Component {
   }
   componentWillMount() {
     //this.updateComponentInfo();
+    Orientation.lockToPortrait();
   }
 
   componentDidMount() {

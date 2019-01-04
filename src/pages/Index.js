@@ -142,6 +142,7 @@ export default class Home extends PureComponent {
             refreshControl={
                 <RefreshControl refreshing={this.state.refreshing}
                     onRefresh={() => {
+                        NativeModules.MainBridge.playSystemAudio(1100);
                         this.setState({ refreshing: true })
                         this.fetchMarketList();
                     }}
@@ -172,7 +173,7 @@ export default class Home extends PureComponent {
 
                 }}
 
-                onFocus={() => { 
+                onFocus={() => {
                     //_scrollView.scrollTo({ x: 0, y: 135, animated: true }); 
                 }}
                 onClearText={() => { }}

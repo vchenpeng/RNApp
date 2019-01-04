@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image, View, StyleSheet, FlatList, Dimensions, StatusBar, Alert, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { Text, Image, View, StyleSheet, FlatList, Dimensions, StatusBar, Alert, TouchableOpacity, TouchableHighlight, NativeModules } from 'react-native';
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import NavigationService from '../utils/navigationService';
@@ -138,6 +138,7 @@ export default class Market extends Component {
                 }}
                 refreshing={this.state.refreshing}
                 onRefresh={() => {
+                    NativeModules.MainBridge.playSystemAudio(1100);
                     this.setState({ refreshing: true })
                     this.fetchMarketList();
                 }}

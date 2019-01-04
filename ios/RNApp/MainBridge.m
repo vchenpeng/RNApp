@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <AudioToolbox/AudioToolbox.h>
 #import "MainBridge.h"
 
 @implementation MainBridge
@@ -36,5 +37,11 @@ RCT_EXPORT_METHOD(cleanCache:(RCTResponseSenderBlock)callback)
   [httpCache removeAllCachedResponses];
   NSUInteger cache = [httpCache currentDiskUsage];
   callback(@[[NSNull null],@(cache)]);
+}
+//  播放系统声音
+RCT_EXPORT_METHOD(playSystemAudio:(NSInteger)id)
+{
+  SystemSoundID soundID = (SystemSoundID)id;
+  AudioServicesPlaySystemSound(soundID);
 }
 @end

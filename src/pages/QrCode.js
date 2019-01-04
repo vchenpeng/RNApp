@@ -7,6 +7,7 @@ import { ImageButton, TitleBar } from "../components";
 import Styles from '../resource/styles/wechat';
 import { Constants, Images, Colors } from "../resource";
 import Orientation from 'react-native-orientation';
+import Torch from 'react-native-torch';
 
 export default class QRCode extends Component {
     static navigationOptions = ({ navigation }) => ({
@@ -17,6 +18,7 @@ export default class QRCode extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isTorchOn: false,
             isScanning: false
         };
         // this.renderTitleBar.bind(this);
@@ -32,7 +34,8 @@ export default class QRCode extends Component {
         });
     }
     componentWillUnmount() {
-        Orientation.unlockAllOrientations();
+        // Orientation.unlockAllOrientations();
+        // Orientation.lockToPortrait();
     }
     barcodeReceived(e) {
         if (this.state.isScanning) {
@@ -49,7 +52,8 @@ export default class QRCode extends Component {
             //     ],
             //     { cancelable: false }
             // );
-            NavigationService.navigate("Web", { url: e.data });
+            NativeModules.MainBridge.playSystemAudio(1004);
+            NavigationService.replace("Web", { url: e.data });
             switch (e.type) {
                 case "org.ios.QRCode":
                     break;
@@ -62,14 +66,13 @@ export default class QRCode extends Component {
     render() {
         return (
             < QRScannerView
-                bottomMenuStyle={{ backgroundColor: '#000', opacity: 0.8 }}
-
+                bottomMenuStyle={{ backgroundColor: '#000', opacity: 0.85 }}
                 scanBarImage={Images.ic_scan_bar}
                 cornerColor="#fff"
                 cornerOffsetSize={0}
                 borderWidth={0}
                 hintText={'请扫描二维码或条形码'}
-                hintTextStyle={{ color: "#fff", fontSize: 16 }}
+                hintTextStyle={{ color: "#fff", fontSize: 14 }}
                 hintTextPosition={110}
                 maskColor={Colors.black_0000004D}
                 onScanResultReceived={this.barcodeReceived.bind(this)}
@@ -107,11 +110,12 @@ export default class QRCode extends Component {
 
                 <View style={Styles.view_menu_item_container}>
                     <ImageButton
-                        style={Styles.image_bottom_menu}
-                        source={Images.ic_light_off}
+                        style={[Styles.image_bottom_menu, {}]}
+                        source={this.state.isTorchOn ? Images.ic_light_on : Images.ic_light_off}
                         onPress={() => {
-                            Alert.alert("sdfsd");
-                            NativeModules.CameraManager.flashMode = "on";
+                            let torch = !this.state.isTorchOn;
+                            this.setState({ isTorchOn: torch });
+                            Torch.switchState(torch);
                         }}
                     />
                     <Text

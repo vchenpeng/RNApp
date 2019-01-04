@@ -6,6 +6,7 @@ import Market from "./Market";
 import Explore from "./Explore";
 import Mine from "./Mine";
 import { Colors } from "../resource";
+import AntDesignIcon from "react-native-vector-icons/AntDesign"
 
 export default createBottomTabNavigator({
     Home: {
@@ -13,10 +14,11 @@ export default createBottomTabNavigator({
         navigationOptions: {
             tabBarLabel: '首页',
             tabBarIcon: ({ focused, tintColor }) => (
-                <Image
-                    source={focused ? require('../resource/images/home.png') : require('../resource/images/home.png')}
-                    style={{ width: 30, height: 30, tintColor: tintColor }}
-                />
+                // <Image
+                //     source={focused ? require('../resource/images/home.png') : require('../resource/images/home.png')}
+                //     style={{ width: 30, height: 30, tintColor: tintColor }}
+                // />
+                <AntDesignIcon name='home' size={24} color={tintColor} />
             )
         }
     },
@@ -25,10 +27,7 @@ export default createBottomTabNavigator({
         navigationOptions: {
             tabBarLabel: '行情',
             tabBarIcon: ({ focused, tintColor }) => (
-                <Image
-                    source={focused ? require('../resource/images/hq.png') : require('../resource/images/hq.png')}
-                    style={{ width: 30, height: 30, tintColor: tintColor }}
-                />
+                <AntDesignIcon name='flag' size={24} color={tintColor} />
             )
         }
     },
@@ -37,10 +36,7 @@ export default createBottomTabNavigator({
         navigationOptions: {
             tabBarLabel: '发现',
             tabBarIcon: ({ focused, tintColor }) => (
-                <Image
-                    source={focused ? require('../resource/images/fx.png') : require('../resource/images/fx.png')}
-                    style={{ width: 30, height: 30, tintColor: tintColor }}
-                />
+                <AntDesignIcon name='find' size={24} color={tintColor} />
             )
         }
     },
@@ -49,10 +45,7 @@ export default createBottomTabNavigator({
         navigationOptions: {
             tabBarLabel: '我的',
             tabBarIcon: ({ focused, tintColor }) => (
-                <Image
-                    source={focused ? require('../resource/images/wd.png') : require('../resource/images/wd.png')}
-                    style={{ width: 30, height: 30, tintColor: tintColor }}
-                />
+                <AntDesignIcon name='user' size={24} color={tintColor} />
             ),
             tabBarOnPress: (({ navigation, defaultHandler }) => {
                 defaultHandler();
@@ -75,14 +68,17 @@ export default createBottomTabNavigator({
             style: {
                 backgroundColor: '#fff',
                 height: 52,
-                paddingBottom: 5,
-                borderTopWidth: 0
+                paddingTop: 7,
+                borderTopWidth: 0.5,
+                borderTopColor: "#eee"
             },
             iconStyle: {
-                width: 27, height: 27
+                width: 24, height: 24
             },
             labelStyle: {
                 fontSize: 10,
+                marginTop: 0,
+                marginBottom: 5,
                 textAlign: "center"
             }
         },

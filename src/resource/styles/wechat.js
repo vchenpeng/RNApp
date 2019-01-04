@@ -19,6 +19,6 @@ export default StyleSheet.create({
     },
     view_menu_item_container: {
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     }
 })
