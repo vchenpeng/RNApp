@@ -5,7 +5,7 @@
  */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { StyleSheet, Text, View, TouchableOpacity, AlertIOS, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import { Images } from '../resource/'
 import ImageButton from "./ImageButton";
 import NavigationService from '../utils/navigationService';
@@ -33,18 +33,16 @@ export default class TitleBar extends Component {
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={[styles.view_header_container, {}]}>
-                    <ImageButton
-                        style={{ width: 18, height: 35, marginLeft: 9, marginRight: 6 }}
-                        source={this.props.leftIcon}
-                        onPress={() => {
-                            NavigationService.back();
-                        }}
-                    />
-                    <TouchableOpacity activeOpacity={0.5} onPress={() => {
+                    <TouchableOpacity activeOpacity={0.5} style={{ flexDirection: "row", alignItems: "center" }} onPress={() => {
                         NavigationService.back();
                     }}>
-                        <Text style={[styles.text_title, { color: this.props.titleColor, textAlign: "center" }]}>{this.props.leftTitle}</Text>
+                        <Image
+                            style={{ width: 18, height: 35, marginLeft: 9, marginRight: 6 }}
+                            source={this.props.leftIcon}
+                        />
+                        <Text style={[styles.text_title, { color: this.props.titleColor }]}>{this.props.leftTitle}</Text>
                     </TouchableOpacity>
+
                     {this._renderRight()}
                 </View>
             </SafeAreaView>
@@ -75,7 +73,7 @@ const styles = StyleSheet.create({
     view_header_container: {
         height: 44,
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: "center",
         height: 44
     },
     image_header_left: {

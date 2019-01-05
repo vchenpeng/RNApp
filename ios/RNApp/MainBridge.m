@@ -44,4 +44,15 @@ RCT_EXPORT_METHOD(playSystemAudio:(NSInteger)id)
   SystemSoundID soundID = (SystemSoundID)id;
   AudioServicesPlaySystemSound(soundID);
 }
+//  屏幕常亮
+RCT_EXPORT_METHOD(setIdleTimerDisabled:(BOOL)flag)
+{
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+}
+//  屏幕常亮
+RCT_EXPORT_METHOD(setIdleTimerDisabled2:(BOOL)flag)
+{
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
+}
 @end

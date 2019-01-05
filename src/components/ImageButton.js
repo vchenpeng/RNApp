@@ -4,7 +4,7 @@
  * Desc:
  */
 import React, { Component } from 'react';
-import { Image, TouchableOpacity, AlertIOS } from 'react-native';
+import { Image, TouchableOpacity, ImageBackground, AlertIOS } from 'react-native';
 
 export default class ImageButton extends Component {
     render() {
@@ -15,9 +15,8 @@ export default class ImageButton extends Component {
                     style={this.props.style}
                     source={this.props.source}
                     onPress={this.props.onPress}
-                >
-                    {this.props.children}
-                </Image>
+                />
+                {this.props.children}
             </TouchableOpacity>
         )
     }
