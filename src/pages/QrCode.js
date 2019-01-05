@@ -37,7 +37,7 @@ export default class QRCode extends Component {
     componentWillUnmount() {
         // Orientation.unlockAllOrientations();
         // Orientation.lockToPortrait();
-        NativeModules.MainBridge.setIdleTimerDisabled2(false);
+        NativeModules.MainBridge.setIdleTimerDisabled(false);
     }
     barcodeReceived(e) {
         if (this.state.isScanning) {
