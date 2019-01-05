@@ -9,7 +9,7 @@ const images = {
      */
     ic_avatar: require('./qrcode/avatar.jpg'),
     ic_back: require('./qrcode/back.png'),
-
+    ic_webloading: require('./images/web-loading.gif'),
 
     /**
      * OFO

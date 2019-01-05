@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Text, SafeAreaView, View, StyleSheet, Clipboard, WebView, Alert, TouchableOpacity } from 'react-native';
+import { Text, Image, SafeAreaView, View, StyleSheet, Clipboard, WebView, Alert, TouchableOpacity } from 'react-native';
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
 import Icon from "react-native-vector-icons/AntDesign";
 import NavigationService from '../utils/navigationService';
+import { Constants, Images, Colors } from "../resource";
 
 export default class Web extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -40,6 +41,13 @@ export default class Web extends Component {
         return (<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <WebView
                 source={{ uri: this.state.url }}
+                startInLoadingState={true}
+                renderLoading={() => (<View
+                    style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}
+
+                >
+                    <Image source={Images.ic_webloading} />
+                </View>)}
                 onNavigationStateChange={this.onNavigationStateChange.bind(this)}
             /></SafeAreaView>)
     }

@@ -37,7 +37,7 @@ export default class Explore extends Component {
     }
 
     fetchUserList(index) {
-        const url = 'https://api.jinse.com/v6/information/list?catelogue_key=' + this.state.tabs[index]['name'] + '&limit=50&information_id=141061&flag=down&version=9.9.9';
+        const url = 'https://api.jinse.com/v6/information/list?catelogue_key=' + this.state.tabs[index]['name'] + '&limit=50&information_id=141061&flag=up&version=9.9.9';
         fetch(url)
             .then((response) => response.json())
             .then((responseJson) => {
