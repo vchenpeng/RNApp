@@ -8,5 +8,12 @@
 ```
 Product > Scheme > Edit Scheme...中Build Configuration选项改成Release
 ```
-6.因为`react-native-scrollable-tab-view`的作者没有更新npmjs版本，所以此处用的另一个开发解决的版本，后期待原版本调整请切换一下。  
-7.
+6.因为`react-native-scrollable-tab-view`的作者没有更新npmjs版本，所以此处用的另一个开发解决的版本，后期待原版本调整请切换一下。
+7.选择图片api
+```
+self.navigationBar.barTintColor = [UIColor colorWithRed:(59/255.0) green:(175/255.0)  blue:(218/255.0) alpha:1.0];
+```
+8.TZImagePickerController.m
+```
+Line265设置字体大小
+```

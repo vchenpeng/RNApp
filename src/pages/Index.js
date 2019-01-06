@@ -176,6 +176,7 @@ export default class Home extends PureComponent {
                 onFocus={() => {
                     //_scrollView.scrollTo({ x: 0, y: 135, animated: true }); 
                 }}
+
                 onClearText={() => { }}
                 returnKeyType='search'
                 icon={{ type: 'font-awesome', name: 'search' }}
