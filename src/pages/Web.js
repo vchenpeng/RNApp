@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Text, Image, SafeAreaView, View, StyleSheet, Clipboard, WebView, Alert, TouchableOpacity } from 'react-native';
+import { Text, Image, SafeAreaView, View, StyleSheet, Clipboard, Alert, TouchableOpacity } from 'react-native';
+import { WebView } from "react-native-webview";
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
 import Icon from "react-native-vector-icons/AntDesign";
 import NavigationService from '../utils/navigationService';
@@ -18,7 +19,8 @@ export default class Web extends Component {
                 }} >
                     <Icon name='setting' size={24} color='white' style={{ marginRight: 15 }} />
                 </TouchableOpacity>
-            </View>)
+            </View>),
+            gesturesEnabled: false
         }
     };
     constructor(props) {
@@ -42,6 +44,11 @@ export default class Web extends Component {
             <WebView
                 source={{ uri: this.state.url }}
                 startInLoadingState={true}
+                hideKeyboardAccessoryView={true}
+                allowsBackForwardNavigationGestures={true}
+                allowsLinkPreview={true}
+                decelerationRate="normal"
+                dataDetectorTypes="none"
                 renderLoading={() => (<View
                     style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}
 

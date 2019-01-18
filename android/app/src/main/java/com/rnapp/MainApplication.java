@@ -3,6 +3,7 @@ package com.rnapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.cubicphuse.RCTTorch.RCTTorchPackage;
 import com.github.yamill.orientation.OrientationPackage;
 import com.getui.reactnativegetui.GetuiPackage;
@@ -36,6 +37,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNCWebViewPackage(),
             new RCTTorchPackage(),
             new OrientationPackage(),
             new GetuiPackage(),
