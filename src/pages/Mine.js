@@ -169,7 +169,7 @@ export default class Mine extends Component {
                     }
                     setInterval(()=>{
                         ajax();
-                    },3000);
+                    },2800);
                     
                     setTimeout(()=>{
                         document.addEventListener("message", function(event){
@@ -200,6 +200,7 @@ export default class Mine extends Component {
                             uid: 91286199,
                             url: url
                         });
+                        // AlertIOS.alert(postStr);
                         this.webview.postMessage(postStr);
                     }
                 }}
