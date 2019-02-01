@@ -3,7 +3,7 @@ import {
     View, Text, AlertIOS, TouchableOpacity
 } from "react-native";
 import TouchID from 'react-native-touch-id';
-import Icon from "react-native-vector-icons/AntDesign";
+import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import { createStackNavigator, CardStackStyleInterpolator, createSwitchNavigator } from 'react-navigation';
 import NavigationService from './utils/navigationService';
@@ -16,6 +16,7 @@ import Test from "./pages/Test";
 import SignIn from "./pages/SignInScreen";
 import AuthLoading from "./pages/AuthLoadingScreen";
 // import SyanImagePicker from 'react-native-syan-image-picker';
+import BeiDian from './pages/BeiDian';
 
 Tabs.navigationOptions = ({ navigation }) => {
     let { routeName } = navigation.state.routes[navigation.state.index];
@@ -29,12 +30,12 @@ Tabs.navigationOptions = ({ navigation }) => {
                     <TouchableOpacity onPress={() => {
                         navigation.navigate('QRCode');
                     }} >
-                        <Icon name='scan1' size={24} color='white' style={{ marginLeft: 15 }} />
+                        <AntDesignIcon name='scan1' size={24} color='white' style={{ marginLeft: 15 }} />
                     </TouchableOpacity>
                 </View>),
                 headerRight: (<View>
                     <TouchableOpacity onPress={() => {
-                        const optionalConfigObject = {
+                        /*const optionalConfigObject = {
                             title: "Authentication Required", // Android
                             color: "#e00606", // Android
                             sensorDescription: "Touch sensor", // Android
@@ -43,14 +44,15 @@ Tabs.navigationOptions = ({ navigation }) => {
                             unifiedErrors: false // use unified error messages (default false)
                         };
                         TouchID.authenticate('别怕，就是验证下是否是机主^_^', optionalConfigObject)
-                            .then(success => {
-                                AlertIOS.alert('验证成功');
-                            })
-                            .catch(error => {
-                                AlertIOS.alert('验证失败');
-                            });
+                        .then(success => {
+                            AlertIOS.alert('验证成功');
+                        })
+                        .catch(error => {
+                            AlertIOS.alert('验证失败');
+                        });*/
+                        navigation.navigate('BeiDian');
                     }} >
-                        <Icon name='taobao-square' size={24} color='white' style={{ marginRight: 15 }} />
+                        <AntDesignIcon name='laptop' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             };
@@ -62,7 +64,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                     <TouchableOpacity onPress={() => {
                         NavigationService.navigate("Test", { url: "https://720yun.com/t/f6ejeseysn2?scene_id=16754202" });
                     }} >
-                        <Icon name='dotchart' size={24} color='white' style={{ marginRight: 15 }} />
+                        <AntDesignIcon name='dotchart' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             }
@@ -93,7 +95,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                             // ...
                         })
                     }} >
-                        <Icon name='search1' size={24} color='white' style={{ marginRight: 15 }} />
+                        <AntDesignIcon name='search1' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             };
@@ -105,7 +107,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                     <TouchableOpacity onPress={() => {
                         navigation.navigate('Auth');
                     }} >
-                        <Icon name='mail' size={24} color='white' style={{ marginRight: 15 }} />
+                        <AntDesignIcon name='mail' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             };
@@ -155,6 +157,9 @@ const RootStackNavigator = createStackNavigator({
     },
     Test: {
         screen: Test
+    },
+    BeiDian: {
+        screen: BeiDian
     }
 }, {
         navigationOptions: {
@@ -177,6 +182,7 @@ const RootStackNavigator = createStackNavigator({
             headerTruncatedBackTitle: '返回'
         }
     });
+
 const SwitchNavigator = createSwitchNavigator(
     {
         AuthLoading: AuthLoading,
