@@ -34,7 +34,7 @@
     jsCodeLocation = [CodePush bundleURL];
   }else{
     BOOL isContain = [ip hasPrefix:@"192.168.1."];
-    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"192.168.1.103":@"192.168.1.5")];
+    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"192.168.1.100":@"192.168.1.5")];
     
     jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
   }

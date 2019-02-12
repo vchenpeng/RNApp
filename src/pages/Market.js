@@ -14,30 +14,11 @@ export default class Market extends Component {
     }
 
     fetchMarketList() {
-        const url = 'http://www.coin918.cc/ajax/allcoin_a/id/0?kw=';
+        const url = 'https://api.1sapp.com/app/msgBox?OSVersion=12.1.1&active_method=icon&deviceCode=1E4CF07F-0893-40D7-8FFA-063DE2E9F46E&dtu=100&lat=31.10167244734609&lon=114.459986901727&network=WIFI&page=1&sign=b303bfdeed1d34d90dd8344dee3b0194&sys=2&time=1549438569&tk=ACIeTPB_CJNA14_6Bj3i6fRuDqsUlvsJezQ0NzUxNDk1MDg5NTIyNQ&token=83946ytpSmafvYj0PnekTmENaHben93NveylrG8_YmTdEkMaJh72yHEA6xvfj-LS-jGZmSb6W13lzSA&uuid=CB79DB7A-3325-4587-8491-D7A093E92CDA&version=30017000&versionName=3.0.17.000.718.1740';
         fetch(url)
             .then((response) => response.json())
             .then((responseJson) => {
-                let url = responseJson.url;
-                let list = [];
-                for (const key in url) {
-                    if (url.hasOwnProperty(key)) {
-                        const element = url[key];
-                        let item = {
-                            key: key,
-                            name: element[0],
-                            price: element[1],
-                            change: element[7],
-                            vol: element[6],
-                            icon_url: 'http://www.coin918.cc/Upload/coin/' + element[9]
-                        };
-                        if (key == 'gath_usd_') {
-                            list.unshift(item);
-                        } else {
-                            list.push(item);
-                        }
-                    }
-                }
+                let list = responseJson.data;
                 this.setState({
                     list: list
                 });
@@ -55,7 +36,7 @@ export default class Market extends Component {
                 activeOpacity={0.85}
                 underlayColor='#000'
                 onPress={() => {
-                    NavigationService.navigate('MarketDetail', { title: item.name, key: item.key });
+                    // NavigationService.navigate('MarketDetail', { title: item.title, key: item.key });
                 }} >
                 <View style={{ backgroundColor: '#fff' }}>
                     <ListItem
@@ -64,26 +45,26 @@ export default class Market extends Component {
                             backgroundColor: '#fff', padding: 0, margin: 0, borderBottomColor: '#eee',
                             paddingTop: 10, paddingBottom: 10, paddingLeft: 10
                         }}
-                        key={item.key}
+                        key={item.id}
                         avatar={<Avatar
                             width={40}
                             height={40}
                             avatarStyle={{ borderRadius: 0, backgroundColor: '#fff', margin: 20 }}
-                            source={item.icon_url && { uri: item.icon_url }}
+                            source={{ uri: item.cover[0] }}
                             title={item.name}
                         />}
                         titleStyle={{ fontSize: 14 }}
                         subtitleStyle={{ fontSize: 12 }}
                         titleContainerStyle={{
                             height: 20,
-                            width: 200,
+                            width: 230,
                             marginLeft: 10,
                             justifyContent: "center"
                         }}
                         subtitleContainerStyle={{ justifyContent: "center", marginLeft: 10, height: 20 }}
-                        title={item.name}
-                        subtitle={'$' + item.price.toFixed(4)}
-                        rightTitle={item.change > 0 ? '+' + item.change + '%' : item.change + '%'}
+                        title={item.title}
+                        subtitle={item.source_name}
+                        rightTitle={item.read_count_show}
                         rightTitleStyle={[{
                             backgroundColor: '#d43f3a', paddingTop: 5, paddingBottom: 5, width: 50, color: '#fff', fontSize: 12, textAlign: "center",
                         }, { backgroundColor: item.change > 0 ? '#d43f3a' : '#7ED321' }]}
@@ -134,7 +115,7 @@ export default class Market extends Component {
                 previewDuration={0}
                 previewOpenValue={.01}
                 keyExtractor={(rowData, index) => {
-                    return rowData.name.toString();
+                    return rowData.id.toString();
                 }}
                 refreshing={this.state.refreshing}
                 onRefresh={() => {

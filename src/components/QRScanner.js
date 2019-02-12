@@ -441,8 +441,12 @@ class QRScannerView extends Component {
                     {/*绘制顶部标题栏组件*/}
                     {!IS_ANDROID ? this.props.renderTopBarView() : null}
                     {/* var {opacity: opacity, backgroundColor:backgroundColor} = this.props.bottomMenuStyle; */}
-                    <SafeAreaView style={[this.props.bottomMenuStyle]}>
-                        <View style={[this.props.bottomMenuStyle, { height: this.props.bottomMenuHeight }]}>
+                    <SafeAreaView style={[this.props.bottomMenuStyle, {
+                        position: "absolute", bottom: 0, left: 0, right: 0,
+                    }]}>
+                        <View style={[this.props.bottomMenuStyle, {
+
+                        }, { height: this.props.bottomMenuHeight }]}>
                             {/*绘制底部操作栏*/}
                             <View style={[styles.buttonsContainer]}>
                                 {this.props.renderBottomMenuView()}

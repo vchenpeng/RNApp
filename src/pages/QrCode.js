@@ -67,8 +67,10 @@ export default class QRCode extends Component {
     }
     render() {
         return (
-            < QRScannerView
-                bottomMenuStyle={{ backgroundColor: '#000', opacity: 0.85 }}
+            <QRScannerView
+                bottomMenuStyle={{
+                    backgroundColor: '#000', opacity: 0.85
+                }}
                 scanBarImage={Images.ic_scan_bar}
                 cornerColor="#fff"
                 cornerOffsetSize={0}
@@ -85,9 +87,13 @@ export default class QRCode extends Component {
                             title={Constants.string_title_scanner_qrcode}
                             leftIcon={Images.ic_back}
                             leftTitle="返回"
+                            title="扫一扫"
                             titleColor="#fff"
                             rightTitle="帮助"
-                            leftIconPress={() => this.props.navigation.goBack()}
+                            leftPress={() => this.props.navigation.goBack()}
+                            rightPress={() => {
+                                Alert.alert("dsf");
+                            }}
                         />
                     )
                 }}

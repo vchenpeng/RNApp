@@ -52,7 +52,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                         });*/
                         navigation.navigate('BeiDian');
                     }} >
-                        <AntDesignIcon name='laptop' size={24} color='white' style={{ marginRight: 15 }} />
+                        <AntDesignIcon name='redenvelopes' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             };
@@ -86,14 +86,11 @@ Tabs.navigationOptions = ({ navigation }) => {
                             showCropFrame: true,    // 是否显示裁剪区域，默认true
                             showCropGrid: false     // 是否隐藏裁剪区域网格，默认false
                         };
-                        SyanImagePicker.showImagePicker(options, (err, selectedPhotos) => {
-                            if (err) {
-                                // 取消选择
-                                return;
-                            }
-                            // 选择成功，渲染图片
-                            // ...
-                        })
+                        // SyanImagePicker.showImagePicker(options, (err, selectedPhotos) => {
+                        //     if (err) {
+                        //         return;
+                        //     }
+                        // });
                     }} >
                         <AntDesignIcon name='search1' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>

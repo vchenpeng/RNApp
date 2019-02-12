@@ -148,7 +148,7 @@ export default class Home extends PureComponent {
                     }}
                 ></RefreshControl>}>
             <StatusBar barStyle="light-content" />
-            <View style={{ height: 135 }}>
+            <View style={{ height: 175 }}>
 
                 <Swiper style={styles.wrapper}
                     autoplay={true}
@@ -157,13 +157,13 @@ export default class Home extends PureComponent {
                     activeDotStyle={{ bottom: -15, width: 10, height: 2, backgroundColor: Colors.theme_color, borderRadius: 0 }}
                     showsButtons={false}>
                     <View style={[styles.slide1]}>
-                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://www.coin918.cc/Upload/ad/5bda59a05c841.jpg' }}></Image>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://pic32.photophoto.cn/20140915/0034034424700073_b.jpg' }}></Image>
                     </View>
                     <View style={styles.slide2}>
-                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://www.coin918.cc/Upload/ad/5bd6c521587c4.png' }}></Image>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://pic3.40017.cn/scenery/destination/2015/04/18/03/vrn29Y.jpg' }}></Image>
                     </View>
                     <View style={styles.slide2}>
-                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://www.coin918.cc/Upload/ad/5bd6c521587c4.png' }}></Image>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://pic2.16pic.com/00/55/40/16pic_5540749_b.jpg' }}></Image>
                     </View>
                 </Swiper>
             </View>

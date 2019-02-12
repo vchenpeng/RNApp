@@ -5,13 +5,12 @@
  */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { StyleSheet, Text, View, TouchableOpacity, Image, SafeAreaView, Dimensions } from 'react-native';
-import { Images } from '../resource/'
+import { StyleSheet, Text, View, TouchableOpacity, Image, SafeAreaView } from 'react-native';
+import { Images, Colors } from '../resource'
 import ImageButton from "./ImageButton";
 import NavigationService from '../utils/navigationService';
 
-let { height, width } = Dimensions.get('window');
-export default class TitleBar extends Component {
+export default class TopBar extends Component {
 
     static propTypes = {
         leftTitle: PropTypes.string,
@@ -32,13 +31,11 @@ export default class TitleBar extends Component {
 
     render() {
         return (
-            <SafeAreaView style={{}}>
+            <SafeAreaView style={{ backgroundColor: this.props.bgColor }}>
                 <View style={[styles.view_header_container, {}]}>
-                    <TouchableOpacity activeOpacity={0.5} style={[styles.image_header_left, { flexDirection: "row", alignItems: "center", backgroundColor: "transparent" }]} onPress={() => {
-                        NavigationService.back();
-                    }}>
+                    <TouchableOpacity activeOpacity={0.5} style={[styles.image_header_left, { flexDirection: "row", alignItems: "center", backgroundColor: "transparent" }]} onPress={this.props.leftPress}>
                         <Image
-                            style={{ width: 13, height: 21, marginLeft: 9, marginRight: 6, tintColor: "#fff", resizeMode: "contain" }}
+                            style={{ width: 24, height: 24, marginLeft: 15, marginRight: 6, tintColor: "#fff", resizeMode: "contain" }}
                             source={this.props.leftIcon}
                         />
                         <Text style={[styles.text_left_title, { color: this.props.titleColor }]}>{this.props.leftTitle}</Text>
@@ -59,14 +56,17 @@ export default class TitleBar extends Component {
                 {this.props.rightIcon}
             </TouchableOpacity>;
         } else if (this.props.rightTitle) {
-            return <Text style={styles.text_right_title}>
-                {this.props.rightTitle}
-            </Text>;
+            return <TouchableOpacity style={styles.text_right_title} onPress={this.props.rightPress} >
+                <Text style={styles.text_right_title}>
+                    {this.props.rightTitle}
+                </Text>
+            </TouchableOpacity>;
         }
     }
 }
 
 const styles = StyleSheet.create({
+
     view_header_container: {
         height: 44,
         flexDirection: 'row',

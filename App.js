@@ -110,6 +110,7 @@ export default class App extends React.Component {
             paddingLeft: 8,
             paddingRight: 0
           }}
+          zIndex={999}
         />
       </View>
     );

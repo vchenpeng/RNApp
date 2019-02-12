@@ -11,7 +11,7 @@ export default StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         paddingTop: 20,
-        paddingBottom: 20
+        paddingBottom: 20,
     },
     text_menu_title: {
         color: 'white',

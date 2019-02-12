@@ -50,7 +50,7 @@ const images = {
     ic_wechat_back: require('./qrcode/wechatBack.png'),
     ic_wechat_more: require('./qrcode/wechatMore.png'),
 
-
+    ic_remove: require('./qrcode/remove.png'),
 };
 
 export default images;
