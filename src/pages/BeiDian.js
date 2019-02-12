@@ -245,7 +245,7 @@ export default class BeiDian extends Component {
                     onMessage={async (event) => {
                         let data = JSON.parse(event.nativeEvent.data);
                         if (data.code == "WN1001") {
-                            DropDownHolder.alert('', data.msg, 'error');
+                            DropDownHolder.alert(data.msg, '', 'warn');
                         } else if (data.code == "WN1002") {
                             that.setState({
                                 historys: data.data
@@ -264,8 +264,13 @@ export default class BeiDian extends Component {
                                     if (jdInfo.retcode == 0) {
                                         let paragraph = jdInfo["data"]["searchm"]["Paragraph"];
                                         if (paragraph && paragraph.length > 0) {
-                                            let url = `https://item.m.jd.com/product/${paragraph[0]["wareid"]}.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/p9tJcC9MKs93pymWEt1EcstNabDUIjr7Gjg54qn7sDwheRy5/MRPKp2OY=`;
-                                            obj.url = url;
+                                            for (let i = 0; i < paragraph.length; i++) {
+                                                if (paragraph[i]["shop_name"].indexOf("自营") > -1 || paragraph[i]["shop_name"].indexOf("旗舰店") > -1) {
+                                                    let url = `https://item.m.jd.com/product/${paragraph[i]["wareid"]}.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/p9tJcC9MKs93pymWEt1EcstNabDUIjr7Gjg54qn7sDwheRy5/MRPKp2OY=`;
+                                                    obj.url = url;
+                                                    break;
+                                                }
+                                            }
                                         }
                                     }
                                     break;
@@ -365,7 +370,22 @@ export default class BeiDian extends Component {
                 </Modal>
                 <View style={[styles.container, { display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }]}>
                     <TouchableOpacity
-                        onPress={() => { }}>
+                        onLongPress={() => {
+                            let obj = {
+                                code: "NW1003",
+                                data: 1,
+                                msg: "切换天猫平台"
+                            };
+                            this.webview.postMessage(JSON.stringify(obj));
+                        }}
+                        onPress={() => {
+                            let obj = {
+                                code: "NW1003",
+                                data: 6,
+                                msg: "切换唯品会平台"
+                            };
+                            this.webview.postMessage(JSON.stringify(obj));
+                        }}>
                         {/* <AntDesignIcon name='mail' size={30} color='white' style={{ marginLeft: 10, marginTop: 10 }} /> */}
                         <Text style={{ color: "#fff", fontSize: 18 }}>{this.state.products.length}</Text>
                     </TouchableOpacity>

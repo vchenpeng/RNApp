@@ -42,16 +42,26 @@ let inject = (window, $) => {
                 if (data.success) {
                     // 存在productInfo时
                     if (data.body.productInfo) {
-                        pid = data.body.productInfo.pid;
-                        let productInfo = data.body.productInfo;
-                        window.postMessage(JSON.stringify(productInfo));
+                        if (pid == data.body.productInfo.pid) {
+                            let obj = {
+                                code: "WN1001",
+                                data: null,
+                                msg: `出现重复商品信息`
+                            };
+                            window.postMessage(JSON.stringify(obj));
+                        } else {
+                            pid = data.body.productInfo.pid;
+                            let productInfo = data.body.productInfo;
+                            window.postMessage(JSON.stringify(productInfo));
+                        }
                     } else if (data.body.nextPlatform) {
                         let obj = {
                             code: "WN1001",
                             data: null,
-                            msg: `请进入贝店App加入${data.body.nextPlatform.name}情报组`
+                            msg: `程序自动加入 [${data.body.nextPlatform.name}] 情报组`
                         };
                         window.postMessage(JSON.stringify(obj));
+                        changePlatform(data.body.nextPlatform.code);
                     }
                 } else {
                     let error = JSON.parse(data);
@@ -73,8 +83,6 @@ let inject = (window, $) => {
                 }
             },
             error: (error) => {
-
-                alert(error);
                 console.log(error);
             }
         });
@@ -150,6 +158,31 @@ let inject = (window, $) => {
             }
         });
     }
+    function changePlatform(p) {
+        $.ajax({
+            type: "GET",
+            url: "https://imapi.beidian.com/server/gateway?method=voc.price.hunter.agency.change&uid=91286199&platform=" + p,
+            contentType: 'application/json;charset=utf-8',
+            dataType: 'json',
+            data: null,
+            headers: {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)",
+                "Referer": "https://m.beidian.com/promote/price_info.html"
+            },
+            xhrFields: {
+                withCredentials: true
+            },
+            beforeSend: (xhr, settings) => {
+
+            },
+            "success": (data) => {
+                console.log(data);
+            },
+            "error": (error) => {
+                console.log(error);
+            }
+        });
+    }
     document.addEventListener("message", function (event) {
         let result = JSON.parse(event.data);
         switch (result.code) {
@@ -158,6 +191,9 @@ let inject = (window, $) => {
                 break;
             case "NW1002":
                 getHistory();
+                break;
+            case "NW1003":
+                changePlatform(result.data);
                 break;
             default:
                 submitBD(result);
