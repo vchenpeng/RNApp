@@ -20,7 +20,7 @@ export default class Web extends Component {
                     <Icon name='setting' size={24} color='white' style={{ marginRight: 15 }} />
                 </TouchableOpacity>
             </View>),
-            gesturesEnabled: false
+            gesturesEnabled: true
         }
     };
     constructor(props) {

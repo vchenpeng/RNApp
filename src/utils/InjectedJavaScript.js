@@ -159,9 +159,10 @@ let inject = (window, $) => {
         });
     }
     function changePlatform(p) {
+        uid = +getCookie('_logged_');
         $.ajax({
             type: "GET",
-            url: "https://imapi.beidian.com/server/gateway?method=voc.price.hunter.agency.change&uid=91286199&platform=" + p,
+            url: "https://imapi.beidian.com/server/gateway?method=voc.price.hunter.agency.change&uid=" + uid + "&platform=" + p,
             contentType: 'application/json;charset=utf-8',
             dataType: 'json',
             data: null,

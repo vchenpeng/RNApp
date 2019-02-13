@@ -5,6 +5,7 @@ import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import { WebView } from "react-native-webview";
+import NavigationService from '../utils/navigationService';
 import { Constants, Images, Colors } from "../resource";
 import DropDownHolder from '../utils/DropDownHolder';
 import tool from '../utils/tool';
@@ -150,18 +151,40 @@ export default class BeiDian extends Component {
         }
         return str;
     }
+    switchPlatformName(code) {
+        let platformName = "未知";
+        switch (code) {
+            case 1:
+                platformName = "天猫";
+                break;
+            case 2:
+                platformName = "京东";
+                break;
+            case 6:
+                platformName = "唯品会";
+                break;
+            default:
+                break;
+        }
+        return platformName;
+    }
     componentDidMount() {
         NativeModules.MainBridge.setIdleTimerDisabled(true);
         this.props.navigation.setParams({ webview: this.webview });
         this.props.navigation.setParams({ openHistory: this.openHistory });
     }
     renderRow({ item }) {
+
         return (
             <TouchableHighlight
                 activeOpacity={0.85}
                 underlayColor='#000'
                 onPress={() => {
                     // NavigationService.navigate('MarketDetail', { title: item.name });
+                    this.setState({
+                        isShowHistory: false
+                    });
+                    NavigationService.navigate("Web", { url: item.outerUrl, title: item.title });
                 }} >
                 <View style={{ backgroundColor: '#fff' }}>
                     <ListItem
@@ -188,7 +211,7 @@ export default class BeiDian extends Component {
                         }}
                         subtitleContainerStyle={{ justifyContent: "center", width: 230, marginLeft: 10, height: 20 }}
                         title={item.title}
-                        subtitle={"更新于 " + tool.formatDateTmp(+(item.gmtModified + '000'))}
+                        subtitle={this.switchPlatformName(item.platform) + "·更新于 " + tool.formatDateTmp(+(item.gmtModified + '000'))}
                         rightTitle={item.status == 1 ? '分析中' : (item.status == 2 ? '成功' : '失败')}
                         rightTitleStyle={[{
                             backgroundColor: '#d43f3a', paddingTop: 5, paddingBottom: 5, width: 50, color: '#fff', fontSize: 12, textAlign: "center",
