@@ -315,9 +315,17 @@ export default class BeiDian extends Component {
                                     let tmInfo = await that.searchTM(data.title);
                                     let item = tmInfo["item"];
                                     if (item && item.length > 0) {
-                                        let first = item[0];
-                                        let url = `https:${first.url}`;
-                                        obj.url = url;
+                                        for (let i = 0; i < item.length; i++) {
+                                            if (item[i]["shop_name"].indexOf("天猫超市") > -1
+                                                || item[i]["shop_name"].indexOf("旗舰店") > -1
+                                                || item[i]["shop_name"].indexOf("直营") > -1
+                                            ) {
+                                                let first = item[i];
+                                                let url = `https:${first.url}`;
+                                                obj.url = url;
+                                                break;
+                                            }
+                                        }
                                     }
                                     break;
                             }
