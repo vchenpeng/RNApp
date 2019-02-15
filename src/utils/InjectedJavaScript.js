@@ -67,7 +67,7 @@ let inject = (window, $) => {
                     let error = JSON.parse(data);
                     if (error.code == 1003) {
                         let obj = {
-                            code: "WN1001",
+                            code: "WN1000",
                             data: null,
                             msg: "授权失败，请登录贝店"
                         };

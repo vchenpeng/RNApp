@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Text, Image, View, Modal, SafeAreaView, FlatList, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, Dimensions, Clipboard, NativeModules, StyleSheet, StatusBar, Alert } from 'react-native';
+import { Text, Image, View, SafeAreaView, FlatList, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, Dimensions, Clipboard, NativeModules, StyleSheet, StatusBar, Alert } from 'react-native';
+import Modal from '../components/ModalBox';
+import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
 import { Header, Button, ListItem, Avatar } from 'react-native-elements';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
@@ -13,49 +15,67 @@ import { ImageButton, TopBar } from "../components";
 import InjectedJavaScript from '../utils/InjectedJavaScript'
 
 let self;
+let platformCode = 1;   // 天猫
 export default class BeiDian extends Component {
-    webview: WebView
     //接收上一个页面传过来的title显示出来
-    static navigationOptions = ({ navigation }) => ({
-        headerTitle: "贝店情报局",
-        headerTitleStyle: {
-            fontSize: 18,
-            fontWeight: '400',
-            alignSelf: 'center',
-            color: '#fff'
-        },
-        headerMode: "card",
-        headerStyle: { backgroundColor: Colors.theme_color, borderBottomWidth: 0 },
-        headerRight: (<View>
-            <TouchableOpacity onPress={() => {
-                // navigation.state.params.webview.reload();
-                navigation.state.params.openHistory();
-            }} >
-                <AntDesignIcon name='profile' size={24} color='white' style={{ marginRight: 15 }} />
-            </TouchableOpacity>
-        </View>),
-    })
+    static navigationOptions = ({ navigation }) => {
+        let { params } = navigation.state;
+        return {
+            headerTitle: "贝店情报局",
+            headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: '400',
+                alignSelf: 'center',
+                color: '#fff'
+            },
+            headerMode: "card",
+            headerStyle: { backgroundColor: Colors.theme_color, borderBottomWidth: 0 },
+            headerRight: (<View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        platformCode = platformCode == 1 ? 6 : 1;
+                        let obj = {
+                            code: "NW1003",
+                            data: platformCode,
+                            msg: "切换价格情报平台"
+                        };
+                        navigation.state.params.webview.postMessage(JSON.stringify(obj));
+                        NativeModules.MainBridge.playSystemAudio(1001);
+                    }} >
+                    <AntDesignIcon name='retweet' size={24} color='white' style={{ marginRight: 10 }} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    navigation.state.params.openLogin();
+                }} >
+                    <AntDesignIcon name='iconfontdesktop' size={24} color='white' style={{ marginRight: 15 }} />
+                    <View style={{ position: "absolute", right: 12, top: -4, paddingTop: 1, paddingBottom: 1, paddingLeft: 3, paddingRight: 3, backgroundColor: "red", borderRadius: 3 }}>
+                        <Text style={{ fontSize: 10, color: "#fff" }}>{((params && params.products) ? params.products.length : 0).toString()}</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>),
+        }
+    }
+    webview: WebView
     constructor(props) {
         super(props);
         self = this;
         this.state = {
+            refreshing: false,
             isShowLogin: false,
-            isShowHistory: false,
             id: null,
             pid: 91286199,
             products: [],
             historys: []
         };
     }
-    openHistory() {
-        /*let obj = {
-            code: "NW1002",
-            data: null,
-            msg: "请求历史记录"
-        };
-        self.webview.postMessage(JSON.stringify(obj));*/
+    setLoginModalStatus(flag) {
         self.setState({
-            isShowHistory: true
+            isShowLogin: flag
+        });
+    }
+    openLogin() {
+        self.setState({
+            isShowLogin: !self.state.isShowLogin
         });
     }
     searchWPH(title) {
@@ -171,19 +191,14 @@ export default class BeiDian extends Component {
     componentDidMount() {
         NativeModules.MainBridge.setIdleTimerDisabled(true);
         this.props.navigation.setParams({ webview: this.webview });
-        this.props.navigation.setParams({ openHistory: this.openHistory });
+        this.props.navigation.setParams({ openLogin: this.openLogin });
     }
     renderRow({ item }) {
-
         return (
             <TouchableHighlight
                 activeOpacity={0.85}
                 underlayColor='#000'
                 onPress={() => {
-                    // NavigationService.navigate('MarketDetail', { title: item.name });
-                    this.setState({
-                        isShowHistory: false
-                    });
                     NavigationService.navigate("Web", { url: item.outerUrl, title: item.title });
                 }} >
                 <View style={{ backgroundColor: '#fff' }}>
@@ -230,143 +245,32 @@ export default class BeiDian extends Component {
         let that = this;
         let { height, width } = Dimensions.get('window');
         const { navigate } = this.props.navigation;
-
         return (<SafeAreaView style={{ flex: 1, backgroundColor: "#f2f4f6" }}>
             <View style={{ flex: 1, backgroundColor: "#f2f4f6" }}>
                 <StatusBar barStyle="light-content" />
-                <WebView
-                    ref={w => this.webview = w}
-                    style={{ display: this.state.isShowLogin ? "flex" : "none" }}
-                    source={{ uri: "https://m.beidian.com/login/fast_login.html" }}
-                    startInLoadingState={true}
-                    hideKeyboardAccessoryView={true}
-                    allowsBackForwardNavigationGestures={true}
-                    allowsLinkPreview={true}
-                    decelerationRate="normal"
-                    dataDetectorTypes="none"
-                    scrollEnabled={false}
-                    useWebkit={false}
-                    onLoadEnd={() => {
-                        let obj = {
-                            code: "NW1001",
-                            data: null,
-                            msg: "加载完毕"
-                        };
-                        this.webview.postMessage(JSON.stringify(obj));
-                        this.setState({
-                            isShowLogin: true
-                        });
-                    }}
-                    renderLoading={() => (<View
-                        style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}
 
-                    >
-                        <Image source={Images.ic_webloading} />
-                    </View>)}
-                    injectedJavaScript={InjectedJavaScript}
-                    userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
-                    onMessage={async (event) => {
-                        let data = JSON.parse(event.nativeEvent.data);
-                        if (data.code == "WN1001") {
-                            DropDownHolder.alert(data.msg, '', 'warn');
-                        } else if (data.code == "WN1002") {
-                            that.setState({
-                                historys: data.data
-                            });
-                        }
-                        else {
-                            let obj = {
-                                id: data.id,
-                                uid: data.uid,
-                                url: ''
-                            };
-                            DropDownHolder.alert('', `${data.title}`, 'info');
-                            switch (data.platform) {
-                                case 2:
-                                    let jdInfo = await that.searchJD(data.title);
-                                    if (jdInfo.retcode == 0) {
-                                        let paragraph = jdInfo["data"]["searchm"]["Paragraph"];
-                                        if (paragraph && paragraph.length > 0) {
-                                            for (let i = 0; i < paragraph.length; i++) {
-                                                if (paragraph[i]["shop_name"].indexOf("自营") > -1 || paragraph[i]["shop_name"].indexOf("旗舰店") > -1) {
-                                                    let url = `https://item.m.jd.com/product/${paragraph[i]["wareid"]}.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/p9tJcC9MKs93pymWEt1EcstNabDUIjr7Gjg54qn7sDwheRy5/MRPKp2OY=`;
-                                                    obj.url = url;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case 6:
-                                    let wphInfo = await that.searchWPH(data.title);
-                                    let wphInfoData = wphInfo[0]["result"]["data"];
-                                    if (wphInfoData) {
-                                        let products = wphInfoData["products"];
-                                        if (products && products.length > 0) {
-                                            let product_url = products[0]["product_url"];
-                                            let tmpWord = that.randomWord(false, 40, 40);
-                                            let chlParam = encodeURIComponent("share:" + that.randomWord(false, 10, 10));
-                                            let url = `https://m.vip.com${product_url}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=`;
-                                            obj.url = url;
-                                        }
-                                    }
-                                    break;
-                                case 1:
-                                    let tmInfo = await that.searchTM(data.title);
-                                    let item = tmInfo["item"];
-                                    if (item && item.length > 0) {
-                                        for (let i = 0; i < item.length; i++) {
-                                            if (item[i]["shop_name"].indexOf("天猫超市") > -1
-                                                || item[i]["shop_name"].indexOf("旗舰店") > -1
-                                                || item[i]["shop_name"].indexOf("直营") > -1
-                                            ) {
-                                                let first = item[i];
-                                                let url = `https:${first.url}`;
-                                                obj.url = url;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    break;
-                            }
-
-                            if (obj.url != '') {
-                                let p = this.state.products;
-                                p.push(obj);
-                                this.setState({
-                                    products: p
-                                });
-                                this.webview.postMessage(JSON.stringify(obj));
-                                NativeModules.MainBridge.playSystemAudio(1009);
-                                Clipboard.setString(obj.url);
-                            }
-                        }
+                <ScrollableTabView
+                    style={{ marginTop: 0 }}
+                    initialPage={0}
+                    renderTabBar={() => (<ScrollableTabBar
+                        style={{ borderBottomWidth: 0, height: 40, paddingVertical: 0 }}
+                        textStyle={{ height: 40, paddingTop: 8, fontSize: 14 }}
+                        activeTextColor={Colors.theme_color}
+                        underlineWidth={20}
+                        inactiveTextColor="#999" />)
+                    }
+                    tabBarBackgroundColor="#eee"
+                    tabBarUnderlineStyle={{
+                        backgroundColor: Colors.theme_color, height: 2
                     }}
-                />
-                <Modal
-                    animationType='slide'           // 从底部滑入
-                    transparent={false}             // 不透明
-                    visible={that.state.isShowHistory}    // 根据isModal决定是否显示
-                    presentationStyle="formSheet"
-                    onRequestClose={() => { }}  // android必须实现
+                    underlineWidth={10}
+                    onChangeTab={(obj) => {
+                        console.log('index:' + obj.i);
+                    }}
                 >
-                    <View style={{ flex: 1 }}>
-                        <TopBar
-                            title={"历史记录"}
-                            leftIcon={Images.ic_remove}
-                            leftTitle=""
-                            bgColor={Colors.theme_color}
-                            titleColor="#fff"
-                            rightIcon={<AntDesignIcon name='reload1' size={24} color='white' />}
-                            rightPress={that.openHistory}
-                            leftPress={() => {
-                                that.setState({
-                                    isShowHistory: false
-                                });
-                            }}
-                        />
+                    <View tabLabel={"价格情报局"} style={{}} key={"价格情报局"}>
                         <SwipeListView
-                            style={{ backgroundColor: '#eee' }}
+                            style={{}}
                             useFlatList={true}
                             data={this.state.historys}
                             renderItem={(rowData, rowMap) => this.renderRow(rowData, rowMap)}
@@ -396,43 +300,197 @@ export default class BeiDian extends Component {
                             keyExtractor={(rowData, index) => {
                                 return rowData.id.toString();
                             }}
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                NativeModules.MainBridge.playSystemAudio(1100);
+                                this.setState({ refreshing: true });
+                                let obj = {
+                                    code: "NW1002",
+                                    data: null,
+                                    msg: "请求历史记录"
+                                };
+                                self.webview.postMessage(JSON.stringify(obj));
+                            }}
                         />
                     </View>
-                </Modal>
-                <View style={[styles.container, { display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }]}>
-                    <TouchableOpacity
-                        onLongPress={() => {
+                    <View tabLabel={"情报检验科"} style={{}} key={"情报检验科"}>
+                        <SwipeListView
+                            style={{}}
+                            useFlatList={true}
+                            data={this.state.historys}
+                            renderItem={(rowData, rowMap) => this.renderRow(rowData, rowMap)}
+                            directionalDistanceChangeThreshold={1}
+                            renderHiddenItem={(data, rowMap) => (
+                                <View style={styles.rowBack}>
+                                    <Text></Text>
+                                    <TouchableOpacity activeOpacity={1} style={[styles.backRightBtn, styles.backRightBtnLeft]}
+                                    >
+                                        <Text style={styles.backTextWhite}>关闭</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity activeOpacity={1} style={[styles.backRightBtn, styles.backRightBtnRight]}
+                                    >
+                                        <Text style={styles.backTextWhite}>删除</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                            leftOpenValue={75}
+                            rightOpenValue={-150}
+                            disableRightSwipe={true}
+                            disableLeftSwipe={true}
+                            friction={10}
+                            tension={0}
+                            recalculateHiddenLayout={false}
+                            previewDuration={0}
+                            previewOpenValue={.01}
+                            keyExtractor={(rowData, index) => {
+                                return rowData.id.toString();
+                            }}
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                NativeModules.MainBridge.playSystemAudio(1100);
+                                this.setState({ refreshing: true });
+                                let obj = {
+                                    code: "NW1002",
+                                    data: null,
+                                    msg: "请求历史记录"
+                                };
+                                self.webview.postMessage(JSON.stringify(obj));
+                            }}
+                        />
+                    </View>
+                </ScrollableTabView >
+                <Modal
+                    isOpen={that.state.isShowLogin}
+                    keyboardTopOffset={0}
+                    startOpen={false}
+                    backdrop={false}
+                    coverScreen={false}
+                    swipeToClose={false}
+                    useNativeDriver={false}
+                    position={"top"}
+                >
+                    <WebView
+                        ref={w => this.webview = w}
+                        style={{ flex: 1 }}
+                        source={{ uri: "https://m.beidian.com/login/fast_login.html" }}
+                        startInLoadingState={-22}
+                        hideKeyboardAccessoryView={true}
+                        allowsBackForwardNavigationGestures={true}
+                        allowsLinkPreview={false}
+                        decelerationRate="normal"
+                        dataDetectorTypes="none"
+                        scrollEnabled={false}
+                        bounces={true}
+                        useWebkit={true}
+                        onLoadEnd={() => {
                             let obj = {
-                                code: "NW1003",
-                                data: 1,
-                                msg: "切换天猫平台"
+                                code: "NW1001",
+                                data: null,
+                                msg: "加载完毕"
                             };
                             this.webview.postMessage(JSON.stringify(obj));
                         }}
-                        onPress={() => {
-                            let obj = {
-                                code: "NW1003",
-                                data: 6,
-                                msg: "切换唯品会平台"
-                            };
-                            this.webview.postMessage(JSON.stringify(obj));
-                        }}>
-                        {/* <AntDesignIcon name='mail' size={30} color='white' style={{ marginLeft: 10, marginTop: 10 }} /> */}
-                        <Text style={{ color: "#fff", fontSize: 18 }}>{this.state.products.length}</Text>
-                    </TouchableOpacity>
-                </View>
-            </View></SafeAreaView>)
+                        renderLoading={() => (<View
+                            style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}
+                        >
+                            <Image source={Images.ic_webloading} />
+                        </View>)}
+                        injectedJavaScript={InjectedJavaScript}
+                        userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
+                        onMessage={async (event) => {
+                            let data = JSON.parse(event.nativeEvent.data);
+                            if (data.code == "WN1000") {
+                                if (that.state.isShowLogin) {
+                                    DropDownHolder.alert(data.msg, '', 'error');
+                                } else {
+                                    that.setLoginModalStatus(true);
+                                }
+                            } else if (data.code == "WN1001") {
+                                DropDownHolder.alert(data.msg, '', 'warn');
+                            } else if (data.code == "WN1002") {
+                                that.setState({
+                                    historys: data.data
+                                });
+                                that.setState({ refreshing: false });
+                            }
+                            else {
+                                that.setLoginModalStatus(false);
+                                let obj = {
+                                    id: data.id,
+                                    uid: data.uid,
+                                    url: ''
+                                };
+                                DropDownHolder.alert('', `${data.title}`, 'info');
+                                switch (data.platform) {
+                                    case 2:
+                                        let jdInfo = await that.searchJD(data.title);
+                                        if (jdInfo.retcode == 0) {
+                                            let paragraph = jdInfo["data"]["searchm"]["Paragraph"];
+                                            if (paragraph && paragraph.length > 0) {
+                                                for (let i = 0; i < paragraph.length; i++) {
+                                                    if (paragraph[i]["shop_name"].indexOf("自营") > -1 || paragraph[i]["shop_name"].indexOf("旗舰店") > -1) {
+                                                        let tmpWord = that.randomWord(false, 58, 58);
+                                                        let url = `https://item.m.jd.com/product/${paragraph[i]["wareid"]}.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/${tmpWord}`;
+                                                        obj.url = url;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    case 6:
+                                        let wphInfo = await that.searchWPH(data.title);
+                                        let wphInfoData = wphInfo[0]["result"]["data"];
+                                        if (wphInfoData) {
+                                            let products = wphInfoData["products"];
+                                            if (products && products.length > 0) {
+                                                let product_url = products[0]["product_url"];
+                                                let tmpWord = that.randomWord(false, 40, 40);
+                                                let chlParam = encodeURIComponent("share:" + that.randomWord(false, 10, 10));
+                                                let url = `https://m.vip.com${product_url}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=`;
+                                                obj.url = url;
+                                            }
+                                        }
+                                        break;
+                                    case 1:
+                                        let tmInfo = await that.searchTM(data.title);
+                                        let item = tmInfo["item"];
+                                        if (item && item.length > 0) {
+                                            for (let i = 0; i < item.length; i++) {
+                                                if (item[i]["shop_name"].indexOf("天猫超市") > -1
+                                                    || item[i]["shop_name"].indexOf("旗舰店") > -1
+                                                    || item[i]["shop_name"].indexOf("直营") > -1
+                                                ) {
+                                                    let first = item[i];
+                                                    let url = `https:${first.url}`;
+                                                    obj.url = url;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                }
+
+                                if (obj.url != '') {
+                                    let p = this.state.products;
+                                    p.push(obj);
+                                    this.setState({
+                                        products: p
+                                    });
+                                    this.props.navigation.setParams({ products: p });
+                                    this.webview.postMessage(JSON.stringify(obj));
+                                    NativeModules.MainBridge.playSystemAudio(1009);
+                                    Clipboard.setString(obj.url);
+                                }
+                            }
+                        }}
+                    />
+                </Modal>
+            </View>
+        </SafeAreaView>)
     }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        position: "absolute",
-        right: 25,
-        bottom: 25,
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: Colors.theme_color
-    }
+
 });
