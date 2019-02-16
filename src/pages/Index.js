@@ -157,13 +157,13 @@ export default class Home extends PureComponent {
                     activeDotStyle={{ bottom: -15, width: 10, height: 2, backgroundColor: Colors.theme_color, borderRadius: 0 }}
                     showsButtons={false}>
                     <View style={[styles.slide1]}>
-                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://pic32.photophoto.cn/20140915/0034034424700073_b.jpg' }}></Image>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1550330175936&di=3ef757c8b9f242d1bc998d8410d6250a&imgtype=0&src=http%3A%2F%2Fimg17.3lian.com%2Fd%2Ffile%2F201702%2F16%2F17cd567662bafc8d63d73d41444585d2.jpg' }}></Image>
                     </View>
                     <View style={styles.slide2}>
-                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://pic3.40017.cn/scenery/destination/2015/04/18/03/vrn29Y.jpg' }}></Image>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1550330175932&di=100d7cfe710ae51fba888b4118d85a64&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F2017-12-26%2F5a41b8379de50.jpg' }}></Image>
                     </View>
                     <View style={styles.slide2}>
-                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'http://pic2.16pic.com/00/55/40/16pic_5540749_b.jpg' }}></Image>
+                        <Image style={{ flex: 1, resizeMode: "stretch", width: width }} source={{ uri: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1550330300991&di=365cb5dbfe3833c905b29da1f90617e0&imgtype=0&src=http%3A%2F%2Fimg17.3lian.com%2Fd%2Ffile%2F201702%2F13%2F29949fc0ed8c766195cd1f34f87df42f.jpg' }}></Image>
                     </View>
                 </Swiper>
             </View>

@@ -4,9 +4,10 @@
  * Desc:
  */
 const colors = {
-    // theme_color: '#376fff',
+    theme_color: '#6C890B',
     // theme_color: '#373f51',
-    theme_color: '#3bafda',
+    // theme_color: '#3bafda',
+    // theme_color:'#ABC327',
     //通用颜色
     white_fff: '#fff',
     black_000: '#000',

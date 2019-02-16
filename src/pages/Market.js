@@ -40,9 +40,9 @@ export default class Market extends Component {
                 }} >
                 <View style={{ backgroundColor: '#fff' }}>
                     <ListItem
-                        style={[styles.item]}
+                        style={[styles.item, { flexDirection: "column" }]}
                         containerStyle={{
-                            backgroundColor: '#fff', padding: 0, margin: 0, borderBottomColor: '#eee',
+                            backgroundColor: '#fff', padding: 0, margin: 0, borderBottomWidth: 0,
                             paddingTop: 10, paddingBottom: 10, paddingLeft: 10
                         }}
                         key={item.id}
@@ -57,8 +57,8 @@ export default class Market extends Component {
                         subtitleStyle={{ fontSize: 12 }}
                         titleContainerStyle={{
                             height: 20,
-                            width: 230,
                             marginLeft: 10,
+                            marginRight: 10,
                             justifyContent: "center"
                         }}
                         subtitleContainerStyle={{ justifyContent: "center", marginLeft: 10, height: 20 }}
@@ -73,6 +73,7 @@ export default class Market extends Component {
                         rightAvatar={false}
                         rightIcon={<View />}
                         buttonGroup={null}
+                        rightTitleContainerStyle={{ width: 60, flex: 0 }}
                     />
                 </View>
             </TouchableHighlight>
@@ -92,6 +93,7 @@ export default class Market extends Component {
                 useFlatList={true}
                 data={this.state.list}
                 renderItem={(rowData, rowMap) => this.renderRow(rowData, rowMap)}
+                swipeRowStyle={{ borderBottomWidth: 1, borderBottomColor: "#eee" }}
                 directionalDistanceChangeThreshold={1}
                 renderHiddenItem={(data, rowMap) => (
                     <View style={styles.rowBack}>

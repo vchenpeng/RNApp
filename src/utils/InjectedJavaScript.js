@@ -55,13 +55,18 @@ let inject = (window, $) => {
                             window.postMessage(JSON.stringify(productInfo));
                         }
                     } else if (data.body.nextPlatform) {
+                        let nextPlatform = data.body.nextPlatform;
+                        if (nextPlatform.code == 2) {
+                            nextPlatform.code = 1;
+                            nextPlatform.name = "↷天猫"
+                        }
                         let obj = {
                             code: "WN1004",
                             data: null,
-                            msg: `程序自动加入 [${data.body.nextPlatform.name}] 情报组`
+                            msg: `程序自动加入 [${nextPlatform.name}] 情报组`
                         };
                         window.postMessage(JSON.stringify(obj));
-                        changePlatform(data.body.nextPlatform.code);
+                        changePlatform(nextPlatform.code);
                     }
                 } else {
                     let error = JSON.parse(data);
@@ -128,7 +133,7 @@ let inject = (window, $) => {
             data: JSON.stringify({
                 "uid": uid,
                 "page": 1,
-                "size": 150
+                "size": 200
             }),
             headers: {
                 "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)",

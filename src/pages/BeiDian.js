@@ -251,7 +251,7 @@ export default class BeiDian extends Component {
         let that = this;
         let { height, width } = Dimensions.get('window');
         const { navigate } = this.props.navigation;
-        return (<SafeAreaView style={{ flex: 1, backgroundColor: "#f2f4f6" }}>
+        return (<SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
             <View style={{ flex: 1, backgroundColor: "#f2f4f6" }}>
                 <StatusBar barStyle="light-content" />
 
