@@ -56,7 +56,7 @@ let inject = (window, $) => {
                         }
                     } else if (data.body.nextPlatform) {
                         let obj = {
-                            code: "WN1001",
+                            code: "WN1004",
                             data: null,
                             msg: `程序自动加入 [${data.body.nextPlatform.name}] 情报组`
                         };

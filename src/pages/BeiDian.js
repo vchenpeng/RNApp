@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image, View, SafeAreaView, FlatList, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, Dimensions, Clipboard, NativeModules, StyleSheet, StatusBar, Alert } from 'react-native';
+import { Text, Image, View, SafeAreaView, Easing, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, Dimensions, Clipboard, NativeModules, StyleSheet, StatusBar, Alert } from 'react-native';
 import Modal from '../components/ModalBox';
 import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
 import { Header, Button, ListItem, Avatar } from 'react-native-elements';
@@ -193,7 +193,7 @@ export default class BeiDian extends Component {
         this.props.navigation.setParams({ webview: this.webview });
         this.props.navigation.setParams({ openLogin: this.openLogin });
     }
-    renderRow({ item }) {
+    renderRow({ item }, rowId, secId, rowMap) {
         return (
             <TouchableHighlight
                 activeOpacity={0.85}
@@ -203,10 +203,15 @@ export default class BeiDian extends Component {
                 }} >
                 <View style={{ backgroundColor: '#fff' }}>
                     <ListItem
-                        style={[styles.item]}
+                        style={[styles.item, {
+                            flexDirection: "column",
+                        }]}
                         containerStyle={{
-                            backgroundColor: '#fff', padding: 0, margin: 0, borderBottomColor: '#eee',
-                            paddingTop: 10, paddingBottom: 10, paddingLeft: 10
+                            backgroundColor: '#fff', padding: 0, margin: 0,
+                            borderBottomWidth: 0,
+                            paddingTop: 10,
+                            paddingBottom: 10,
+                            paddingLeft: 10,
                         }}
                         key={item.key}
                         avatar={<Avatar
@@ -220,7 +225,7 @@ export default class BeiDian extends Component {
                         subtitleStyle={{ fontSize: 12 }}
                         titleContainerStyle={{
                             height: 20,
-                            width: 230,
+                            marginRight: 10,
                             marginLeft: 10,
                             justifyContent: "center"
                         }}
@@ -236,6 +241,7 @@ export default class BeiDian extends Component {
                         rightAvatar={false}
                         rightIcon={<View />}
                         buttonGroup={null}
+                        rightTitleContainerStyle={{ width: 60, flex: 0 }}
                     />
                 </View>
             </TouchableHighlight>
@@ -263,35 +269,49 @@ export default class BeiDian extends Component {
                     tabBarUnderlineStyle={{
                         backgroundColor: Colors.theme_color, height: 2
                     }}
+                    locked={true}
                     underlineWidth={10}
                     onChangeTab={(obj) => {
                         console.log('index:' + obj.i);
                     }}
                 >
-                    <View tabLabel={"价格情报局"} style={{}} key={"价格情报局"}>
+                    <View tabLabel={"价格情报局"} style={{ flex: 1 }} key={"价格情报局"}>
                         <SwipeListView
-                            style={{}}
                             useFlatList={true}
                             data={this.state.historys}
+                            swipeRowStyle={{ borderBottomWidth: 1, borderBottomColor: "#eee" }}
                             renderItem={(rowData, rowMap) => this.renderRow(rowData, rowMap)}
+                            onRowOpen={(rowId, secId, rowMap) => { this.openRowId = rowId; }}
+                            onRowClose={(rowId, secId, rowMap) => { this.openRowId = null }}
                             directionalDistanceChangeThreshold={1}
+                            closeOnRowPress={true}
                             renderHiddenItem={(data, rowMap) => (
                                 <View style={styles.rowBack}>
                                     <Text></Text>
                                     <TouchableOpacity activeOpacity={1} style={[styles.backRightBtn, styles.backRightBtnLeft]}
+                                        onPress={() => {
+                                            let { item } = data;
+                                            Clipboard.setString(item.title);
+                                            rowMap[data.item.id.toString()].closeRow();
+                                        }}
                                     >
-                                        <Text style={styles.backTextWhite}>关闭</Text>
+                                        <Text style={styles.backTextWhite}>复制标题</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity activeOpacity={1} style={[styles.backRightBtn, styles.backRightBtnRight]}
+                                        onPress={() => {
+                                            let { item } = data;
+                                            Clipboard.setString(item.outerUrl);
+                                            rowMap[data.item.id.toString()].closeRow();
+                                        }}
                                     >
-                                        <Text style={styles.backTextWhite}>删除</Text>
+                                        <Text style={styles.backTextWhite}>复制链接</Text>
                                     </TouchableOpacity>
                                 </View>
                             )}
                             leftOpenValue={75}
-                            rightOpenValue={-150}
+                            rightOpenValue={-180}
                             disableRightSwipe={true}
-                            disableLeftSwipe={true}
+                            disableLeftSwipe={false}
                             friction={10}
                             tension={0}
                             recalculateHiddenLayout={false}
@@ -313,50 +333,8 @@ export default class BeiDian extends Component {
                             }}
                         />
                     </View>
-                    <View tabLabel={"情报检验科"} style={{}} key={"情报检验科"}>
-                        <SwipeListView
-                            style={{}}
-                            useFlatList={true}
-                            data={this.state.historys}
-                            renderItem={(rowData, rowMap) => this.renderRow(rowData, rowMap)}
-                            directionalDistanceChangeThreshold={1}
-                            renderHiddenItem={(data, rowMap) => (
-                                <View style={styles.rowBack}>
-                                    <Text></Text>
-                                    <TouchableOpacity activeOpacity={1} style={[styles.backRightBtn, styles.backRightBtnLeft]}
-                                    >
-                                        <Text style={styles.backTextWhite}>关闭</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity activeOpacity={1} style={[styles.backRightBtn, styles.backRightBtnRight]}
-                                    >
-                                        <Text style={styles.backTextWhite}>删除</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-                            leftOpenValue={75}
-                            rightOpenValue={-150}
-                            disableRightSwipe={true}
-                            disableLeftSwipe={true}
-                            friction={10}
-                            tension={0}
-                            recalculateHiddenLayout={false}
-                            previewDuration={0}
-                            previewOpenValue={.01}
-                            keyExtractor={(rowData, index) => {
-                                return rowData.id.toString();
-                            }}
-                            refreshing={this.state.refreshing}
-                            onRefresh={() => {
-                                NativeModules.MainBridge.playSystemAudio(1100);
-                                this.setState({ refreshing: true });
-                                let obj = {
-                                    code: "NW1002",
-                                    data: null,
-                                    msg: "请求历史记录"
-                                };
-                                self.webview.postMessage(JSON.stringify(obj));
-                            }}
-                        />
+                    <View tabLabel={"贝店果园"} style={{}} key={"贝店果园"}>
+
                     </View>
                 </ScrollableTabView >
                 <Modal
@@ -368,6 +346,8 @@ export default class BeiDian extends Component {
                     swipeToClose={false}
                     useNativeDriver={false}
                     position={"top"}
+                    animationDuration={500}
+                    easing={Easing.elastic(0)}
                 >
                     <WebView
                         ref={w => this.webview = w}
@@ -412,6 +392,8 @@ export default class BeiDian extends Component {
                                     historys: data.data
                                 });
                                 that.setState({ refreshing: false });
+                            } else if (data.code == "WN1004") {
+                                DropDownHolder.alert(data.msg, '', 'warn');
                             }
                             else {
                                 that.setLoginModalStatus(false);
@@ -492,5 +474,76 @@ export default class BeiDian extends Component {
 }
 
 const styles = StyleSheet.create({
-
+    container: {
+        backgroundColor: 'white',
+        flex: 1
+    },
+    standalone: {
+        marginTop: 30,
+        marginBottom: 30,
+    },
+    standaloneRowFront: {
+        alignItems: 'center',
+        backgroundColor: '#CCC',
+        justifyContent: 'center',
+        height: 50,
+    },
+    standaloneRowBack: {
+        alignItems: 'center',
+        backgroundColor: '#8BC645',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 15
+    },
+    backTextWhite: {
+        color: '#FFF'
+    },
+    rowFront: {
+        alignItems: 'center',
+        backgroundColor: '#CCC',
+        borderBottomColor: 'black',
+        borderBottomWidth: 1,
+        justifyContent: 'center',
+        height: 50,
+    },
+    rowBack: {
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: 15,
+    },
+    backRightBtn: {
+        alignItems: 'center',
+        bottom: 0,
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        width: 90
+    },
+    backRightBtnLeft: {
+        backgroundColor: '#FAA732',
+        right: 90
+    },
+    backRightBtnRight: {
+        backgroundColor: '#d43f3a',
+        right: 0
+    },
+    controls: {
+        alignItems: 'center',
+        marginBottom: 30
+    },
+    switchContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 5
+    },
+    switch: {
+        alignItems: 'center',
+        borderWidth: 1,
+        paddingVertical: 10,
+        width: Dimensions.get('window').width / 4,
+    }
 });
