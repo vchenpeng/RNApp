@@ -18,3 +18,5 @@ self.navigationBar.barTintColor = [UIColor colorWithRed:(59/255.0) green:(175/25
 选择本地相册库中配置字体: TZImagePickerController.m
 Line:265设置字体大小
 ```
+8.设置是否开启设置摇一摇开启调试
+[self setIsShakeToShowDevMenuEnabled:NO];

@@ -11,11 +11,9 @@ import NavigationService from '../utils/navigationService';
 import { Constants, Images, Colors } from "../resource";
 import DropDownHolder from '../utils/DropDownHolder';
 import tool from '../utils/tool';
-import { ImageButton, TopBar } from "../components";
 import InjectedJavaScript from '../utils/InjectedJavaScript'
 
-let self;
-let platformCode = 1;   // 天猫
+let self, nextPlatformIndex = 0;   // 天猫
 export default class BeiDian extends Component {
     //接收上一个页面传过来的title显示出来
     static navigationOptions = ({ navigation }) => {
@@ -33,20 +31,21 @@ export default class BeiDian extends Component {
             headerRight: (<View style={{ flexDirection: "row" }}>
                 <TouchableOpacity
                     onPress={() => {
-                        platformCode = platformCode == 1 ? 6 : 1;
-                        let obj = {
-                            code: "NW1003",
-                            data: platformCode,
-                            msg: "切换价格情报平台"
-                        };
+                        let code = [6, 2, 1][nextPlatformIndex];
+                        let codeName = ["唯品会", "京东", "天猫"][nextPlatformIndex];
+                        let obj = { code: "NW1003", data: code, msg: `手动切换到${codeName}平台` };
                         navigation.state.params.webview.postMessage(JSON.stringify(obj));
                         NativeModules.MainBridge.playSystemAudio(1001);
+                        // DropDownHolder.alert(`手动切换到 [${codeName}] 平台`, '', 'info');
+
+                        nextPlatformIndex += 1;
+                        nextPlatformIndex = nextPlatformIndex > 2 ? 0 : nextPlatformIndex;
                     }} >
                     <AntDesignIcon name='retweet' size={24} color='white' style={{ marginRight: 10 }} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                     navigation.state.params.openLogin();
-                }} >
+                }}>
                     <AntDesignIcon name='iconfontdesktop' size={24} color='white' style={{ marginRight: 15 }} />
                     <View style={{ position: "absolute", right: 12, top: -4, paddingTop: 1, paddingBottom: 1, paddingLeft: 3, paddingRight: 3, backgroundColor: "red", borderRadius: 3 }}>
                         <Text style={{ fontSize: 10, color: "#fff" }}>{((params && params.products) ? params.products.length : 0).toString()}</Text>
@@ -55,7 +54,7 @@ export default class BeiDian extends Component {
             </View>),
         }
     }
-    webview: WebView
+    webview
     constructor(props) {
         super(props);
         self = this;
@@ -69,17 +68,24 @@ export default class BeiDian extends Component {
         };
     }
     setLoginModalStatus(flag) {
-        self.setState({
-            isShowLogin: flag
-        });
+        self.setState({ isShowLogin: flag });
     }
     openLogin() {
-        self.setState({
-            isShowLogin: !self.state.isShowLogin
-        });
+        self.setState({ isShowLogin: !self.state.isShowLogin });
     }
-    searchWPH(title) {
-        let that = this;
+    checkIn(str, arr) {
+        let result = false;
+        for (let i = 0; i < arr.length; i++) {
+            if ((str.toUpperCase()).indexOf(arr[i].toUpperCase()) > -1) {
+                result = true;
+                break;
+            } else {
+                continue;
+            }
+        }
+        return result;
+    }
+    searchWPH(product) {
         const url = `https://m.vip.com/server.html?rpc&method=SearchRpc.getSearchList&f=www`;
         return fetch(url, {
             method: 'POST',
@@ -88,9 +94,9 @@ export default class BeiDian extends Component {
                 "params": {
                     "page": "searchlist.html",
                     "channel_id": "",
-                    "keyword": title,
+                    "keyword": product.title,
                     "np": 1,
-                    "ep": 5,
+                    "ep": 30,
                     "brand_ids": "",
                     "brand_store_sn": "",
                     "props": "",
@@ -108,53 +114,105 @@ export default class BeiDian extends Component {
                 "authorization": "OAuth api_sign=9499c033242a2dd1a0e38e03a136acd86d17d194",
             },
             credentials: 'include'
-        })
-            .then((response) => response.json())
-            .catch((error) => console.error(error));
+        }).then(r => r.json()).then((wphInfo) => {
+            let returnUrl = null;
+            try {
+                let wphInfoData = wphInfo[0]["result"]["data"];
+
+                if (wphInfoData) {
+                    let products = wphInfoData["products"];
+                    if (products && products.length > 0) {
+                        for (let i = 0; i < products.length; i++) {
+                            let item = products[i];
+                            let brands = product.brandName.split("/");
+                            if (this.checkIn(item["brand_name"], brands)
+                                && Math.abs(product.price - item.sale_price) < 50) {
+
+                                let productUrl = item["product_url"];
+                                let tmpWord = this.randomWord(false, 40, 40);
+                                let chlParam = encodeURIComponent("share:" + this.randomWord(false, 10, 10));
+                                returnUrl = `https://m.vip.com${productUrl}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=`;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                returnUrl = null;
+            }
+            return returnUrl;
+        }).catch((error) => {
+            return null;
+        });
     }
-    searchJD(title) {
-        let that = this;
-        const url = `https://so.m.jd.com/ware/search._m2wq_list?keyword=${title}&datatype=1&page=1&pagesize=10&ext_attr=no&brand_col=no&price_col=no&color_col=no&size_col=no&ext_attr_sort=no&merge_sku=yes&multi_suppliers=yes&area_ids=1,72,2819&filt_type=col_type,L0M0;&qp_disable=no&fdesc=%E5%8C%97%E4%BA%AC&t1=1548735239631`;
+    searchJD(product) {
+        const url = `https://so.m.jd.com/ware/search._m2wq_list?keyword=${product.title}&datatype=1&page=1&pagesize=30&ext_attr=no&brand_col=no&price_col=no&color_col=no&size_col=no&ext_attr_sort=no&merge_sku=yes&multi_suppliers=yes&qp_disable=no&t1=1548735239631&callback=self.handleJD`;
         return fetch(url, {
             method: 'GET',
-            headers: {
-
-            },
             credentials: 'include'
-        })
-            .then((response) => {
-                try {
+        }).then((response) => {
+            let jdInfo = eval(response._bodyInit);
 
-                    let result = JSON.stringify(response._bodyInit);
-                    let dataStr = result.replace(/\\n/g, "").replace(/\\"/g, '"').replace(/\)"/g, "").substr(10, result.length - 3);
-                    let data = JSON.parse(dataStr);
-                    return data;
-                } catch (e) {
-                    return null;
+            let returnUrl = null;
+            try {
+                if (jdInfo.retcode == 0) {
+                    let paragraph = jdInfo["data"]["searchm"]["Paragraph"];
+                    if (paragraph && paragraph.length > 0) {
+                        let brands = product.brandName.split("/");
+                        let keywords = ['自营', '旗舰店'];
+                        for (let i = 0; i < paragraph.length; i++) {
+                            let item = paragraph[i];
+
+                            if (this.checkIn(item["shop_name"], keywords) && this.checkIn(item["shop_name"], brands)
+                                && Math.abs(product.price - item.dredisprice) < 30
+                            ) {
+                                let tmpWord = this.randomWord(false, 58, 58);
+                                returnUrl = `https://item.m.jd.com/product/${item["wareid"]}.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/${tmpWord}`;
+                                break;
+                            }
+                        }
+                    }
                 }
-            })
-            .catch((error) => console.error(error));
+            } catch (e) {
+                returnUrl = null;
+            }
+            return returnUrl;
+        }).catch((error) => console.error(error));
     }
-    searchTM(title) {
-        let that = this;
-        const url = `https://list.tmall.com/m/search_items.htm?page_size=20&page_no=1&q=${title}&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton`;
+    handleJD(jdInfo) { return jdInfo; }
+    searchTM(product) {
+        const url = `https://list.tmall.com/m/search_items.htm?page_size=30&page_no=1&q=${product.title}&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton`;
         return fetch(url, {
             method: 'GET',
             headers: {
                 referer: 'https://list.tmall.com/search_product.htm?q=444&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton'
             },
             credentials: 'include'
-        })
-            .then(response => {
-                try {
-                    let dataStr = response._bodyInit.replace(/\\n/g, "").replace(/\\"/g, '"').replace(/\)"/g, "");
-                    let data = JSON.parse(dataStr);
-                    return data;
-                } catch (e) {
-                    return null;
+        }).then(response => {
+            let returnUrl = null;
+            try {
+                let dataStr = response._bodyInit.replace(/\\n/g, "").replace(/\\"/g, '"').replace(/\)"/g, "");
+                let tmInfo = JSON.parse(dataStr);
+                let item = tmInfo["item"];
+                if (item && item.length > 0) {
+                    for (let i = 0; i < item.length; i++) {
+                        let brands = product.brandName.split("/");
+                        let keywords = ['天猫超市', '旗舰店', '直营'];
+
+                        if (this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
+                            && Math.abs(product.price - item[i].price) < 50
+                        ) {
+                            returnUrl = `https:${item[i].url}`;
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
                 }
-            })
-            .catch((error) => console.error(error));
+                return returnUrl;
+            } catch (e) {
+                return null;
+            }
+        }).catch((error) => console.error(error));
     }
     randomWord(randomFlag, min, max) {
         let str = "",
@@ -188,10 +246,19 @@ export default class BeiDian extends Component {
         }
         return platformName;
     }
-    componentDidMount() {
+    async componentDidMount() {
         NativeModules.MainBridge.setIdleTimerDisabled(true);
+        NativeModules.MainBridge.setBrightness(0.1);
         this.props.navigation.setParams({ webview: this.webview });
         this.props.navigation.setParams({ openLogin: this.openLogin });
+        // let test = await this.searchJD({
+        //     title: "女式羽绒服",
+        //     brandName: "森马/GAP"
+        // });
+        // alert(test);
+    }
+    componentWillUnmount() {
+        NativeModules.MainBridge.setIdleTimerDisabled(false);
     }
     renderRow({ item }, rowId, secId, rowMap) {
         return (
@@ -231,7 +298,7 @@ export default class BeiDian extends Component {
                         }}
                         subtitleContainerStyle={{ justifyContent: "center", width: 230, marginLeft: 10, height: 20 }}
                         title={item.title}
-                        subtitle={this.switchPlatformName(item.platform) + "·更新于 " + tool.formatDateTmp(+(item.gmtModified + '000'))}
+                        subtitle={this.switchPlatformName(item.platform) + `·¥${item.price}·™` + tool.formatDateTmp(+(item.gmtModified + '000'))}
                         rightTitle={item.status == 1 ? '分析中' : (item.status == 2 ? '成功' : '失败')}
                         rightTitleStyle={[{
                             backgroundColor: '#d43f3a', paddingTop: 5, paddingBottom: 5, width: 50, color: '#fff', fontSize: 12, textAlign: "center",
@@ -248,9 +315,7 @@ export default class BeiDian extends Component {
         )
     }
     render() {
-        let that = this;
         let { height, width } = Dimensions.get('window');
-        const { navigate } = this.props.navigation;
         return (<SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
             <View style={{ flex: 1, backgroundColor: "#f2f4f6" }}>
                 <StatusBar barStyle="light-content" />
@@ -338,7 +403,7 @@ export default class BeiDian extends Component {
                     </View>
                 </ScrollableTabView >
                 <Modal
-                    isOpen={that.state.isShowLogin}
+                    isOpen={this.state.isShowLogin}
                     keyboardTopOffset={0}
                     startOpen={false}
                     backdrop={false}
@@ -352,7 +417,10 @@ export default class BeiDian extends Component {
                     <WebView
                         ref={w => this.webview = w}
                         style={{ flex: 1 }}
-                        source={{ uri: "https://m.beidian.com/login/fast_login.html" }}
+                        source={{
+                            uri: "https://m.beidian.com/login/fast_login.html",
+                            headers: { 'Cache-Control': 'no-cache' }
+                        }}
                         startInLoadingState={-22}
                         hideKeyboardAccessoryView={true}
                         allowsBackForwardNavigationGestures={true}
@@ -360,110 +428,68 @@ export default class BeiDian extends Component {
                         decelerationRate="normal"
                         dataDetectorTypes="none"
                         scrollEnabled={false}
-                        bounces={true}
+                        bounces={false}
                         useWebkit={true}
                         onLoadEnd={() => {
-                            let obj = {
-                                code: "NW1001",
-                                data: null,
-                                msg: "加载完毕"
-                            };
+                            let obj = { code: "NW1001", data: null, msg: "加载完毕" };
                             this.webview.postMessage(JSON.stringify(obj));
                         }}
-                        renderLoading={() => (<View
-                            style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}
-                        >
-                            <Image source={Images.ic_webloading} />
-                        </View>)}
+                        renderLoading={() => (<View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}><Image source={Images.ic_webloading} /></View>)}
                         injectedJavaScript={InjectedJavaScript}
                         userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
                         onMessage={async (event) => {
-                            let data = JSON.parse(event.nativeEvent.data);
-                            if (data.code == "WN1000") {
-                                if (that.state.isShowLogin) {
-                                    DropDownHolder.alert(data.msg, '', 'error');
-                                } else {
-                                    that.setLoginModalStatus(true);
-                                }
-                            } else if (data.code == "WN1001") {
-                                DropDownHolder.alert(data.msg, '', 'warn');
-                            } else if (data.code == "WN1002") {
-                                that.setState({
-                                    historys: data.data
-                                });
-                                that.setState({ refreshing: false });
-                            } else if (data.code == "WN1004") {
-                                DropDownHolder.alert(data.msg, '', 'warn');
-                            }
-                            else {
-                                that.setLoginModalStatus(false);
-                                let obj = {
-                                    id: data.id,
-                                    uid: data.uid,
-                                    url: ''
-                                };
-                                DropDownHolder.alert('', `${data.title}`, 'info');
-                                switch (data.platform) {
-                                    case 2:
-                                        let jdInfo = await that.searchJD(data.title);
-                                        if (jdInfo.retcode == 0) {
-                                            let paragraph = jdInfo["data"]["searchm"]["Paragraph"];
-                                            if (paragraph && paragraph.length > 0) {
-                                                for (let i = 0; i < paragraph.length; i++) {
-                                                    if (paragraph[i]["shop_name"].indexOf("自营") > -1 || paragraph[i]["shop_name"].indexOf("旗舰店") > -1) {
-                                                        let tmpWord = that.randomWord(false, 58, 58);
-                                                        let url = `https://item.m.jd.com/product/${paragraph[i]["wareid"]}.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/${tmpWord}`;
-                                                        obj.url = url;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        break;
-                                    case 6:
-                                        let wphInfo = await that.searchWPH(data.title);
-                                        let wphInfoData = wphInfo[0]["result"]["data"];
-                                        if (wphInfoData) {
-                                            let products = wphInfoData["products"];
-                                            if (products && products.length > 0) {
-                                                let product_url = products[0]["product_url"];
-                                                let tmpWord = that.randomWord(false, 40, 40);
-                                                let chlParam = encodeURIComponent("share:" + that.randomWord(false, 10, 10));
-                                                let url = `https://m.vip.com${product_url}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=`;
-                                                obj.url = url;
-                                            }
-                                        }
-                                        break;
-                                    case 1:
-                                        let tmInfo = await that.searchTM(data.title);
-                                        let item = tmInfo["item"];
-                                        if (item && item.length > 0) {
-                                            for (let i = 0; i < item.length; i++) {
-                                                if (item[i]["shop_name"].indexOf("天猫超市") > -1
-                                                    || item[i]["shop_name"].indexOf("旗舰店") > -1
-                                                    || item[i]["shop_name"].indexOf("直营") > -1
-                                                ) {
-                                                    let first = item[i];
-                                                    let url = `https:${first.url}`;
-                                                    obj.url = url;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        break;
-                                }
-
-                                if (obj.url != '') {
-                                    let p = this.state.products;
-                                    p.push(obj);
+                            let result = JSON.parse(event.nativeEvent.data);
+                            switch (result.code) {
+                                case "WN1000":
+                                    this.state.isShowLogin ? DropDownHolder.alert(result.msg, '', 'error') : this.setLoginModalStatus(true);
+                                    break;
+                                case "WN1001":
+                                    let platformName = this.switchPlatformName(result.data.platform);
+                                    DropDownHolder.alert(`[${platformName}]${result.msg}`, '', 'info');
+                                    break;
+                                case "WN1002":
                                     this.setState({
-                                        products: p
+                                        historys: result.data,
+                                        refreshing: false
                                     });
-                                    this.props.navigation.setParams({ products: p });
-                                    this.webview.postMessage(JSON.stringify(obj));
-                                    NativeModules.MainBridge.playSystemAudio(1009);
-                                    Clipboard.setString(obj.url);
-                                }
+                                    break;
+                                case "WN1004":
+                                    DropDownHolder.alert(result.msg, '', 'warn');
+                                    break;
+                                case "WN1005":
+                                    {
+                                        let productInfo = result.data;
+                                        this.setLoginModalStatus(false);
+                                        let returnObj = {
+                                            id: productInfo.id,
+                                            uid: productInfo.uid,
+                                            url: null
+                                        };
+                                        DropDownHolder.alert('', `[${this.switchPlatformName(productInfo.platform)}]${productInfo.title}`, 'info');
+                                        switch (productInfo.platform) {
+                                            case 1:
+                                                returnObj.url = await this.searchTM(productInfo);
+                                                break;
+                                            case 2:
+                                                returnObj.url = await this.searchJD(productInfo);
+                                                break;
+                                            case 6:
+                                                returnObj.url = await this.searchWPH(productInfo);
+                                                break;
+                                        }
+
+                                        if (returnObj.url !== null) {
+                                            let products = this.state.products;
+                                            products.push(returnObj);
+                                            this.setState({ products: products });
+                                            this.props.navigation.setParams({ products: products });
+                                            this.webview.postMessage(JSON.stringify(returnObj));
+                                            NativeModules.MainBridge.playSystemAudio(1009);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
                         }}
                     />

@@ -32,7 +32,7 @@ export default class TitleBar extends Component {
 
     render() {
         return (
-            <SafeAreaView style={{}}>
+            <SafeAreaView style={{ backgroundColor: this.props.bgColor }}>
                 <View style={[styles.view_header_container, {}]}>
                     <TouchableOpacity activeOpacity={0.5} style={[styles.image_header_left, { flexDirection: "row", alignItems: "center", backgroundColor: "transparent" }]} onPress={() => {
                         NavigationService.back();

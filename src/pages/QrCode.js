@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { Text, TouchableOpacity, View, Alert, SafeAreaView, NativeModules } from 'react-native';
+import { Text, TouchableOpacity, View, Alert, StyleSheet, SafeAreaView, NativeModules } from 'react-native';
 import { QRScannerView } from '../components/QRScanner';
 import NavigationService from '../utils/navigationService';
 import { ImageButton, TitleBar } from "../components";
@@ -89,7 +89,7 @@ export default class QRCode extends Component {
                             leftTitle="返回"
                             title="扫一扫"
                             titleColor="#fff"
-                            rightTitle="帮助"
+                            rightTitle=""
                             leftPress={() => this.props.navigation.goBack()}
                             rightPress={() => {
                                 Alert.alert("dsf");
@@ -97,7 +97,23 @@ export default class QRCode extends Component {
                         />
                     )
                 }}
-
+                notAuthorizedView={(
+                    <View style={{ flex: 1 }}>
+                        <TitleBar
+                            title={Constants.string_title_scanner_qrcode}
+                            leftIcon={Images.ic_back}
+                            leftTitle="返回"
+                            title="扫一扫"
+                            bgColor={Colors.theme_color}
+                            titleColor="#fff"
+                            rightTitle=""
+                            leftPress={() => this.props.navigation.goBack()}
+                        />
+                        <View style={styles.authorizationContainer}>
+                            <Text style={styles.notAuthorizedText}>相机未授权，请至“设置”中开启!</Text>
+                        </View>
+                    </View>
+                )}
                 renderBottomMenuView={() => this._renderMenu()}
             />
         )
@@ -134,3 +150,15 @@ export default class QRCode extends Component {
         )
     }
 }
+
+const styles = StyleSheet.create({
+    authorizationContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    notAuthorizedText: {
+        textAlign: 'center',
+        fontSize: 16,
+    }
+});

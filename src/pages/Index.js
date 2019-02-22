@@ -27,6 +27,7 @@ export default class Home extends PureComponent {
         //localStorage.save("chenpeng", { a: 12, b: 70 });
         //let value = await localStorage.load("chenpeng");
         //Alert.alert(JSON.stringify(value));
+        this.clearCache();
     }
     getCacheSize() {
         let mainBridge = NativeModules.MainBridge;
@@ -53,7 +54,7 @@ export default class Home extends PureComponent {
         });
     }
     fetchMarketList() {
-        const url = 'http://www.coin918.cc/ajax/allcoin_a/id/0?kw=';
+        const url = 'http://www.coin918.uk/ajax/allcoin_a/id/0?kw=';
         fetch(url)
             .then((response) => response.json())
             .then((responseJson) => {
@@ -68,7 +69,7 @@ export default class Home extends PureComponent {
                             price: element[1],
                             change: element[7],
                             vol: element[6],
-                            icon_url: 'http://www.coin918.cc/Upload/coin/' + element[9]
+                            icon_url: 'http://www.coin918.uk/Upload/coin/' + element[9]
                         };
                         if (key == 'gath_usd') {
                             list.unshift(item);
@@ -89,7 +90,7 @@ export default class Home extends PureComponent {
     renderRow({ item }) {
         return (
             <TouchableOpacity activeOpacity={1} onPress={() => {
-                NavigationService.navigate('MarketDetail', { title: item.name });
+                // NavigationService.navigate('MarketDetail', { title: item.name });
             }} >
                 <ListItem
                     style={[styles.item]}

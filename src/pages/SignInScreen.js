@@ -14,6 +14,7 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import DropDownHolder from '../utils/DropDownHolder';
 import TouchID from 'react-native-touch-id';
+import { Colors } from '../resource/index';
 
 export default class Login extends Component {
     static navigationOptions = ((props) => {
@@ -162,7 +163,7 @@ const styles = {
         flex: 1,
     },
     buttonview: {
-        backgroundColor: '#FAA732',
+        backgroundColor: Colors.theme_color,
         margin: 10,
         marginTop: 20,
         height: 50,

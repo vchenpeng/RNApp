@@ -104,7 +104,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                     <TouchableOpacity onPress={() => {
                         navigation.navigate('Auth');
                     }} >
-                        <AntDesignIcon name='mail' size={24} color='white' style={{ marginRight: 15 }} />
+                        <AntDesignIcon name='closesquare' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             };

@@ -47,6 +47,15 @@ RCT_EXPORT_METHOD(playSystemAudio:(NSInteger)id)
 //  屏幕常亮
 RCT_EXPORT_METHOD(setIdleTimerDisabled:(BOOL)flag)
 {
+  dispatch_async(dispatch_get_main_queue(), ^{
     [[UIApplication sharedApplication] setIdleTimerDisabled:flag];
+  });
+}
+//  屏幕亮度
+RCT_EXPORT_METHOD(setBrightness:(CGFloat)value)
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [[UIScreen mainScreen] setBrightness:value];
+  });
 }
 @end

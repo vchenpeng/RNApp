@@ -8,7 +8,7 @@
     "test": "jest",
     "bundle-ios": "node node_modules/react-native/local-cli/cli.js bundle --entry-file index.js  --platform ios --dev false --bundle-output ./ios/bundle/main.jsbundle --assets-dest ./ios/bundle",
     "release-react": "code-push release-react RNApp ios",
-    "code-push": "code-push release RNApp ./ios/bundle/ 1.0.0",
+    "code-push": "code-push release RNApp ./ios/bundle/ 1.0.0 --description '\n1.近期更新频繁，请谅解\n2.程序优化了' --mandatory true",
     "dev": "node_modules/react-native/scripts/launchPackager.command;"
   },
   "dependencies": {

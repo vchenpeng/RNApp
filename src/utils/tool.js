@@ -12,6 +12,6 @@ export default {
         m = m < 10 ? '0' + m : m;
         s = s < 10 ? '0' + s : s;
 
-        return `${Y}-${M}-${D}  ${h}:${m}:${s}`;
+        return `${M}-${D} ${h}:${m}:${s}`;
     }
 }

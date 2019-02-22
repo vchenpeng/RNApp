@@ -45,21 +45,27 @@ let inject = (window, $) => {
                         if (pid == data.body.productInfo.pid) {
                             let obj = {
                                 code: "WN1001",
-                                data: null,
+                                data: data.body.productInfo,
                                 msg: `出现重复商品信息`
                             };
                             window.postMessage(JSON.stringify(obj));
                         } else {
                             pid = data.body.productInfo.pid;
                             let productInfo = data.body.productInfo;
-                            window.postMessage(JSON.stringify(productInfo));
+
+                            let obj = {
+                                code: "WN1005",
+                                data: productInfo,
+                                msg: `获取商品信息成功`
+                            };
+                            window.postMessage(JSON.stringify(obj));
                         }
                     } else if (data.body.nextPlatform) {
                         let nextPlatform = data.body.nextPlatform;
-                        if (nextPlatform.code == 2) {
-                            nextPlatform.code = 1;
-                            nextPlatform.name = "↷天猫"
-                        }
+                        // if (nextPlatform.code == 2) {
+                        //     nextPlatform.code = 1;
+                        //     nextPlatform.name = "↷天猫"
+                        // }
                         let obj = {
                             code: "WN1004",
                             data: null,
@@ -133,7 +139,7 @@ let inject = (window, $) => {
             data: JSON.stringify({
                 "uid": uid,
                 "page": 1,
-                "size": 200
+                "size": 50
             }),
             headers: {
                 "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)",
@@ -207,7 +213,7 @@ let inject = (window, $) => {
         }
     }, false);
     function init() {
-        insertCSS('html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: #3bafda;}.login .msg-pin-btn{border: 1px solid #3bafda;color:#3bafda;}');
+        insertCSS('html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: #6C890B;}.login .msg-pin-btn{border: 1px solid #6C890B;color:#6C890B;}');
         $(".msg-pin-input").attr("type", "number").attr("pattern", "[0-9]*");
         ajax();
         getHistory();

@@ -408,6 +408,7 @@ class QRScannerView extends Component {
                     onBarCodeRead={this.props.onScanResultReceived}
                     style={{ flex: 1 }}
                     flashMode={Camera.constants.FlashMode.on}
+                    notAuthorizedView={this.props.notAuthorizedView}
                 >
 
                     {/*绘制顶部标题栏组件*/}

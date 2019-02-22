@@ -16,7 +16,7 @@ import DropdownAlert from 'react-native-dropdownalert';
 import DropDownHolder from './src/utils/DropDownHolder';
 import SplashScreen from 'react-native-splash-screen';
 import Getui from 'react-native-getui';
-import codePush from 'react-native-code-push';
+import CodePush from 'react-native-code-push';
 import Orientation from 'react-native-orientation';
 
 import KeyboardManager, { PreviousNextView } from 'react-native-keyboard-manager';
@@ -29,10 +29,38 @@ export default class App extends React.Component {
       version: '',
       status: ''
     };
-
+  }
+  //如果有更新的提示
+  syncImmediate() {
+    CodePush.sync({
+      //安装模式
+      //ON_NEXT_RESUME 下次恢复到前台时
+      //ON_NEXT_RESTART 下一次重启时
+      //IMMEDIATE 马上更新
+      installMode: CodePush.InstallMode.IMMEDIATE,
+      //对话框
+      // updateDialog: {
+      //   //是否显示更新描述
+      //   appendReleaseDescription: true,
+      //   //更新描述的前缀。 默认为"Description"
+      //   descriptionPrefix: "",
+      //   //强制更新按钮文字，默认为continue
+      //   mandatoryContinueButtonLabel: "立即更新",
+      //   //强制更新时的信息. 默认为"An update is available that must be installed."
+      //   mandatoryUpdateMessage: "",
+      //   //非强制更新时，按钮文字,默认为"ignore"
+      //   optionalIgnoreButtonLabel: '忽略',
+      //   //非强制更新时，确认按钮文字. 默认为"Install"
+      //   optionalInstallButtonLabel: '更新',
+      //   //非强制更新时，检查到更新的消息文本
+      //   optionalUpdateMessage: '',
+      //   //Alert窗口的标题
+      //   title: '更新提示'
+      // }
+    } ,
+    );
   }
   componentWillMount() {
-    //this.updateComponentInfo();
     Orientation.lockToPortrait();
   }
 
@@ -49,7 +77,7 @@ export default class App extends React.Component {
     mainBridge.setBadge(0);
     */
     AppState.addEventListener("change", (newState) => {
-      newState === "active" && codePush.sync();
+      newState === "active" && this.syncImmediate();
     });
 
     KeyboardManager.setKeyboardDistanceFromTextField(0);

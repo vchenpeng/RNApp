@@ -26,7 +26,7 @@ export default class TopBar extends Component {
 
     static defaultProps = {
         leftIcon: '关闭',
-        bgColor: '#eee',
+        bgColor: '#eee'
     };
 
     render() {
