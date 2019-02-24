@@ -52,7 +52,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                         });*/
                         navigation.navigate('BeiDian');
                     }} >
-                        <AntDesignIcon name='redenvelopes' size={24} color='white' style={{ marginRight: 15 }} />
+                        <AntDesignIcon name='calendar' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             };
@@ -103,8 +103,8 @@ Tabs.navigationOptions = ({ navigation }) => {
                 headerRight: (<View>
                     <TouchableOpacity onPress={() => {
                         navigation.navigate('Auth');
-                    }} >
-                        <AntDesignIcon name='closesquare' size={24} color='white' style={{ marginRight: 15 }} />
+                    }}>
+                        <AntDesignIcon name='setting' size={24} color='white' style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>)
             };

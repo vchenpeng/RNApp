@@ -176,7 +176,9 @@ export default class BeiDian extends Component {
                 returnUrl = null;
             }
             return returnUrl;
-        }).catch((error) => console.error(error));
+        }).catch((error) => {
+            return null;
+        });
     }
     handleJD(jdInfo) { return jdInfo; }
     searchTM(product) {
@@ -208,11 +210,13 @@ export default class BeiDian extends Component {
                         }
                     }
                 }
-                return returnUrl;
             } catch (e) {
-                return null;
+                returnUrl = null;
             }
-        }).catch((error) => console.error(error));
+            return returnUrl;
+        }).catch((error) => {
+            return null;
+        });
     }
     randomWord(randomFlag, min, max) {
         let str = "",
@@ -248,7 +252,7 @@ export default class BeiDian extends Component {
     }
     async componentDidMount() {
         NativeModules.MainBridge.setIdleTimerDisabled(true);
-        NativeModules.MainBridge.setBrightness(0.1);
+        // NativeModules.MainBridge.setBrightness(0.1);
         this.props.navigation.setParams({ webview: this.webview });
         this.props.navigation.setParams({ openLogin: this.openLogin });
         // let test = await this.searchJD({
@@ -344,7 +348,7 @@ export default class BeiDian extends Component {
                         <SwipeListView
                             useFlatList={true}
                             data={this.state.historys}
-                            swipeRowStyle={{ borderBottomWidth: 1, borderBottomColor: "#eee" }}
+                            swipeRowStyle={{ borderBottomWidth: 0.5, borderBottomColor: "#eee" }}
                             renderItem={(rowData, rowMap) => this.renderRow(rowData, rowMap)}
                             onRowOpen={(rowId, secId, rowMap) => { this.openRowId = rowId; }}
                             onRowClose={(rowId, secId, rowMap) => { this.openRowId = null }}
@@ -398,7 +402,7 @@ export default class BeiDian extends Component {
                             }}
                         />
                     </View>
-                    <View tabLabel={"贝店果园"} style={{}} key={"贝店果园"}>
+                    <View tabLabel={"情报检验科"} style={{ flex: 1 }} key={"情报检验科"}>
 
                     </View>
                 </ScrollableTabView >
@@ -429,7 +433,9 @@ export default class BeiDian extends Component {
                         dataDetectorTypes="none"
                         scrollEnabled={false}
                         bounces={false}
-                        useWebkit={true}
+                        useWebkit={false}
+                        cacheEnabled={false}
+                        geolocationEnabled={false}
                         onLoadEnd={() => {
                             let obj = { code: "NW1001", data: null, msg: "加载完毕" };
                             this.webview.postMessage(JSON.stringify(obj));
@@ -487,6 +493,9 @@ export default class BeiDian extends Component {
                                             NativeModules.MainBridge.playSystemAudio(1009);
                                         }
                                     }
+                                    break;
+                                case "WN1006":
+                                    NativeModules.MainBridge.playSystemAudio(1100);
                                     break;
                                 default:
                                     break;

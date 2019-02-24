@@ -88,11 +88,12 @@ export default class QRCode extends Component {
                             leftIcon={Images.ic_back}
                             leftTitle="返回"
                             title="扫一扫"
+                            bgColor="transparent"
                             titleColor="#fff"
-                            rightTitle=""
+                            rightTitle="帮助"
                             leftPress={() => this.props.navigation.goBack()}
                             rightPress={() => {
-                                Alert.alert("dsf");
+                                Alert.alert("test");
                             }}
                         />
                     )

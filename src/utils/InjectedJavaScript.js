@@ -139,7 +139,7 @@ let inject = (window, $) => {
             data: JSON.stringify({
                 "uid": uid,
                 "page": 1,
-                "size": 50
+                "size": 100
             }),
             headers: {
                 "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)",

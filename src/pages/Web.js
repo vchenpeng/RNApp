@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Text, Image, SafeAreaView, View, StyleSheet, Clipboard, Alert, TouchableOpacity } from 'react-native';
 import { WebView } from "react-native-webview";
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements';
-import Icon from "react-native-vector-icons/AntDesign";
+import EntypoIcon from "react-native-vector-icons/Entypo";
 import NavigationService from '../utils/navigationService';
 import { Constants, Images, Colors } from "../resource";
 
@@ -17,7 +17,7 @@ export default class Web extends Component {
                     Clipboard.setString(url);
                     Alert.alert('地址', url);
                 }} >
-                    <Icon name='setting' size={24} color='white' style={{ marginRight: 15 }} />
+                    <EntypoIcon name='dots-three-horizontal' size={24} color='white' style={{ marginRight: 15 }} />
                 </TouchableOpacity>
             </View>),
             gesturesEnabled: true
@@ -45,7 +45,7 @@ export default class Web extends Component {
                 source={{ uri: this.state.url }}
                 startInLoadingState={true}
                 hideKeyboardAccessoryView={true}
-                allowsBackForwardNavigationGestures={true}
+                allowsBackForwardNavigationGestures={false}
                 allowsLinkPreview={true}
                 decelerationRate="normal"
                 dataDetectorTypes="none"

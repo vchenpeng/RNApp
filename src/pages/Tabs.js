@@ -13,13 +13,13 @@ export default createBottomTabNavigator({
         screen: Home,
         navigationOptions: {
             tabBarLabel: '首页',
-            tabBarIcon: ({ focused, tintColor }) => (
+            tabBarIcon: ({ focused, tintColor }) => {
                 // <Image
                 //     source={focused ? require('../resource/images/home.png') : require('../resource/images/home.png')}
                 //     style={{ width: 30, height: 30, tintColor: tintColor }}
                 // />
-                <AntDesignIcon name='home' size={24} color={tintColor} />
-            )
+                return <AntDesignIcon name="home" size={24} color={tintColor} />
+            }
         }
     },
     Market: {

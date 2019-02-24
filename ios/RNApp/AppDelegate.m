@@ -42,6 +42,7 @@
   jsCodeLocation = [CodePush bundleURL];
 #else
   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"bundle/main" withExtension:@"jsbundle"];
+  jsCodeLocation = [CodePush bundleURL];
 #endif
     
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
