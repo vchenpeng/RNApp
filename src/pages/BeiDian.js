@@ -32,7 +32,7 @@ export default class BeiDian extends Component {
                 <TouchableOpacity
                     onPress={() => {
                         let code = [6, 2, 1][nextPlatformIndex];
-                        let codeName = ["唯品会", "京东", "天猫"][nextPlatformIndex];
+                        let codeName = self.switchPlatformName(code);
                         let obj = { code: "NW1003", data: code, msg: `手动切换到${codeName}平台` };
                         navigation.state.params.webview.postMessage(JSON.stringify(obj));
                         NativeModules.MainBridge.playSystemAudio(1001);
@@ -182,7 +182,25 @@ export default class BeiDian extends Component {
     }
     handleJD(jdInfo) { return jdInfo; }
     searchTM(product) {
-        const url = `https://list.tmall.com/m/search_items.htm?page_size=30&page_no=1&q=${product.title}&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton`;
+        // 12专营店
+        let tmShopType = 1;
+        let keywords = [];
+        switch (product.platform) {
+            case 1:
+                tmShopType = 1;   //旗舰店
+                keywords = ['天猫超市', '旗舰店', '直营'];
+                break;
+            case 13:
+                tmShopType = 2;   //专卖店
+                keywords = ['专卖店'];
+                break;
+            case 12:
+                tmShopType = 3;   //专卖店
+                keywords = ['专营店', '专营'];
+                break;
+        }
+
+        const url = `https://list.tmall.com/m/search_items.htm?page_size=30&page_no=1&q=${product.title}&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton&shop_type=${tmShopType}`;
         return fetch(url, {
             method: 'GET',
             headers: {
@@ -197,16 +215,26 @@ export default class BeiDian extends Component {
                 let item = tmInfo["item"];
                 if (item && item.length > 0) {
                     for (let i = 0; i < item.length; i++) {
-                        let brands = product.brandName.split("/");
-                        let keywords = ['天猫超市', '旗舰店', '直营'];
-
-                        if (this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
-                            && Math.abs(product.price - item[i].price) < 50
-                        ) {
-                            returnUrl = `https:${item[i].url}`;
-                            break;
+                        if (tmShopType == 2) {
+                            let brands = product.brandName.split("/");
+                            if (item[i]["shop_name"] == product.taskShopName && this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
+                                && Math.abs(product.price - item[i].price) < 30
+                            ) {
+                                returnUrl = `https:${item[i].url}`;
+                                break;
+                            } else {
+                                continue;
+                            }
                         } else {
-                            continue;
+                            let brands = product.brandName.split("/");
+                            if (this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
+                                && Math.abs(product.price - item[i].price) < 50
+                            ) {
+                                returnUrl = `https:${item[i].url}`;
+                                break;
+                            } else {
+                                continue;
+                            }
                         }
                     }
                 }
@@ -244,6 +272,12 @@ export default class BeiDian extends Component {
                 break;
             case 6:
                 platformName = "唯品会";
+                break;
+            case 12:
+                platformName = "天猫专营店";
+                break;
+            case 13:
+                platformName = "天猫专卖店";
                 break;
             default:
                 break;
@@ -474,6 +508,8 @@ export default class BeiDian extends Component {
                                         DropDownHolder.alert('', `[${this.switchPlatformName(productInfo.platform)}]${productInfo.title}`, 'info');
                                         switch (productInfo.platform) {
                                             case 1:
+                                            case 12:
+                                            case 13:
                                                 returnObj.url = await this.searchTM(productInfo);
                                                 break;
                                             case 2:

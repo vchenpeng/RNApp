@@ -214,7 +214,9 @@ let inject = (window, $) => {
     }, false);
     function init() {
         insertCSS('html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: #6C890B;}.login .msg-pin-btn{border: 1px solid #6C890B;color:#6C890B;}');
-        $(".msg-pin-input").attr("type", "number").attr("pattern", "[0-9]*");
+        $(".msg-pin-input").attr("type", "number")
+            .attr("pattern", "[0-9]*")
+            .attr("oninput", "if(value.length>4)value=value.slice(0,4)");
         ajax();
         getHistory();
         setInterval(ajax, 3000);
