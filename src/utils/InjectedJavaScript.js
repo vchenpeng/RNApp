@@ -42,7 +42,10 @@ let inject = (window, $) => {
                 if (data.success) {
                     // 存在productInfo时
                     if (data.body.productInfo) {
-                        if (pid == data.body.productInfo.pid) {
+                        // 天猫专卖或者专营不会出现出现重复商品信息
+                        if (pid == data.body.productInfo.pid
+                            && !(data.body.productInfo.platform == 13 || data.body.productInfo.platform == 12)
+                        ) {
                             let obj = {
                                 code: "WN1001",
                                 data: data.body.productInfo,
@@ -220,6 +223,12 @@ let inject = (window, $) => {
         ajax();
         getHistory();
         setInterval(ajax, 3000);
+
+
+        // 页面心跳，保证页面长时间执行定时器，卡死问题
+        setInterval(() => {
+            window.location.reload();
+        }, 1000 * 60 * 15);
     }
 };
 

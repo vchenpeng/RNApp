@@ -31,7 +31,7 @@ export default class BeiDian extends Component {
             headerRight: (<View style={{ flexDirection: "row" }}>
                 <TouchableOpacity
                     onPress={() => {
-                        let code = [6, 2, 1][nextPlatformIndex];
+                        let code = [13, 12, 6, 2, 1][nextPlatformIndex];
                         let codeName = self.switchPlatformName(code);
                         let obj = { code: "NW1003", data: code, msg: `手动切换到${codeName}平台` };
                         navigation.state.params.webview.postMessage(JSON.stringify(obj));
@@ -39,7 +39,7 @@ export default class BeiDian extends Component {
                         // DropDownHolder.alert(`手动切换到 [${codeName}] 平台`, '', 'info');
 
                         nextPlatformIndex += 1;
-                        nextPlatformIndex = nextPlatformIndex > 2 ? 0 : nextPlatformIndex;
+                        nextPlatformIndex = nextPlatformIndex > 4 ? 0 : nextPlatformIndex;
                     }} >
                     <AntDesignIcon name='retweet' size={24} color='white' style={{ marginRight: 10 }} />
                 </TouchableOpacity>
@@ -64,7 +64,8 @@ export default class BeiDian extends Component {
             id: null,
             pid: 91286199,
             products: [],
-            historys: []
+            historys: [],
+            lowest: 0.25
         };
     }
     setLoginModalStatus(flag) {
@@ -96,7 +97,7 @@ export default class BeiDian extends Component {
                     "channel_id": "",
                     "keyword": product.title,
                     "np": 1,
-                    "ep": 30,
+                    "ep": 80,
                     "brand_ids": "",
                     "brand_store_sn": "",
                     "props": "",
@@ -122,17 +123,35 @@ export default class BeiDian extends Component {
                 if (wphInfoData) {
                     let products = wphInfoData["products"];
                     if (products && products.length > 0) {
+                        let pools = [];
                         for (let i = 0; i < products.length; i++) {
                             let item = products[i];
                             let brands = product.brandName.split("/");
+                            let percent = this.strSimilarity2Percent(product.title, item["product_name"]);
                             if (this.checkIn(item["brand_name"], brands)
-                                && Math.abs(product.price - item.sale_price) < 50) {
+                                // && Math.abs(product.price - item.sale_price) < 50
+                            ) {
 
                                 let productUrl = item["product_url"];
                                 let tmpWord = this.randomWord(false, 40, 40);
                                 let chlParam = encodeURIComponent("share:" + this.randomWord(false, 10, 10));
-                                returnUrl = `https://m.vip.com${productUrl}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=`;
+                                let rUrl = `https://m.vip.com${productUrl}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=`;
+
+                                let itemProduct = {
+                                    index: i,
+                                    percent: percent,
+                                    returnUrl: rUrl
+                                };
+                                pools.push(itemProduct);
                             }
+                        }
+                        let sortPools = pools.sort((x, y) => {
+                            return y.percent - x.percent;
+                        });
+                        if (sortPools.length > 0) {
+                            returnUrl = sortPools[0].returnUrl;
+                        } else {
+                            returnUrl = null;
                         }
                     }
                 }
@@ -145,7 +164,7 @@ export default class BeiDian extends Component {
         });
     }
     searchJD(product) {
-        const url = `https://so.m.jd.com/ware/search._m2wq_list?keyword=${product.title}&datatype=1&page=1&pagesize=30&ext_attr=no&brand_col=no&price_col=no&color_col=no&size_col=no&ext_attr_sort=no&merge_sku=yes&multi_suppliers=yes&qp_disable=no&t1=1548735239631&callback=self.handleJD`;
+        const url = `https://so.m.jd.com/ware/search._m2wq_list?keyword=${product.title}&datatype=1&page=1&pagesize=80&ext_attr=no&brand_col=no&price_col=no&color_col=no&size_col=no&ext_attr_sort=no&merge_sku=yes&multi_suppliers=yes&qp_disable=no&t1=1548735239631&callback=self.handleJD`;
         return fetch(url, {
             method: 'GET',
             credentials: 'include'
@@ -159,16 +178,32 @@ export default class BeiDian extends Component {
                     if (paragraph && paragraph.length > 0) {
                         let brands = product.brandName.split("/");
                         let keywords = ['自营', '旗舰店'];
+                        let pools = [];
                         for (let i = 0; i < paragraph.length; i++) {
                             let item = paragraph[i];
+                            let percent = this.strSimilarity2Percent(product.title, item.warename);
 
                             if (this.checkIn(item["shop_name"], keywords) && this.checkIn(item["shop_name"], brands)
                                 && Math.abs(product.price - item.dredisprice) < 30
                             ) {
                                 let tmpWord = this.randomWord(false, 58, 58);
-                                returnUrl = `https://item.m.jd.com/product/${item["wareid"]}.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/${tmpWord}`;
-                                break;
+                                let rUrl = `https://item.m.jd.com/product/${item["wareid"]}.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/${tmpWord}`;
+
+                                let itemProduct = {
+                                    index: i,
+                                    percent: percent,
+                                    returnUrl: rUrl
+                                };
+                                pools.push(itemProduct);
                             }
+                        }
+                        let sortPools = pools.sort((x, y) => {
+                            return y.percent - x.percent;
+                        });
+                        if (sortPools.length > 0) {
+                            returnUrl = sortPools[0].returnUrl;
+                        } else {
+                            returnUrl = null;
                         }
                     }
                 }
@@ -195,12 +230,12 @@ export default class BeiDian extends Component {
                 keywords = ['专卖店'];
                 break;
             case 12:
-                tmShopType = 3;   //专卖店
+                tmShopType = 3;   //专营店
                 keywords = ['专营店', '专营'];
                 break;
         }
 
-        const url = `https://list.tmall.com/m/search_items.htm?page_size=30&page_no=1&q=${product.title}&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton&shop_type=${tmShopType}`;
+        const url = `https://list.tmall.com/m/search_items.htm?page_size=80&page_no=1&q=${product.title}&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton&shop_type=${tmShopType}`;
         return fetch(url, {
             method: 'GET',
             headers: {
@@ -214,28 +249,48 @@ export default class BeiDian extends Component {
                 let tmInfo = JSON.parse(dataStr);
                 let item = tmInfo["item"];
                 if (item && item.length > 0) {
+                    let pools = [];
                     for (let i = 0; i < item.length; i++) {
-                        if (tmShopType == 2) {
+                        let percent = this.strSimilarity2Percent(product.title, item[i]["title"]);
+                        if (tmShopType == 2 || tmShopType == 3) {
                             let brands = product.brandName.split("/");
-                            if (item[i]["shop_name"] == product.taskShopName && this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
-                                && Math.abs(product.price - item[i].price) < 30
-                            ) {
-                                returnUrl = `https:${item[i].url}`;
-                                break;
+                            // if (item[i]["shop_name"] == product.taskShopName && this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
+                            //     && Math.abs(product.price - item[i].price) < 30) {
+                            if (item[i]["shop_name"] == product.taskShopName && percent > this.state.lowest) {
+                                let rUrl = `https:${item[i].url}&percent=${percent}`;
+                                let itemProduct = {
+                                    index: i,
+                                    percent: percent,
+                                    returnUrl: rUrl
+                                };
+                                pools.push(itemProduct);
                             } else {
                                 continue;
                             }
                         } else {
                             let brands = product.brandName.split("/");
-                            if (this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
-                                && Math.abs(product.price - item[i].price) < 50
+                            if (this.checkIn(item[i]["shop_name"], keywords)
+                                && this.checkIn(item[i]["shop_name"], brands)
                             ) {
-                                returnUrl = `https:${item[i].url}`;
-                                break;
+                                let rUrl = `https:${item[i].url}`;
+                                let itemProduct = {
+                                    index: i,
+                                    percent: percent,
+                                    returnUrl: rUrl
+                                };
+                                pools.push(itemProduct);
                             } else {
                                 continue;
                             }
                         }
+                    }
+                    let sortPools = pools.sort((x, y) => {
+                        return y.percent - x.percent;
+                    });
+                    if (sortPools.length > 0) {
+                        returnUrl = sortPools[0].returnUrl;
+                    } else {
+                        returnUrl = null;
                     }
                 }
             } catch (e) {
@@ -284,6 +339,41 @@ export default class BeiDian extends Component {
         }
         return platformName;
     }
+    strSimilarity2Number(s, t) {
+        var n = s.length, m = t.length, d = [];
+        var i, j, s_i, t_j, cost;
+        if (n == 0) return m;
+        if (m == 0) return n;
+        for (i = 0; i <= n; i++) {
+            d[i] = [];
+            d[i][0] = i;
+        }
+        for (j = 0; j <= m; j++) {
+            d[0][j] = j;
+        }
+        for (i = 1; i <= n; i++) {
+            s_i = s.charAt(i - 1);
+            for (j = 1; j <= m; j++) {
+                t_j = t.charAt(j - 1);
+                if (s_i == t_j) {
+                    cost = 0;
+                } else {
+                    cost = 1;
+                }
+                d[i][j] = this.minimum(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+            }
+        }
+        return d[n][m];
+    }
+    //两个字符串的相似程度，并返回相似度百分比
+    strSimilarity2Percent(s, t) {
+        var l = s.length > t.length ? s.length : t.length;
+        var d = this.strSimilarity2Number(s, t);
+        return (1 - d / l);
+    }
+    minimum(a, b, c) {
+        return a < b ? (a < c ? a : c) : (b < c ? b : c);
+    }
     async componentDidMount() {
         NativeModules.MainBridge.setIdleTimerDisabled(true);
         // NativeModules.MainBridge.setBrightness(0.1);
@@ -298,7 +388,19 @@ export default class BeiDian extends Component {
     componentWillUnmount() {
         NativeModules.MainBridge.setIdleTimerDisabled(false);
     }
+    getUrlParam(url, name) {
+        var reg = new RegExp("(^|\\?|&)" + name + "=([^&]*)(\\s|&|$)", "i");
+        if (reg.test(url)) return unescape(RegExp.$2.replace(/\+/g, " "));
+        return "";
+    }
     renderRow({ item }, rowId, secId, rowMap) {
+        let percent = this.getUrlParam(item.outerUrl, "percent");
+        let itemStatusName = '';
+        if (percent) {
+            itemStatusName = (+percent * 100).toFixed(2) + `%`;
+        } else {
+            itemStatusName = item.status == 1 ? '分析中' : (item.status == 2 ? '成功' : '失败');
+        }
         return (
             <TouchableHighlight
                 activeOpacity={0.85}
@@ -337,7 +439,7 @@ export default class BeiDian extends Component {
                         subtitleContainerStyle={{ justifyContent: "center", width: 230, marginLeft: 10, height: 20 }}
                         title={item.title}
                         subtitle={this.switchPlatformName(item.platform) + `·¥${item.price}·™` + tool.formatDateTmp(+(item.gmtModified + '000'))}
-                        rightTitle={item.status == 1 ? '分析中' : (item.status == 2 ? '成功' : '失败')}
+                        rightTitle={itemStatusName}
                         rightTitleStyle={[{
                             backgroundColor: '#d43f3a', paddingTop: 5, paddingBottom: 5, width: 50, color: '#fff', fontSize: 12, textAlign: "center",
                         }, { backgroundColor: item.status == 1 ? '#eee' : (item.status == 2 ? '#7ED321' : '#d43f3a') }]}
@@ -505,7 +607,8 @@ export default class BeiDian extends Component {
                                             uid: productInfo.uid,
                                             url: null
                                         };
-                                        DropDownHolder.alert('', `[${this.switchPlatformName(productInfo.platform)}]${productInfo.title}`, 'info');
+                                        let tName = productInfo.taskShopName || this.switchPlatformName(productInfo.platform);
+                                        DropDownHolder.alert('', `[${tName}]${productInfo.title}`, 'info');
                                         switch (productInfo.platform) {
                                             case 1:
                                             case 12:
