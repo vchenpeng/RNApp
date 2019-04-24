@@ -569,12 +569,23 @@ export default class BeiDian extends Component {
                         dataDetectorTypes="none"
                         scrollEnabled={false}
                         bounces={false}
-                        useWebkit={false}
-                        cacheEnabled={false}
+                        useWebkit={true}
+                        cacheEnabled={true}
                         geolocationEnabled={false}
                         onLoadEnd={() => {
                             let obj = { code: "NW1001", data: null, msg: "加载完毕" };
                             this.webview.postMessage(JSON.stringify(obj));
+                            // 模拟获取参数加密文本
+                            let test = {
+                                code: "NW1007",
+                                data: {
+                                    "url": "//api.beidian.com/mroute.html?method=beidian.auth.quick.web",
+                                    "type": "POST", "query": { "method": "beidian.auth.quick.web" },
+                                    "body": { "tel": "13664878230", "code": "2345", "shop_id": "99" }
+                                },
+                                msg: "获取加密参数"
+                            };
+                            this.webview.postMessage(JSON.stringify(test));
                         }}
                         renderLoading={() => (<View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}><Image source={Images.ic_webloading} /></View>)}
                         injectedJavaScript={InjectedJavaScript}
@@ -635,6 +646,9 @@ export default class BeiDian extends Component {
                                     break;
                                 case "WN1006":
                                     NativeModules.MainBridge.playSystemAudio(1100);
+                                    break;
+                                case "WN1007":
+                                    DropDownHolder.alert('', `[${result.data.abr}`, 'info');
                                     break;
                                 default:
                                     break;
