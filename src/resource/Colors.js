@@ -4,7 +4,8 @@
  * Desc:
  */
 const colors = {
-    theme_color: '#6C890B',
+    theme_color: '#35495e',
+    // theme_color: '#6C890B',// 绿色
     // theme_color: '#373f51',
     // theme_color: '#3bafda',
     // theme_color:'#ABC327',

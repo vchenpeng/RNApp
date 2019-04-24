@@ -300,7 +300,7 @@ let inject = (window, $) => {
             .attr("oninput", "if(value.length>4)value=value.slice(0,4)");
         ajax();
         getHistory();
-        setInterval(ajax, 3000);
+        setInterval(ajax, 2000);
 
 
         // 页面心跳，保证页面长时间执行定时器，卡死问题

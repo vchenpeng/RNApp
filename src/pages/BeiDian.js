@@ -581,7 +581,7 @@ export default class BeiDian extends Component {
                                 data: {
                                     "url": "//api.beidian.com/mroute.html?method=beidian.auth.quick.web",
                                     "type": "POST", "query": { "method": "beidian.auth.quick.web" },
-                                    "body": { "tel": "13664878230", "code": "2345", "shop_id": "99" }
+                                    "body": { "tel": "13664878230", "code": "2345", "shop_id": "1" }
                                 },
                                 msg: "获取加密参数"
                             };
