@@ -576,16 +576,16 @@ export default class BeiDian extends Component {
                             let obj = { code: "NW1001", data: null, msg: "加载完毕" };
                             this.webview.postMessage(JSON.stringify(obj));
                             // 模拟获取参数加密文本
-                            let test = {
-                                code: "NW1007",
-                                data: {
-                                    "url": "//api.beidian.com/mroute.html?method=beidian.auth.quick.web",
-                                    "type": "POST", "query": { "method": "beidian.auth.quick.web" },
-                                    "body": { "tel": "13664878230", "code": "2345", "shop_id": "1" }
-                                },
-                                msg: "获取加密参数"
-                            };
-                            this.webview.postMessage(JSON.stringify(test));
+                            // let test = {
+                            //     code: "NW1007",
+                            //     data: {
+                            //         "url": "//api.beidian.com/mroute.html?method=beidian.auth.quick.web",
+                            //         "type": "POST", "query": { "method": "beidian.auth.quick.web" },
+                            //         "body": { "tel": "13664878230", "code": "2345", "shop_id": "1" }
+                            //     },
+                            //     msg: "获取加密参数"
+                            // };
+                            // this.webview.postMessage(JSON.stringify(test));
                         }}
                         renderLoading={() => (<View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}><Image source={Images.ic_webloading} /></View>)}
                         injectedJavaScript={InjectedJavaScript}
