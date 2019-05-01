@@ -129,7 +129,7 @@ const AuthStack = createStackNavigator({ SignIn: SignIn }, {
         headerMode: "card",
         gesturesEnabled: true,
         headerStyle: { backgroundColor: Colors.theme_color, borderBottomWidth: 0 },
-        headerBackTitle: '返回7',
+        headerBackTitle: '返回',
         headerTruncatedBackTitle: '返回'
     }
 });

@@ -573,7 +573,7 @@ export default class BeiDian extends Component {
                         cacheEnabled={true}
                         geolocationEnabled={false}
                         onLoadEnd={() => {
-                            let obj = { code: "NW1001", data: null, msg: "加载完毕" };
+                            let obj = { code: "NW1001", data: null, msg: "加载完毕~" };
                             this.webview.postMessage(JSON.stringify(obj));
                             // 模拟获取参数加密文本
                             // let test = {
@@ -594,7 +594,8 @@ export default class BeiDian extends Component {
                             let result = JSON.parse(event.nativeEvent.data);
                             switch (result.code) {
                                 case "WN1000":
-                                    this.state.isShowLogin ? DropDownHolder.alert(result.msg, '', 'error') : this.setLoginModalStatus(true);
+                                    // this.state.isShowLogin ? DropDownHolder.alert(result.msg, '', 'error') : this.setLoginModalStatus(true);
+                                    this.state.isShowLogin ? () => { } : this.setLoginModalStatus(true);
                                     break;
                                 case "WN1001":
                                     let platformName = this.switchPlatformName(result.data.platform);
