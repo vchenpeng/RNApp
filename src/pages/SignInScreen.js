@@ -34,13 +34,13 @@ export default class Login extends Component {
                                 fallbackLabel: "", // iOS (if empty, then label is hidden)
                                 unifiedErrors: false // use unified error messages (default false)
                             };
-                            TouchID.authenticate('别怕，就是验证下是否是机主^_^', optionalConfigObject)
+                            TouchID.authenticate('使用指纹验证身份', optionalConfigObject)
                                 .then(async success => {
-                                    await AsyncStorage.setItem('TOKEN', 'abc');
+                                    await AsyncStorage.setItem('TOKEN', '1024');
                                     navigation.navigate('App');
                                 })
                                 .catch(error => {
-                                    AlertIOS.alert('验证失败');
+                                    Alert.alert('验证失败');
                                 });
                         })
                         .catch(error => {
@@ -89,7 +89,7 @@ export default class Login extends Component {
                 </View>
                 <View style={styles.bottomview}>
                     <TouchableOpacity onPress={async () => {
-                        if (this.state.account == '123' || this.state.password == '123') {
+                        if (this.state.account == '13554282393' || this.state.password == '1024') {
                             this.signInAsync()
                         } else {
                             await AsyncStorage.setItem('TOKEN', this.state.password);

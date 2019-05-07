@@ -232,7 +232,7 @@ let inject = (window, $) => {
         }
     }, false);
     function init() {
-        insertCSS('html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: #35495e;}.login .msg-pin-btn{border: 1px solid #35495e;color:#35495e;}');
+        insertCSS('html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: #3bafda;}.login .msg-pin-btn{border: 1px solid #3bafda;color:#3bafda;}');
         $(".msg-pin-input").attr("type", "number")
             .attr("pattern", "[0-9]*")
             .attr("oninput", "if(value.length>4)value=value.slice(0,4)");
