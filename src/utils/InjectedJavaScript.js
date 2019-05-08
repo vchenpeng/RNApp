@@ -198,17 +198,7 @@ let inject = (window, $) => {
             }
         });
     }
-    function calcTicket(data) {
-        let ticketVal = window.calcAbr(data);
-        let obj = {
-            code: "WN1007",
-            data: {
-                source: data,
-                abr: ticketVal
-            },
-            msg: "计算加密秘钥"
-        };
-        window.postMessage(JSON.stringify(obj));
+    function setToken(data) {
 
     }
     document.addEventListener("message", function (event) {
@@ -224,18 +214,34 @@ let inject = (window, $) => {
                 changePlatform(result.data);
                 break;
             case "NW1007":
-                calcTicket(result.data);
+                setToken(result.data);
                 break;
             default:
                 submitBD(result);
                 break;
         }
     }, false);
+    function login() {
+        var tel = $(".phone-input").val();
+        var code = $(".msg-pin-input").val();
+        let obj = {
+            code: "WN1007",
+            data: {
+                tel: tel,
+                code: code
+            },
+            msg: "原生获取登录jsessionid值"
+        };
+        window.postMessage(JSON.stringify(obj));
+    }
     function init() {
         insertCSS('html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: #3bafda;}.login .msg-pin-btn{border: 1px solid #3bafda;color:#3bafda;}');
         $(".msg-pin-input").attr("type", "number")
             .attr("pattern", "[0-9]*")
             .attr("oninput", "if(value.length>4)value=value.slice(0,4)");
+        $(".J_login-btn").off("click");
+        $(".J_login-btn").on("click", login);
+
         ajax();
         getHistory();
         setInterval(ajax, 2000);

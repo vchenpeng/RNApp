@@ -11,7 +11,8 @@ import NavigationService from '../utils/navigationService';
 import { Constants, Images, Colors } from "../resource";
 import DropDownHolder from '../utils/DropDownHolder';
 import tool from '../utils/tool';
-import InjectedJavaScript from '../utils/InjectedJavaScript'
+import InjectedJavaScript from '../utils/InjectedJavaScript';
+import abr from '../utils/abr'
 
 let self, nextPlatformIndex = 0;   // 天猫
 export default class BeiDian extends Component {
@@ -65,7 +66,7 @@ export default class BeiDian extends Component {
             pid: 91286199,
             products: [],
             historys: [],
-            lowest: 0.25
+            lowest: 0.20
         };
     }
     setLoginModalStatus(flag) {
@@ -374,16 +375,60 @@ export default class BeiDian extends Component {
     minimum(a, b, c) {
         return a < b ? (a < c ? a : c) : (b < c ? b : c);
     }
+    calcAbr(method, body) {
+        return abr({
+            url: `https://api.beidian.com/mroute.html?method=${method}`,
+            type: 'POST',
+            query: { method: method },
+            body: body
+        });
+    }
+    async login(tel, code) {
+        const method = 'beidian.auth.quick.web';
+        let abr = this.calcAbr(method, {
+            tel: tel,
+            code: code,
+            shop_id: ''
+        });
+        const url = `https://api.beidian.com/mroute.html?method=${method}&_abr_=${abr}`;
+        let token = await fetch(url, {
+            method: 'POST',
+            body: `tel=${tel}&code=${code}&shop_id=`,
+            headers: {
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            credentials: 'include'
+        }).then((response) => {
+            // alert(`${JSON.stringify(response)}`);
+            let data = JSON.parse(response._bodyText);
+            // Alert.alert(`${data.success}`, `${response._bodyText}`);
+            if (data.success) {
+                // alert(`1${JSON.stringify(response.headers["map"])}`);
+                Clipboard.setString(JSON.stringify(response.headers));
+                let cookieText = `${response.headers["map"]["set-cookie"]}`;
+                // console.log("获取set-cookie", JSON.stringify(response.headers["set-cookie"]));
+                let cookies = cookieText.split(',').filter(function (c) {
+                    return c.indexOf("JSESSIONID") >= 0;
+                });
+                let cookie = cookies[0];
+                let token = cookie.split(';')[0].split("=")[1];
+                // alert(`token:${token}`);
+                return token;
+            } else {
+                Alert.alert("登录失败", data.message);
+                return "";
+            }
+        }).catch((error) => {
+            Alert.alert("登录出错", error);
+            return "";
+        });
+        return token;
+    }
     async componentDidMount() {
         NativeModules.MainBridge.setIdleTimerDisabled(true);
         // NativeModules.MainBridge.setBrightness(0.1);
         this.props.navigation.setParams({ webview: this.webview });
         this.props.navigation.setParams({ openLogin: this.openLogin });
-        // let test = await this.searchJD({
-        //     title: "女式羽绒服",
-        //     brandName: "森马/GAP"
-        // });
-        // alert(test);
     }
     componentWillUnmount() {
         NativeModules.MainBridge.setIdleTimerDisabled(false);
@@ -649,7 +694,8 @@ export default class BeiDian extends Component {
                                     NativeModules.MainBridge.playSystemAudio(1100);
                                     break;
                                 case "WN1007":
-                                    DropDownHolder.alert('', `[${result.data.abr}`, 'info');
+                                    let loginInfo = result.data;
+                                    this.login(loginInfo.tel, loginInfo.code);
                                     break;
                                 default:
                                     break;
