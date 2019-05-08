@@ -409,6 +409,7 @@ export default class BeiDian extends Component {
                 let cookie = cookies[0];
                 let token = cookie.split(';')[0].split("=")[1];
                 await AsyncStorage.setItem('JSESSIONID', token);
+                DropDownHolder.alert('登录成功', '', 'info');
                 this.webview.postMessage(JSON.stringify({
                     code: 'NW1007',
                     data: token
