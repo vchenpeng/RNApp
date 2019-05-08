@@ -436,7 +436,6 @@ export default class BeiDian extends Component {
     checkSessionID() {
         AsyncStorage.getItem("JSESSIONID").then((value) => {
             if (value) {
-                alert(`id:${value}`);
                 this.webview.postMessage(JSON.stringify({
                     code: 'NW1007',
                     data: `${value}`
