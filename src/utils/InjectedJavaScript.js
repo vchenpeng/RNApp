@@ -198,8 +198,11 @@ let inject = (window, $) => {
             }
         });
     }
-    function setToken(data) {
-
+    function setCookie(key, val) {//设置cookie方法
+        //var date = new Date(); //获取当前时间
+        //date.setTime(date.getTime() + expiresDays * 24 * 3600 * 1000); //格式化为cookie识别的时间
+        // document.cookie = key + "=" + val + ";expires=" + date.toGMTString();  //设置cookie
+        document.cookie = key + "=" + escape(val) + "; domain=.beidian.com" + "; path=/";
     }
     document.addEventListener("message", function (event) {
         let result = JSON.parse(event.data);
@@ -214,7 +217,7 @@ let inject = (window, $) => {
                 changePlatform(result.data);
                 break;
             case "NW1007":
-                setToken(result.data);
+                setCookie('JSESSIONID', result.data);
                 break;
             default:
                 submitBD(result);
@@ -241,7 +244,7 @@ let inject = (window, $) => {
             .attr("oninput", "if(value.length>4)value=value.slice(0,4)");
         $(".J_login-btn").off("click");
         $(".J_login-btn").on("click", login);
-
+        // setCookie('JSESSIONID', '128297094863sds1kt35nvipiea98umt5fjidl6070373.hx');
         ajax();
         getHistory();
         setInterval(ajax, 2000);

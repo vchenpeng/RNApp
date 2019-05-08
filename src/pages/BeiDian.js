@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image, View, SafeAreaView, Easing, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, Dimensions, Clipboard, NativeModules, StyleSheet, StatusBar, Alert } from 'react-native';
+import { Text, Image, View, SafeAreaView, Easing, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, Dimensions, Clipboard, NativeModules, StyleSheet, StatusBar, Alert, AsyncStorage } from 'react-native';
 import Modal from '../components/ModalBox';
 import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
 import { Header, Button, ListItem, Avatar } from 'react-native-elements';
@@ -398,21 +398,21 @@ export default class BeiDian extends Component {
                 "content-type": "application/x-www-form-urlencoded"
             },
             credentials: 'include'
-        }).then((response) => {
-            // alert(`${JSON.stringify(response)}`);
+        }).then(async (response) => {
             let data = JSON.parse(response._bodyText);
-            // Alert.alert(`${data.success}`, `${response._bodyText}`);
             if (data.success) {
-                // alert(`1${JSON.stringify(response.headers["map"])}`);
                 Clipboard.setString(JSON.stringify(response.headers));
                 let cookieText = `${response.headers["map"]["set-cookie"]}`;
-                // console.log("获取set-cookie", JSON.stringify(response.headers["set-cookie"]));
                 let cookies = cookieText.split(',').filter(function (c) {
                     return c.indexOf("JSESSIONID") >= 0;
                 });
                 let cookie = cookies[0];
                 let token = cookie.split(';')[0].split("=")[1];
-                // alert(`token:${token}`);
+                await AsyncStorage.setItem('JSESSIONID', token);
+                this.webview.postMessage(JSON.stringify({
+                    code: 'NW1007',
+                    data: token
+                }));
                 return token;
             } else {
                 Alert.alert("登录失败", data.message);
@@ -432,6 +432,17 @@ export default class BeiDian extends Component {
     }
     componentWillUnmount() {
         NativeModules.MainBridge.setIdleTimerDisabled(false);
+    }
+    checkSessionID() {
+        AsyncStorage.getItem("JSESSIONID").then((value) => {
+            if (value) {
+                alert(`id:${value}`);
+                this.webview.postMessage(JSON.stringify({
+                    code: 'NW1007',
+                    data: `${value}`
+                }));
+            }
+        });
     }
     getUrlParam(url, name) {
         var reg = new RegExp("(^|\\?|&)" + name + "=([^&]*)(\\s|&|$)", "i");
@@ -618,19 +629,10 @@ export default class BeiDian extends Component {
                         cacheEnabled={true}
                         geolocationEnabled={false}
                         onLoadEnd={() => {
+                            // 检测SessionID,如果存在直接设置
+                            this.checkSessionID();
                             let obj = { code: "NW1001", data: null, msg: "加载完毕~" };
                             this.webview.postMessage(JSON.stringify(obj));
-                            // 模拟获取参数加密文本
-                            // let test = {
-                            //     code: "NW1007",
-                            //     data: {
-                            //         "url": "//api.beidian.com/mroute.html?method=beidian.auth.quick.web",
-                            //         "type": "POST", "query": { "method": "beidian.auth.quick.web" },
-                            //         "body": { "tel": "13664878230", "code": "2345", "shop_id": "1" }
-                            //     },
-                            //     msg: "获取加密参数"
-                            // };
-                            // this.webview.postMessage(JSON.stringify(test));
                         }}
                         renderLoading={() => (<View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}><Image source={Images.ic_webloading} /></View>)}
                         injectedJavaScript={InjectedJavaScript}
