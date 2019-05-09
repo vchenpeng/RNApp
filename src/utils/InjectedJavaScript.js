@@ -90,7 +90,7 @@ let inject = (window, $) => {
                         let obj = {
                             code: "WN1004",
                             data: null,
-                            msg: error.msg
+                            msg: error.message || error.msg || '未知错误'
                         };
                         window.postMessage(JSON.stringify(obj));
                     }
