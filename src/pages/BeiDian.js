@@ -399,8 +399,10 @@ export default class BeiDian extends Component {
             },
             credentials: 'include'
         }).then(async (response) => {
-            let data = JSON.parse(response._bodyText);
-            if (data.success) {
+            let body = JSON.parse(response._bodyText);
+            if (body.success) {
+                alert(response._bodyText);
+                const uid = body.data;
                 Clipboard.setString(JSON.stringify(response.headers));
                 let cookieText = `${response.headers["map"]["set-cookie"]}`;
                 let cookies = cookieText.split(',').filter(function (c) {
@@ -409,14 +411,18 @@ export default class BeiDian extends Component {
                 let cookie = cookies[0];
                 let token = cookie.split(';')[0].split("=")[1];
                 await AsyncStorage.setItem('JSESSIONID', token);
+                await AsyncStorage.setItem('UID', `${uid}`);
                 DropDownHolder.alert('登录成功', '', 'info');
                 this.webview.postMessage(JSON.stringify({
                     code: 'NW1007',
-                    data: token
+                    data: [
+                        { key: "JSESSIONID", value: token },
+                        { key: "_logged_", value: uid }
+                    ]
                 }));
                 return token;
             } else {
-                Alert.alert("登录失败", data.message);
+                Alert.alert("登录失败", body.message);
                 return "";
             }
         }).catch((error) => {
@@ -435,13 +441,16 @@ export default class BeiDian extends Component {
         NativeModules.MainBridge.setIdleTimerDisabled(false);
     }
     checkSessionID() {
-        AsyncStorage.getItem("JSESSIONID").then((value) => {
-            if (value) {
-                this.webview.postMessage(JSON.stringify({
-                    code: 'NW1007',
-                    data: `${value}`
-                }));
-            }
+        Promise.all([AsyncStorage.getItem("JSESSIONID"), AsyncStorage.getItem("UID")]).then((values) => {
+            let token = values[0];
+            let uid = values[1];
+            this.webview.postMessage(JSON.stringify({
+                code: 'NW1007',
+                data: [
+                    { key: "JSESSIONID", value: token },
+                    { key: "_logged_", value: uid }
+                ]
+            }));
         });
     }
     getUrlParam(url, name) {
