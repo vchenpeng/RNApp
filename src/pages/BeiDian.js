@@ -401,7 +401,6 @@ export default class BeiDian extends Component {
         }).then(async (response) => {
             let body = JSON.parse(response._bodyText);
             if (body.success) {
-                alert(response._bodyText);
                 const uid = body.data || 0;
                 Clipboard.setString(JSON.stringify(response.headers));
                 let cookieText = `${response.headers["map"]["set-cookie"]}`;
