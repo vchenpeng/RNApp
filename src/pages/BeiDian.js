@@ -402,7 +402,7 @@ export default class BeiDian extends Component {
             let body = JSON.parse(response._bodyText);
             if (body.success) {
                 alert(response._bodyText);
-                const uid = body.data;
+                const uid = body.data || 0;
                 Clipboard.setString(JSON.stringify(response.headers));
                 let cookieText = `${response.headers["map"]["set-cookie"]}`;
                 let cookies = cookieText.split(',').filter(function (c) {
@@ -443,12 +443,12 @@ export default class BeiDian extends Component {
     checkSessionID() {
         Promise.all([AsyncStorage.getItem("JSESSIONID"), AsyncStorage.getItem("UID")]).then((values) => {
             let token = values[0];
-            let uid = values[1];
+            let uid = values[1] || 0;
             this.webview.postMessage(JSON.stringify({
                 code: 'NW1007',
                 data: [
                     { key: "JSESSIONID", value: token },
-                    { key: "_logged_", value: uid }
+                    { key: "_logged_", value: `${uid}` }
                 ]
             }));
         });

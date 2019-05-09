@@ -78,7 +78,7 @@ let inject = (window, $) => {
                         changePlatform(nextPlatform.code);
                     }
                 } else {
-                    let error = JSON.parse(data);
+                    let error = data;
                     if (error.code == 1003) {
                         let obj = {
                             code: "WN1000",
@@ -90,7 +90,7 @@ let inject = (window, $) => {
                         let obj = {
                             code: "WN1004",
                             data: null,
-                            msg: error.message || error.msg || '未知错误'
+                            msg: error.msg || '未知错误'
                         };
                         window.postMessage(JSON.stringify(obj));
                     }
