@@ -441,13 +441,13 @@ export default class BeiDian extends Component {
     }
     checkSessionID() {
         Promise.all([AsyncStorage.getItem("JSESSIONID"), AsyncStorage.getItem("UID")]).then((values) => {
-            let token = values[0];
-            let uid = values[1] || 0;
+            let token = values[0] || '';
+            let uid = values[1] || '0';
             this.webview.postMessage(JSON.stringify({
                 code: 'NW1007',
                 data: [
                     { key: "JSESSIONID", value: token },
-                    { key: "_logged_", value: `${uid}` }
+                    { key: "_logged_", value: uid }
                 ]
             }));
         });
@@ -638,9 +638,16 @@ export default class BeiDian extends Component {
                         geolocationEnabled={false}
                         onLoadEnd={() => {
                             // 检测SessionID,如果存在直接设置
-                            this.checkSessionID();
-                            let obj = { code: "NW1001", data: null, msg: "加载完毕~" };
-                            this.webview.postMessage(JSON.stringify(obj));
+                            Promise.all([AsyncStorage.getItem("JSESSIONID"), AsyncStorage.getItem("UID")]).then((values) => {
+                                let token = values[0] || '';
+                                let uid = values[1] || '0';
+                                let cookies = [
+                                    { key: "JSESSIONID", value: token },
+                                    { key: "_logged_", value: uid }
+                                ];
+                                let obj = { code: "NW1001", data: cookies, msg: "加载完毕~" };
+                                this.webview.postMessage(JSON.stringify(obj));
+                            });
                         }}
                         renderLoading={() => (<View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#fff" }}><Image source={Images.ic_webloading} /></View>)}
                         injectedJavaScript={InjectedJavaScript}

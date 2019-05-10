@@ -1,6 +1,6 @@
 
 let inject = (window, $) => {
-    var pid = 0;
+    let pid = 0;
     let uid = 0; //91286199
     function getCookie(name) {
         var strcookie = document.cookie;//获取cookie字符串
@@ -24,9 +24,6 @@ let inject = (window, $) => {
     }
     function ajax() {
         uid = +getCookie('_logged_');
-        // if (uid > 0 && window.location.href == "https://m.beidian.com/login/fast_login.html") {
-        //     window.location.replace("https://m.beidian.com/promote/price_info_detail.html");
-        // }
         $.ajax({
             type: "GET",
             url: "https://imapi.beidian.com/server/gateway?method=voc.price.hunter.mission.change&uid=" + uid + "&pid=" + pid,
@@ -90,7 +87,7 @@ let inject = (window, $) => {
                         let obj = {
                             code: "WN1004",
                             data: null,
-                            msg: error.msg || '未知错误'
+                            msg: error.msg || '出现错误啦'
                         };
                         window.postMessage(JSON.stringify(obj));
                     }
@@ -163,7 +160,6 @@ let inject = (window, $) => {
                 if (data && data.total > 0) {
                     let items = data.items;
                     obj.data = items;
-                    // alert(JSON.stringify(items[items.length - 2]));
                     window.postMessage(JSON.stringify(obj));
                 }
             },
@@ -207,7 +203,7 @@ let inject = (window, $) => {
         let result = JSON.parse(event.data);
         switch (result.code) {
             case "NW1001":
-                init();
+                init(result.data);
                 break;
             case "NW1002":
                 getHistory();
@@ -236,17 +232,17 @@ let inject = (window, $) => {
         };
         window.postMessage(JSON.stringify(obj));
     }
-    function init() {
+    function init(cookies) {
         insertCSS('html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: #3bafda;}.login .msg-pin-btn{border: 1px solid #3bafda;color:#3bafda;}');
         $(".msg-pin-input").attr("type", "number")
             .attr("pattern", "[0-9]*")
             .attr("oninput", "if(value.length>4)value=value.slice(0,4)");
         $(".J_login-btn").off("click");
         $(".J_login-btn").on("click", login);
+        setCookie(cookies);
         ajax();
         getHistory();
         setInterval(ajax, 2000);
-
         // 页面心跳，保证页面长时间执行定时器，卡死问题
         setInterval(() => {
             window.location.reload();
