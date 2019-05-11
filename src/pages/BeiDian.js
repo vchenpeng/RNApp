@@ -36,7 +36,7 @@ export default class BeiDian extends Component {
                         let codeName = self.switchPlatformName(code);
                         let obj = { code: "NW1003", data: code, msg: `手动切换到${codeName}平台` };
                         navigation.state.params.webview.postMessage(JSON.stringify(obj));
-                        NativeModules.MainBridge.playSystemAudio(1001);
+                        self.playSysAudio(1001);
                         // DropDownHolder.alert(`手动切换到 [${codeName}] 平台`, '', 'info');
 
                         nextPlatformIndex += 1;
@@ -66,7 +66,9 @@ export default class BeiDian extends Component {
             pid: 91286199,
             products: [],
             historys: [],
-            lowest: 0.20
+            lowest: 0.20,
+            audioCode: 1009,    // 提交成功提示音
+            isSilence: false    // 是否静音
         };
     }
     setLoginModalStatus(flag) {
@@ -430,9 +432,26 @@ export default class BeiDian extends Component {
         });
         return token;
     }
+    // 设置提交成功提示音
+    setAudioCode(code) {
+        this.setState({ audioCode: code });
+    }
+    toggleSilenceMode() {
+        let isSilence = this.state.isSilence;
+        this.setState({ isSilence: !isSilence });
+    }
+    // 播放系统声音
+    playSysAudio(code) {
+        if (!this.state.isSilence) {
+            NativeModules.MainBridge.playSystemAudio(code);
+        } else {
+            console.log('当前处于静音模式');
+        }
+    }
     async componentDidMount() {
         NativeModules.MainBridge.setIdleTimerDisabled(true);
         // NativeModules.MainBridge.setBrightness(0.1);
+
         this.props.navigation.setParams({ webview: this.webview });
         this.props.navigation.setParams({ openLogin: this.openLogin });
     }
@@ -469,6 +488,9 @@ export default class BeiDian extends Component {
             <TouchableHighlight
                 activeOpacity={0.85}
                 underlayColor='#000'
+                onLongPress={() => {
+                    this.toggleSilenceMode();
+                }}
                 onPress={() => {
                     NavigationService.navigate("Web", { url: item.outerUrl, title: item.title });
                 }} >
@@ -520,6 +542,7 @@ export default class BeiDian extends Component {
     }
     render() {
         let { height, width } = Dimensions.get('window');
+        let tabIndex = 0;
         return (<SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
             <View style={{ flex: 1, backgroundColor: "#f2f4f6" }}>
                 <StatusBar barStyle="light-content" />
@@ -541,10 +564,13 @@ export default class BeiDian extends Component {
                     locked={true}
                     underlineWidth={10}
                     onChangeTab={(obj) => {
-                        console.log('index:' + obj.i);
+                        if (obj.i == tabIndex && tabIndex == 0) {
+                            this.toggleSilenceMode();
+                        }
+                        tabIndex = obj.i;
                     }}
                 >
-                    <View tabLabel={"价格情报局"} style={{ flex: 1 }} key={"价格情报局"}>
+                    <View tabLabel={'价格情报局 ' + (this.state.isSilence ? '☾' : '♬')} style={{ flex: 1 }} key={"价格情报局"}>
                         <SwipeListView
                             useFlatList={true}
                             data={this.state.historys}
@@ -591,7 +617,7 @@ export default class BeiDian extends Component {
                             }}
                             refreshing={this.state.refreshing}
                             onRefresh={() => {
-                                NativeModules.MainBridge.playSystemAudio(1100);
+                                this.playSysAudio(1100);
                                 this.setState({ refreshing: true });
                                 let obj = {
                                     code: "NW1002",
@@ -703,12 +729,12 @@ export default class BeiDian extends Component {
                                             this.setState({ products: products });
                                             this.props.navigation.setParams({ products: products });
                                             this.webview.postMessage(JSON.stringify(returnObj));
-                                            NativeModules.MainBridge.playSystemAudio(1009);
+                                            this.playSysAudio(this.state.audioCode);
                                         }
                                     }
                                     break;
                                 case "WN1006":
-                                    NativeModules.MainBridge.playSystemAudio(1100);
+                                    this.playSysAudio(1100);
                                     break;
                                 case "WN1007":
                                     let loginInfo = result.data;
