@@ -1,5 +1,6 @@
 
 let inject = (window, $) => {
+    const themeColor = '#2ca146';
     let pid = 0;
     let uid = 0; //91286199
     function getCookie(name) {
@@ -233,7 +234,7 @@ let inject = (window, $) => {
         window.postMessage(JSON.stringify(obj));
     }
     function init(cookies) {
-        insertCSS('html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: #3bafda;}.login .msg-pin-btn{border: 1px solid #3bafda;color:#3bafda;}');
+        insertCSS(`html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: ${themeColor};}.login .msg-pin-btn{border: 1px solid ${themeColor};color:${themeColor};}`);
         $(".msg-pin-input").attr("type", "number")
             .attr("pattern", "[0-9]*")
             .attr("oninput", "if(value.length>4)value=value.slice(0,4)");
