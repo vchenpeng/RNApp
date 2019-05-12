@@ -12,7 +12,8 @@ import { Constants, Images, Colors } from "../resource";
 import DropDownHolder from '../utils/DropDownHolder';
 import tool from '../utils/tool';
 import InjectedJavaScript from '../utils/InjectedJavaScript';
-import abr from '../utils/abr'
+import abr from '../utils/abr';
+import RNShakeEvent from 'react-native-shake-event';
 
 let self, nextPlatformIndex = 0;   // 天猫
 export default class BeiDian extends Component {
@@ -20,7 +21,7 @@ export default class BeiDian extends Component {
     static navigationOptions = ({ navigation }) => {
         let { params } = navigation.state;
         return {
-            headerTitle: "贝店情报局",
+            title: params && params.title ? params.title : '贝店情报局',
             headerTitleStyle: {
                 fontSize: 18,
                 fontWeight: '400',
@@ -436,9 +437,10 @@ export default class BeiDian extends Component {
     setAudioCode(code) {
         this.setState({ audioCode: code });
     }
-    toggleSilenceMode() {
-        let isSilence = this.state.isSilence;
-        this.setState({ isSilence: !isSilence });
+    setSilenceMode(flag) {
+        this.setState({ isSilence: flag });
+        let title = `贝店情报局` + (this.state.isSilence ? ' ☾' : '');
+        this.props.navigation.setParams({ title: title });
     }
     // 播放系统声音
     playSysAudio(code) {
@@ -448,15 +450,34 @@ export default class BeiDian extends Component {
             console.log('当前处于静音模式');
         }
     }
+    onShake() {
+        RNShakeEvent.addEventListener('shake', () => {
+            Alert.alert('提醒模式', '开启静音模式后，所有提示不再提醒', [
+                {
+                    text: '音效',
+                    onPress: () => {
+                        this.setSilenceMode(false);
+                    }
+                },
+                {
+                    text: '静音',
+                    onPress: () => {
+                        this.setSilenceMode(true);
+                    }
+                }
+            ]);
+        });
+    }
     async componentDidMount() {
         NativeModules.MainBridge.setIdleTimerDisabled(true);
         // NativeModules.MainBridge.setBrightness(0.1);
-
+        this.onShake();
         this.props.navigation.setParams({ webview: this.webview });
         this.props.navigation.setParams({ openLogin: this.openLogin });
     }
     componentWillUnmount() {
         NativeModules.MainBridge.setIdleTimerDisabled(false);
+        RNShakeEvent.removeEventListener('shake');
     }
     checkSessionID() {
         Promise.all([AsyncStorage.getItem("JSESSIONID"), AsyncStorage.getItem("UID")]).then((values) => {
@@ -488,9 +509,6 @@ export default class BeiDian extends Component {
             <TouchableHighlight
                 activeOpacity={0.85}
                 underlayColor='#000'
-                onLongPress={() => {
-                    this.toggleSilenceMode();
-                }}
                 onPress={() => {
                     NavigationService.navigate("Web", { url: item.outerUrl, title: item.title });
                 }} >
@@ -542,7 +560,6 @@ export default class BeiDian extends Component {
     }
     render() {
         let { height, width } = Dimensions.get('window');
-        let tabIndex = 0;
         return (<SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
             <View style={{ flex: 1, backgroundColor: "#f2f4f6" }}>
                 <StatusBar barStyle="light-content" />
@@ -564,13 +581,10 @@ export default class BeiDian extends Component {
                     locked={true}
                     underlineWidth={10}
                     onChangeTab={(obj) => {
-                        if (obj.i == tabIndex && tabIndex == 0) {
-                            this.toggleSilenceMode();
-                        }
-                        tabIndex = obj.i;
+                        console.log(`index:${obj.i}`);
                     }}
                 >
-                    <View tabLabel={'价格情报局 ' + (this.state.isSilence ? '☾' : '♬')} style={{ flex: 1 }} key={"价格情报局"}>
+                    <View tabLabel={'价格情报局'} style={{ flex: 1 }} key={"价格情报局"}>
                         <SwipeListView
                             useFlatList={true}
                             data={this.state.historys}
