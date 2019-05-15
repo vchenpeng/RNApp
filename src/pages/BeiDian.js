@@ -16,6 +16,7 @@ import abr from '../utils/abr';
 import RNShakeEvent from 'react-native-shake-event';
 
 let self, nextPlatformIndex = 0;   // 天猫
+let canShowModal = true;
 export default class BeiDian extends Component {
     //接收上一个页面传过来的title显示出来
     static navigationOptions = ({ navigation }) => {
@@ -452,20 +453,25 @@ export default class BeiDian extends Component {
     }
     onShake() {
         RNShakeEvent.addEventListener('shake', () => {
-            Alert.alert('提醒模式', '开启静音模式后，所有提示不再提醒', [
-                {
-                    text: '音效',
-                    onPress: () => {
-                        this.setSilenceMode(false);
+            if (canShowModal == true) {
+                canShowModal = false;
+                Alert.alert('提醒模式', '开启静音模式后，所有提示不再提醒！', [
+                    {
+                        text: '音效',
+                        onPress: () => {
+                            this.setSilenceMode(false);
+                            canShowModal = true;
+                        }
+                    },
+                    {
+                        text: '静音',
+                        onPress: () => {
+                            this.setSilenceMode(true);
+                            canShowModal = true;
+                        }
                     }
-                },
-                {
-                    text: '静音',
-                    onPress: () => {
-                        this.setSilenceMode(true);
-                    }
-                }
-            ]);
+                ]);
+            }
         });
     }
     async componentDidMount() {
