@@ -68,7 +68,7 @@ export default class BeiDian extends Component {
             pid: 91286199,
             products: [],
             historys: [],
-            lowest: 0.20,
+            lowest: 0.10,
             audioCode: 1009,    // 提交成功提示音
             isSilence: false    // 是否静音
         };

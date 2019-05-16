@@ -89,7 +89,7 @@ let inject = (window, $) => {
             let obj = {
               code: 'WN1000',
               data: null,
-              msg: '授权失败，请登录贝店'
+              msg: '授权失败，请登录贝店!'
             };
             window.postMessage(JSON.stringify(obj));
           } else {
