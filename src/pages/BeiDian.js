@@ -34,11 +34,12 @@ import tool from '../utils/tool';
 import InjectedJavaScript from '../utils/InjectedJavaScript';
 import abr from '../utils/abr';
 import RNShakeEvent from 'react-native-shake-event';
-import { ActionSheetCustom as ActionSheet } from 'react-native-actionsheet';
+import { ActionSheetCustom as ActionSheet } from '../components/ActionSheet/index';
 
 let self,
   nextPlatformIndex = 0; // 天猫
 let canShowModal = true;
+
 export default class BeiDian extends Component {
   //接收上一个页面传过来的title显示出来
   static navigationOptions = ({ navigation }) => {
@@ -60,19 +61,7 @@ export default class BeiDian extends Component {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             onPress={() => {
-              let code = [13, 12, 6, 2, 1][nextPlatformIndex];
-              let codeName = self.switchPlatformName(code);
-              let obj = {
-                code: 'NW1003',
-                data: code,
-                msg: `手动切换到${codeName}平台`
-              };
-              navigation.state.params.webview.postMessage(JSON.stringify(obj));
-              self.playSysAudio(1001);
-              // DropDownHolder.alert(`手动切换到 [${codeName}] 平台`, '', 'info');
-
-              nextPlatformIndex += 1;
-              nextPlatformIndex = nextPlatformIndex > 4 ? 0 : nextPlatformIndex;
+              navigation.state.params.changePlatform.call(self);
             }}
           >
             <AntDesignIcon
@@ -84,7 +73,7 @@ export default class BeiDian extends Component {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.state.params.openLogin();
+              navigation.state.params.showOptions();
             }}
           >
             <AntDesignIcon
@@ -129,16 +118,17 @@ export default class BeiDian extends Component {
       pid: 91286199,
       products: [],
       historys: [],
-      lowest: 0.1,
+      lowest: 0.01,
       audioCode: 1009, // 提交成功提示音
-      isSilence: false // 是否静音
+      isSilence: false, // 是否静音
+      actionSheetStyles: {}
     };
   }
   setLoginModalStatus(flag) {
     self.setState({ isShowLogin: flag });
   }
   openLogin() {
-    self.setState({ isShowLogin: !self.state.isShowLogin });
+    this.setState({ isShowLogin: !this.state.isShowLogin });
   }
   checkIn(str, arr) {
     let result = false;
@@ -151,6 +141,19 @@ export default class BeiDian extends Component {
       }
     }
     return result;
+  }
+  changePlatform() {
+    let code = [13, 12, 6, 2, 1][nextPlatformIndex];
+    let codeName = this.switchPlatformName(code);
+    let obj = {
+      code: 'NW1003',
+      data: code,
+      msg: `手动切换到${codeName}平台`
+    };
+    this.webview.postMessage(JSON.stringify(obj));
+    self.playSysAudio(1001);
+    nextPlatformIndex += 1;
+    nextPlatformIndex = nextPlatformIndex > 4 ? 0 : nextPlatformIndex;
   }
   searchWPH(product) {
     const url = `https://m.vip.com/server.html?rpc&method=SearchRpc.getSearchList&f=www`;
@@ -608,7 +611,8 @@ export default class BeiDian extends Component {
   setAudioCode(code) {
     this.setState({ audioCode: code });
   }
-  setSilenceMode(flag) {
+  toggleSilenceMode() {
+    let flag = !this.state.isSilence;
     this.setState({ isSilence: flag });
     let title = `贝店情报局` + (this.state.isSilence ? ' ☾' : '');
     this.props.navigation.setParams({ title: title });
@@ -621,20 +625,21 @@ export default class BeiDian extends Component {
       console.log('当前处于静音模式');
     }
   }
-  onShake() {
-    RNShakeEvent.addEventListener('shake', () => {
-      if (canShowModal == true) {
-        canShowModal = false;
-        this.ActionSheet.show();
-      }
-    });
+  showOptions() {
+    self.ActionSheet.show();
   }
+  onShake() {
+    RNShakeEvent.addEventListener('shake', () => {});
+  }
+  componentWillMount() {}
   async componentDidMount() {
     NativeModules.MainBridge.setIdleTimerDisabled(true);
     // NativeModules.MainBridge.setBrightness(0.1);
     this.onShake();
     this.props.navigation.setParams({ webview: this.webview });
     this.props.navigation.setParams({ openLogin: this.openLogin });
+    this.props.navigation.setParams({ showOptions: this.showOptions });
+    this.props.navigation.setParams({ changePlatform: this.changePlatform });
   }
   componentWillUnmount() {
     NativeModules.MainBridge.setIdleTimerDisabled(false);
@@ -675,7 +680,7 @@ export default class BeiDian extends Component {
     return (
       <TouchableHighlight
         activeOpacity={0.85}
-        underlayColor="#000"
+        underlayColor="#000000"
         onPress={() => {
           NavigationService.navigate('Web', {
             url: item.outerUrl,
@@ -766,9 +771,10 @@ export default class BeiDian extends Component {
     );
   }
   render() {
-    let { height, width } = Dimensions.get('window');
+    const { height, width } = Dimensions.get('window');
+
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#f2f4f6' }}>
         <View style={{ flex: 1, backgroundColor: '#f2f4f6' }}>
           <StatusBar barStyle="light-content" />
 
@@ -1021,20 +1027,23 @@ export default class BeiDian extends Component {
         </View>
         <ActionSheet
           ref={o => (this.ActionSheet = o)}
-          title={'提醒模式'}
+          title={'设置'}
           message={'开启静音模式后，所有提示不再提醒'}
-          options={['音效', '静音', '关闭']}
+          options={['切换提醒模式', '切换任务平台', '登录']}
           cancelButtonIndex={2}
           destructiveButtonIndex={2}
+          tintColor={'#000'}
           onPress={index => {
             if (index == 0) {
-              this.setSilenceMode(false);
+              this.toggleSilenceMode();
             } else if (index == 1) {
-              this.setSilenceMode(true);
-            } else {
+              this.changePlatform();
+            } else if (index == 2) {
+              this.openLogin();
             }
             canShowModal = true;
           }}
+          styles={this.state.actionSheetStyles}
         />
       </SafeAreaView>
     );

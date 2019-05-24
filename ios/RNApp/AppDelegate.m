@@ -34,12 +34,12 @@
     jsCodeLocation = [CodePush bundleURL];
   }else{
     BOOL isContain = [ip hasPrefix:@"192.168.1."];
-    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"192.168.1.9":@"192.168.1.5")];
+    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"192.168.1.8":@"127.0.0.1")];
     
     jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
   }
   //jsCodeLocation = [NSURL URLWithString:@"http://192.168.31.148:8081/index.ios.bundle?platform=ios&dev=true"];
-  jsCodeLocation = [CodePush bundleURL];
+  //jsCodeLocation = [CodePush bundleURL];
 #else
   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"bundle/main" withExtension:@"jsbundle"];
   jsCodeLocation = [CodePush bundleURL];

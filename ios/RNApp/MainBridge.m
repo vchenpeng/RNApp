@@ -58,4 +58,22 @@ RCT_EXPORT_METHOD(setBrightness:(CGFloat)value)
     [[UIScreen mainScreen] setBrightness:value];
   });
 }
+//  获取safearea位置
+RCT_EXPORT_METHOD(getSafeAreaInsets:(RCTResponseSenderBlock)callback)
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    UIViewController *rootCtrl = UIApplication.sharedApplication.delegate.window.rootViewController;
+    if (@available(iOS 11.0, *)) {
+      UIEdgeInsets insets = rootCtrl.view.safeAreaInsets;
+      NSDictionary *dict = @{@"top":[NSNumber numberWithInt:insets.top],
+                             @"bottom":[NSNumber numberWithInt:insets.bottom],
+                             @"left":[NSNumber numberWithInt:insets.left],
+                             @"right":[NSNumber numberWithInt:insets.right]};
+      callback(@[[NSNull null], dict]);
+    } else {
+      NSDictionary *dict = @{@"top":@0,@"bottom":@0,@"left":@0,@"right":@0};
+      callback(@[[NSNull null], dict]);
+    }
+  });
+}
 @end
