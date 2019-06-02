@@ -38,14 +38,13 @@ import { ActionSheetCustom as ActionSheet } from '../components/ActionSheet/inde
 
 let self,
   nextPlatformIndex = 0; // 天猫
-let canShowModal = true;
 
 export default class BeiDian extends Component {
   //接收上一个页面传过来的title显示出来
   static navigationOptions = ({ navigation }) => {
     let { params } = navigation.state;
     return {
-      title: params && params.title ? params.title : '贝店情报局',
+      title: params && params.title ? params.title : '贝店情报局 ☾',
       headerTitleStyle: {
         fontSize: 18,
         fontWeight: '400',
@@ -120,7 +119,7 @@ export default class BeiDian extends Component {
       historys: [],
       lowest: 0.01,
       audioCode: 1009, // 提交成功提示音
-      isSilence: false, // 是否静音
+      isSilence: true, // 是否静音
       actionSheetStyles: {}
     };
   }
@@ -1029,7 +1028,7 @@ export default class BeiDian extends Component {
           ref={o => (this.ActionSheet = o)}
           title={'设置'}
           message={'开启静音模式后，所有提示不再提醒'}
-          options={['切换提醒模式', '切换任务平台', '登录']}
+          options={['提醒模式', '任务平台', '登录']}
           cancelButtonIndex={2}
           destructiveButtonIndex={2}
           tintColor={'#000'}
@@ -1041,7 +1040,6 @@ export default class BeiDian extends Component {
             } else if (index == 2) {
               this.openLogin();
             }
-            canShowModal = true;
           }}
           styles={this.state.actionSheetStyles}
         />
