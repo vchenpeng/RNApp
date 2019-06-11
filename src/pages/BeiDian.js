@@ -36,15 +36,15 @@ import abr from '../utils/abr';
 import RNShakeEvent from 'react-native-shake-event';
 import { ActionSheetCustom as ActionSheet } from '../components/ActionSheet/index';
 
-let self,
-  nextPlatformIndex = 0; // 天猫
+let self;
+let nextPlatformIndex = 0; // 天猫
 
 export default class BeiDian extends Component {
   //接收上一个页面传过来的title显示出来
   static navigationOptions = ({ navigation }) => {
     let { params } = navigation.state;
     return {
-      title: params && params.title ? params.title : '贝店情报局 ☾',
+      title: params && params.title ? params.title : '贝店情报局',
       headerTitleStyle: {
         fontSize: 18,
         fontWeight: '400',
@@ -109,7 +109,6 @@ export default class BeiDian extends Component {
   webview;
   constructor(props) {
     super(props);
-    self = this;
     this.state = {
       refreshing: false,
       isShowLogin: false,
@@ -122,6 +121,7 @@ export default class BeiDian extends Component {
       isSilence: true, // 是否静音
       actionSheetStyles: {}
     };
+    self = this;
   }
   setLoginModalStatus(flag) {
     self.setState({ isShowLogin: flag });
@@ -612,8 +612,8 @@ export default class BeiDian extends Component {
   }
   toggleSilenceMode() {
     let flag = !this.state.isSilence;
+    let title = `贝店情报局` + (flag ? '' : ' ♪');
     this.setState({ isSilence: flag });
-    let title = `贝店情报局` + (this.state.isSilence ? ' ☾' : '');
     this.props.navigation.setParams({ title: title });
   }
   // 播放系统声音
@@ -1028,7 +1028,11 @@ export default class BeiDian extends Component {
           ref={o => (this.ActionSheet = o)}
           title={'设置'}
           message={'开启静音模式后，所有提示不再提醒'}
-          options={['提醒模式', '任务平台', '登录']}
+          options={[
+            `${!this.state.isSilence ? '静音' : '提醒'}模式`,
+            '任务平台',
+            '登录'
+          ]}
           cancelButtonIndex={2}
           destructiveButtonIndex={2}
           tintColor={'#000'}
