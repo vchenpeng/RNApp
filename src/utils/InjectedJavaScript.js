@@ -107,6 +107,7 @@ let inject = (window, $) => {
       }
     });
   }
+  // 提交价格情报
   function submitBD(params) {
     $.ajax({
       type: 'POST',
@@ -140,6 +141,7 @@ let inject = (window, $) => {
       }
     });
   }
+  // 获取提交列表
   function getHistory() {
     uid = +getCookie('_logged_');
     $.ajax({
@@ -179,6 +181,7 @@ let inject = (window, $) => {
       }
     });
   }
+  // 切换任务平台
   function changePlatform(p) {
     uid = +getCookie('_logged_');
     $.ajax({
@@ -208,6 +211,77 @@ let inject = (window, $) => {
       }
     });
   }
+  // 获取jyk任务
+  function getJykTask() {
+    uid = +getCookie('_logged_');
+    setTimeout(() => {
+      $.ajax({
+        type: 'GET',
+        url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.detail.get&uid=${uid}`,
+        contentType: 'application/json;charset=utf-8',
+        dataType: 'json',
+        data: null,
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)',
+          Referer: 'https://m.beidian.com/promote/price_info.html'
+        },
+        xhrFields: {
+          withCredentials: true
+        },
+        beforeSend: (xhr, settings) => {},
+        success: data => {
+          console.log(data);
+          if (data.success) {
+            // let checkTaskId = data.body.checkTaskId;
+            // let iid = data.body.iid;
+            // submitJykTask(checkTaskId);
+            let task = data.body;
+            let obj = {
+              code: 'WN1008',
+              data: task,
+              msg: '传递jyk任务'
+            };
+            window.postMessage(JSON.stringify(obj));
+          } else {
+            getJykTask();
+          }
+        },
+        error: error => {
+          getJykTask();
+        }
+      });
+    }, 2000);
+  }
+  // 提交jyk任务
+  function submitJykTask(task) {
+    uid = +getCookie('_logged_');
+    let result = task.percent > 0.2 ? 'accept' : 'reject';
+    $.ajax({
+      type: 'GET',
+      url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.check.${result}&checkTaskId=${
+        task.checkTaskId
+      }&uid=${uid}`,
+      contentType: 'application/json;charset=utf-8',
+      dataType: 'json',
+      data: null,
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)',
+        Referer: 'https://m.beidian.com/promote/price_info.html'
+      },
+      xhrFields: {
+        withCredentials: true
+      },
+      beforeSend: (xhr, settings) => {},
+      success: data => {},
+      error: error => {},
+      complete: () => {
+        getJykTask();
+      }
+    });
+  }
+  // 设置cookie
   function setCookie(cookies) {
     cookies.forEach(cookie => {
       document.cookie =
@@ -218,6 +292,7 @@ let inject = (window, $) => {
         '; path=/';
     });
   }
+  // 监听Native层事件
   document.addEventListener(
     'message',
     function(event) {
@@ -234,6 +309,12 @@ let inject = (window, $) => {
           break;
         case 'NW1007':
           setCookie(result.data);
+          break;
+        case 'NW1009':
+          submitJykTask(result.data);
+          break;
+        case 'NW1010':
+          getJykTask();
           break;
         default:
           submitBD(result);
@@ -268,7 +349,8 @@ let inject = (window, $) => {
     setCookie(cookies);
     ajax();
     getHistory();
-    setInterval(ajax, 2000);
+    setInterval(ajax, 2000); // 1.2s执行一次
+    getJykTask();
     // 页面心跳，保证页面长时间执行定时器，卡死问题
     setInterval(() => {
       window.location.reload();

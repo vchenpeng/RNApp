@@ -116,10 +116,11 @@ export default class BeiDian extends Component {
       pid: 91286199,
       products: [],
       historys: [],
-      lowest: 0.01,
+      lowest: 0,
       audioCode: 1009, // 提交成功提示音
       isSilence: true, // 是否静音
-      actionSheetStyles: {}
+      actionSheetStyles: {},
+      jykSuccessCount: 0
     };
     self = this;
   }
@@ -606,6 +607,52 @@ export default class BeiDian extends Component {
       });
     return token;
   }
+  // 获取BD商品
+  getBdProduct(task) {
+    let url = `https://im.beidian.com/service/intelligence/product?iid=${
+      task.iid
+    }`;
+    return fetch(url, {
+      method: 'GET',
+      body: null,
+      headers: {
+        'content-type': 'application/json;charset=utf-8'
+      },
+      credentials: 'include'
+    })
+      .then(r => r.json())
+      .then(products => {
+        let topBdProduct = products[0];
+        //task.checkTaskId
+        let percent = this.strSimilarity2Percent(
+          topBdProduct.title,
+          task.productTitle
+        );
+        task.percent = percent;
+        this.webview.postMessage(
+          JSON.stringify({
+            code: 'NW1009',
+            data: task
+          })
+        );
+        let jykSuccessCount = this.state.jykSuccessCount;
+        jykSuccessCount++;
+        this.setState({
+          jykSuccessCount: jykSuccessCount
+        });
+      })
+      .catch(error => {
+        this.postWebMessage('NW1010', null);
+      });
+  }
+  postWebMessage(code, data) {
+    this.webview.postMessage(
+      JSON.stringify({
+        code: code,
+        data: data
+      })
+    );
+  }
   // 设置提交成功提示音
   setAudioCode(code) {
     this.setState({ audioCode: code });
@@ -633,7 +680,7 @@ export default class BeiDian extends Component {
   componentWillMount() {}
   async componentDidMount() {
     NativeModules.MainBridge.setIdleTimerDisabled(true);
-    // NativeModules.MainBridge.setBrightness(0.1);
+    NativeModules.MainBridge.setBrightness(0.1);
     this.onShake();
     this.props.navigation.setParams({ webview: this.webview });
     this.props.navigation.setParams({ openLogin: this.openLogin });
@@ -876,9 +923,9 @@ export default class BeiDian extends Component {
               />
             </View>
             <View
-              tabLabel={'情报检验科'}
+              tabLabel={`情报检验科(${this.state.jykSuccessCount})`}
               style={{ flex: 1 }}
-              key={'情报检验科'}
+              key={`情报检验科`}
             />
           </ScrollableTabView>
           <Modal
@@ -981,11 +1028,6 @@ export default class BeiDian extends Component {
                       let tName =
                         productInfo.taskShopName ||
                         this.switchPlatformName(productInfo.platform);
-                      DropDownHolder.alert(
-                        '',
-                        `[${tName}]${productInfo.title}`,
-                        'info'
-                      );
                       switch (productInfo.platform) {
                         case 1:
                         case 12:
@@ -999,7 +1041,12 @@ export default class BeiDian extends Component {
                           returnObj.url = await this.searchWPH(productInfo);
                           break;
                       }
-
+                      // 弹框提示对应商品
+                      DropDownHolder.alert(
+                        '',
+                        `[${tName}]${productInfo.title}`,
+                        'info'
+                      );
                       if (returnObj.url !== null) {
                         let products = this.state.products;
                         products.push(returnObj);
@@ -1016,6 +1063,10 @@ export default class BeiDian extends Component {
                   case 'WN1007':
                     let loginInfo = result.data;
                     this.login(loginInfo.tel, loginInfo.code);
+                    break;
+                  case 'WN1008':
+                    let taskInfo = result.data;
+                    this.getBdProduct(taskInfo);
                     break;
                   default:
                     break;
