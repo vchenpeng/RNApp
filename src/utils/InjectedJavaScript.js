@@ -195,7 +195,7 @@ let inject = (window, $) => {
       }
     });
   }
-  //生成从minNum到maxNum的随机数
+  // 生成从minNum到maxNum的随机数
   function randomNum(minNum, maxNum) {
     switch (arguments.length) {
       case 1:
@@ -212,7 +212,7 @@ let inject = (window, $) => {
   // 获取jyk任务
   function getJykTask() {
     uid = +getCookie('_logged_');
-    let random = randomNum(800, 1500);
+    let random = randomNum(800, 1200);
     setTimeout(() => {
       $.ajax({
         type: 'GET',

@@ -831,7 +831,7 @@ export default class BeiDian extends Component {
             locked={true}
             underlineWidth={10}
             onChangeTab={obj => {
-              console.log(`index:${obj.i}`);
+              console.log(`切换tabindex:${obj.i}`);
             }}
           >
             <View tabLabel={'价格情报局'} style={{ flex: 1 }} key={'价格情报局'}>
