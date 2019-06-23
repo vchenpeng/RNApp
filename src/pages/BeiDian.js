@@ -18,10 +18,7 @@ import {
   AsyncStorage
 } from 'react-native';
 import Modal from '../components/ModalBox';
-import ScrollableTabView, {
-  DefaultTabBar,
-  ScrollableTabBar
-} from 'react-native-scrollable-tab-view';
+import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
 import { Header, Button, ListItem, Avatar } from 'react-native-elements';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -63,24 +60,14 @@ export default class BeiDian extends Component {
               navigation.state.params.changePlatform.call(self);
             }}
           >
-            <AntDesignIcon
-              name="retweet"
-              size={24}
-              color="white"
-              style={{ marginRight: 10 }}
-            />
+            <AntDesignIcon name="retweet" size={24} color="white" style={{ marginRight: 10 }} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               navigation.state.params.showOptions();
             }}
           >
-            <AntDesignIcon
-              name="iconfontdesktop"
-              size={24}
-              color="white"
-              style={{ marginRight: 15 }}
-            />
+            <AntDesignIcon name="iconfontdesktop" size={24} color="white" style={{ marginRight: 15 }} />
             <View
               style={{
                 position: 'absolute',
@@ -94,12 +81,7 @@ export default class BeiDian extends Component {
                 borderRadius: 3
               }}
             >
-              <Text style={{ fontSize: 10, color: '#fff' }}>
-                {(params && params.products
-                  ? params.products.length
-                  : 0
-                ).toString()}
-              </Text>
+              <Text style={{ fontSize: 10, color: '#fff' }}>{(params && params.products ? params.products.length : 0).toString()}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -190,7 +172,6 @@ export default class BeiDian extends Component {
         let returnUrl = null;
         try {
           let wphInfoData = wphInfo[0]['result']['data'];
-
           if (wphInfoData) {
             let products = wphInfoData['products'];
             if (products && products.length > 0) {
@@ -198,19 +179,11 @@ export default class BeiDian extends Component {
               for (let i = 0; i < products.length; i++) {
                 let item = products[i];
                 let brands = product.brandName.split('/');
-                let percent = this.strSimilarity2Percent(
-                  product.title,
-                  item['product_name']
-                );
-                if (
-                  this.checkIn(item['brand_name'], brands)
-                  // && Math.abs(product.price - item.sale_price) < 50
-                ) {
+                let percent = this.strSimilarity2Percent(product.title, item['product_name']);
+                if (this.checkIn(item['brand_name'], brands)) {
                   let productUrl = item['product_url'];
                   let tmpWord = this.randomWord(false, 40, 40);
-                  let chlParam = encodeURIComponent(
-                    'share:' + this.randomWord(false, 10, 10)
-                  );
+                  let chlParam = encodeURIComponent('share:' + this.randomWord(false, 10, 10));
                   let rUrl = `https://m.vip.com${productUrl}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=`;
 
                   let itemProduct = {
@@ -261,10 +234,7 @@ export default class BeiDian extends Component {
               let pools = [];
               for (let i = 0; i < paragraph.length; i++) {
                 let item = paragraph[i];
-                let percent = this.strSimilarity2Percent(
-                  product.title,
-                  item.warename
-                );
+                let percent = this.strSimilarity2Percent(product.title, item.warename);
 
                 if (
                   this.checkIn(item['shop_name'], keywords) &&
@@ -331,8 +301,7 @@ export default class BeiDian extends Component {
     return fetch(url, {
       method: 'GET',
       headers: {
-        referer:
-          'https://list.tmall.com/search_product.htm?q=444&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton'
+        referer: 'https://list.tmall.com/search_product.htm?q=444&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton'
       },
       credentials: 'include'
     })
@@ -348,18 +317,12 @@ export default class BeiDian extends Component {
           if (item && item.length > 0) {
             let pools = [];
             for (let i = 0; i < item.length; i++) {
-              let percent = this.strSimilarity2Percent(
-                product.title,
-                item[i]['title']
-              );
+              let percent = this.strSimilarity2Percent(product.title, item[i]['title']);
               if (tmShopType == 2 || tmShopType == 3) {
                 let brands = product.brandName.split('/');
                 // if (item[i]["shop_name"] == product.taskShopName && this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
                 //     && Math.abs(product.price - item[i].price) < 30) {
-                if (
-                  item[i]['shop_name'] == product.taskShopName &&
-                  percent > this.state.lowest
-                ) {
+                if (item[i]['shop_name'] == product.taskShopName && percent > this.state.lowest) {
                   let rUrl = `https:${item[i].url}&percent=${percent}`;
                   let itemProduct = {
                     index: i,
@@ -372,10 +335,7 @@ export default class BeiDian extends Component {
                 }
               } else {
                 let brands = product.brandName.split('/');
-                if (
-                  this.checkIn(item[i]['shop_name'], keywords) &&
-                  this.checkIn(item[i]['shop_name'], brands)
-                ) {
+                if (this.checkIn(item[i]['shop_name'], keywords) && this.checkIn(item[i]['shop_name'], brands)) {
                   let rUrl = `https:${item[i].url}`;
                   let itemProduct = {
                     index: i,
@@ -530,11 +490,7 @@ export default class BeiDian extends Component {
         } else {
           cost = 1;
         }
-        d[i][j] = this.minimum(
-          d[i - 1][j] + 1,
-          d[i][j - 1] + 1,
-          d[i - 1][j - 1] + cost
-        );
+        d[i][j] = this.minimum(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
       }
     }
     return d[n][m];
@@ -586,15 +542,7 @@ export default class BeiDian extends Component {
           await AsyncStorage.setItem('JSESSIONID', token);
           await AsyncStorage.setItem('UID', `${uid}`);
           DropDownHolder.alert('登录成功', '', 'info');
-          this.webview.postMessage(
-            JSON.stringify({
-              code: 'NW1007',
-              data: [
-                { key: 'JSESSIONID', value: token },
-                { key: '_logged_', value: uid }
-              ]
-            })
-          );
+          this.postWebMessage('NW1007', [{ key: 'JSESSIONID', value: token }, { key: '_logged_', value: `${uid}` }]);
           return token;
         } else {
           Alert.alert('登录失败', body.message);
@@ -609,9 +557,7 @@ export default class BeiDian extends Component {
   }
   // 获取BD商品
   getBdProduct(task) {
-    let url = `https://im.beidian.com/service/intelligence/product?iid=${
-      task.iid
-    }`;
+    let url = `https://im.beidian.com/service/intelligence/product?iid=${task.iid}`;
     return fetch(url, {
       method: 'GET',
       body: null,
@@ -624,15 +570,15 @@ export default class BeiDian extends Component {
       .then(products => {
         let topBdProduct = products[0];
         //task.checkTaskId
-        let percent = this.strSimilarity2Percent(
-          topBdProduct.title,
-          task.productTitle
-        );
+        let percent = this.strSimilarity2Percent(topBdProduct.title, task.productTitle);
         task.percent = percent;
+        // 暂时相似度在0.12
+        task.handle = percent > 0.06 ? 'accept' : 'reject';
         this.webview.postMessage(
           JSON.stringify({
             code: 'NW1009',
-            data: task
+            data: task,
+            msg: '提交情报检验科任务'
           })
         );
         let jykSuccessCount = this.state.jykSuccessCount;
@@ -640,10 +586,58 @@ export default class BeiDian extends Component {
         this.setState({
           jykSuccessCount: jykSuccessCount
         });
+        this.playSysAudio(this.state.audioCode);
+        // Alert.alert(
+        //   `相似度:${percent}`,
+        //   `${topBdProduct.title}\n\n${task.productTitle}`,
+        //   [
+        //     {
+        //       text: '不同商品',
+        //       onPress: () => {
+        //         task.handle = 'reject';
+        //         this.webview.postMessage(
+        //           JSON.stringify({
+        //             code: 'NW1009',
+        //             data: task
+        //           })
+        //         );
+        //         let jykSuccessCount = this.state.jykSuccessCount;
+        //         jykSuccessCount++;
+        //         this.setState({
+        //           jykSuccessCount: jykSuccessCount
+        //         });
+        //       }
+        //     },
+        //     {
+        //       text: '相同商品',
+        //       onPress: () => {
+        //         task.handle = 'accept';
+        //         this.webview.postMessage(
+        //           JSON.stringify({
+        //             code: 'NW1009',
+        //             data: task
+        //           })
+        //         );
+        //         let jykSuccessCount = this.state.jykSuccessCount;
+        //         jykSuccessCount++;
+        //         this.setState({
+        //           jykSuccessCount: jykSuccessCount
+        //         });
+        //       }
+        //     }
+        //   ],
+        //   { cancelable: false }
+        // );
       })
       .catch(error => {
         this.postWebMessage('NW1010', null);
       });
+  }
+  // 退出当前贝店登录
+  async logoutBD() {
+    await AsyncStorage.removeItem('JSESSIONID');
+    await AsyncStorage.removeItem('UID');
+    this.postWebMessage('NW1011', null);
   }
   postWebMessage(code, data) {
     this.webview.postMessage(
@@ -680,31 +674,34 @@ export default class BeiDian extends Component {
   componentWillMount() {}
   async componentDidMount() {
     NativeModules.MainBridge.setIdleTimerDisabled(true);
-    NativeModules.MainBridge.setBrightness(0.1);
+    // NativeModules.MainBridge.setBrightness(0.1);
     this.onShake();
     this.props.navigation.setParams({ webview: this.webview });
     this.props.navigation.setParams({ openLogin: this.openLogin });
     this.props.navigation.setParams({ showOptions: this.showOptions });
     this.props.navigation.setParams({ changePlatform: this.changePlatform });
+    // TODO初始化web参数
+    // let jsSessionID = await AsyncStorage.getItem('JSESSIONID', token);
+    // let UID = await AsyncStorage.getItem('UID', `${uid}`);
+    // if (jsSessionID) {
+    //   await AsyncStorage.setItem('JSESSIONID', '');
+    // }
+    // if (UID) {
+    //   await AsyncStorage.setItem('UID', '');
+    // }
   }
   componentWillUnmount() {
     NativeModules.MainBridge.setIdleTimerDisabled(false);
     RNShakeEvent.removeEventListener('shake');
   }
   checkSessionID() {
-    Promise.all([
-      AsyncStorage.getItem('JSESSIONID'),
-      AsyncStorage.getItem('UID')
-    ]).then(values => {
+    Promise.all([AsyncStorage.getItem('JSESSIONID'), AsyncStorage.getItem('UID')]).then(values => {
       let token = values[0] || '';
       let uid = values[1] || '0';
       this.webview.postMessage(
         JSON.stringify({
           code: 'NW1007',
-          data: [
-            { key: 'JSESSIONID', value: token },
-            { key: '_logged_', value: uid }
-          ]
+          data: [{ key: 'JSESSIONID', value: token }, { key: '_logged_', value: uid }]
         })
       );
     });
@@ -720,8 +717,7 @@ export default class BeiDian extends Component {
     if (percent) {
       itemStatusName = (+percent * 100).toFixed(2) + `%`;
     } else {
-      itemStatusName =
-        item.status == 1 ? '分析中' : item.status == 2 ? '成功' : '失败';
+      itemStatusName = item.status == 1 ? '分析中' : item.status == 2 ? '成功' : '失败';
     }
     return (
       <TouchableHighlight
@@ -780,11 +776,7 @@ export default class BeiDian extends Component {
               height: 20
             }}
             title={item.title}
-            subtitle={
-              this.switchPlatformName(item.platform) +
-              `·¥${item.price}·™` +
-              tool.formatDateTmp(+(item.gmtModified + '000'))
-            }
+            subtitle={this.switchPlatformName(item.platform) + `·¥${item.price}·™` + tool.formatDateTmp(+(item.gmtModified + '000'))}
             rightTitle={itemStatusName}
             rightTitleStyle={[
               {
@@ -797,12 +789,7 @@ export default class BeiDian extends Component {
                 textAlign: 'center'
               },
               {
-                backgroundColor:
-                  item.status == 1
-                    ? '#eee'
-                    : item.status == 2
-                    ? '#7ED321'
-                    : '#d43f3a'
+                backgroundColor: item.status == 1 ? '#eee' : item.status == 2 ? '#7ED321' : '#d43f3a'
               }
             ]}
             checkmark={false}
@@ -847,11 +834,7 @@ export default class BeiDian extends Component {
               console.log(`index:${obj.i}`);
             }}
           >
-            <View
-              tabLabel={'价格情报局'}
-              style={{ flex: 1 }}
-              key={'价格情报局'}
-            >
+            <View tabLabel={'价格情报局'} style={{ flex: 1 }} key={'价格情报局'}>
               <SwipeListView
                 useFlatList={true}
                 data={this.state.historys}
@@ -859,9 +842,7 @@ export default class BeiDian extends Component {
                   borderBottomWidth: 0.5,
                   borderBottomColor: '#eee'
                 }}
-                renderItem={(rowData, rowMap) =>
-                  this.renderRow(rowData, rowMap)
-                }
+                renderItem={(rowData, rowMap) => this.renderRow(rowData, rowMap)}
                 onRowOpen={(rowId, secId, rowMap) => {
                   this.openRowId = rowId;
                 }}
@@ -922,11 +903,7 @@ export default class BeiDian extends Component {
                 }}
               />
             </View>
-            <View
-              tabLabel={`情报检验科(${this.state.jykSuccessCount})`}
-              style={{ flex: 1 }}
-              key={`情报检验科`}
-            />
+            <View tabLabel={`情报检验科(${this.state.jykSuccessCount})`} style={{ flex: 1 }} key={`情报检验科`} />
           </ScrollableTabView>
           <Modal
             isOpen={this.state.isShowLogin}
@@ -960,16 +937,10 @@ export default class BeiDian extends Component {
               geolocationEnabled={false}
               onLoadEnd={() => {
                 // 检测SessionID,如果存在直接设置
-                Promise.all([
-                  AsyncStorage.getItem('JSESSIONID'),
-                  AsyncStorage.getItem('UID')
-                ]).then(values => {
+                Promise.all([AsyncStorage.getItem('JSESSIONID'), AsyncStorage.getItem('UID')]).then(values => {
                   let token = values[0] || '';
                   let uid = values[1] || '0';
-                  let cookies = [
-                    { key: 'JSESSIONID', value: token },
-                    { key: '_logged_', value: uid }
-                  ];
+                  let cookies = [{ key: 'JSESSIONID', value: token }, { key: '_logged_', value: uid }];
                   let obj = { code: 'NW1001', data: cookies, msg: '加载完毕~' };
                   this.webview.postMessage(JSON.stringify(obj));
                 });
@@ -993,19 +964,11 @@ export default class BeiDian extends Component {
                 switch (result.code) {
                   case 'WN1000':
                     // this.state.isShowLogin ? DropDownHolder.alert(result.msg, '', 'error') : this.setLoginModalStatus(true);
-                    this.state.isShowLogin
-                      ? () => {}
-                      : this.setLoginModalStatus(true);
+                    this.state.isShowLogin ? () => {} : this.setLoginModalStatus(true);
                     break;
                   case 'WN1001':
-                    let platformName = this.switchPlatformName(
-                      result.data.platform
-                    );
-                    DropDownHolder.alert(
-                      `[${platformName}]${result.msg}`,
-                      '',
-                      'info'
-                    );
+                    let platformName = this.switchPlatformName(result.data.platform);
+                    DropDownHolder.alert(`[${platformName}]${result.msg}`, '', 'info');
                     break;
                   case 'WN1002':
                     this.setState({
@@ -1025,9 +988,7 @@ export default class BeiDian extends Component {
                         uid: productInfo.uid,
                         url: null
                       };
-                      let tName =
-                        productInfo.taskShopName ||
-                        this.switchPlatformName(productInfo.platform);
+                      let tName = productInfo.taskShopName || this.switchPlatformName(productInfo.platform);
                       switch (productInfo.platform) {
                         case 1:
                         case 12:
@@ -1042,11 +1003,7 @@ export default class BeiDian extends Component {
                           break;
                       }
                       // 弹框提示对应商品
-                      DropDownHolder.alert(
-                        '',
-                        `[${tName}]${productInfo.title}`,
-                        'info'
-                      );
+                      DropDownHolder.alert('', `[${tName}]${productInfo.title}`, 'info');
                       if (returnObj.url !== null) {
                         let products = this.state.products;
                         products.push(returnObj);
@@ -1079,11 +1036,7 @@ export default class BeiDian extends Component {
           ref={o => (this.ActionSheet = o)}
           title={'设置'}
           message={'开启静音模式后，所有提示不再提醒'}
-          options={[
-            `${!this.state.isSilence ? '静音' : '提醒'}模式`,
-            '任务平台',
-            '登录'
-          ]}
+          options={[`${!this.state.isSilence ? '静音' : '提醒'}模式`, '任务平台', '登录']}
           cancelButtonIndex={2}
           destructiveButtonIndex={2}
           tintColor={'#000'}
@@ -1093,7 +1046,7 @@ export default class BeiDian extends Component {
             } else if (index == 1) {
               this.changePlatform();
             } else if (index == 2) {
-              this.openLogin();
+              this.logoutBD();
             }
           }}
           styles={this.state.actionSheetStyles}

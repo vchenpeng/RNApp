@@ -26,11 +26,7 @@ let inject = (window, $) => {
     uid = +getCookie('_logged_');
     $.ajax({
       type: 'GET',
-      url:
-        'https://imapi.beidian.com/server/gateway?method=voc.price.hunter.mission.change&uid=' +
-        uid +
-        '&pid=' +
-        pid,
+      url: 'https://imapi.beidian.com/server/gateway?method=voc.price.hunter.mission.change&uid=' + uid + '&pid=' + pid,
       data: null,
       headers: {
         'User-Agent':
@@ -45,13 +41,7 @@ let inject = (window, $) => {
           // 存在productInfo时
           if (data.body.productInfo) {
             // 天猫专卖或者专营不会出现出现重复商品信息
-            if (
-              pid == data.body.productInfo.pid &&
-              !(
-                data.body.productInfo.platform == 13 ||
-                data.body.productInfo.platform == 12
-              )
-            ) {
+            if (pid == data.body.productInfo.pid && !(data.body.productInfo.platform == 13 || data.body.productInfo.platform == 12)) {
               let obj = {
                 code: 'WN1001',
                 data: data.body.productInfo,
@@ -111,8 +101,7 @@ let inject = (window, $) => {
   function submitBD(params) {
     $.ajax({
       type: 'POST',
-      url:
-        'https://imapi.beidian.com/server/gateway?method=voc.pricetask.submitMission',
+      url: 'https://imapi.beidian.com/server/gateway?method=voc.pricetask.submitMission',
       contentType: 'application/json;charset=utf-8',
       dataType: 'json',
       data: JSON.stringify({
@@ -146,8 +135,7 @@ let inject = (window, $) => {
     uid = +getCookie('_logged_');
     $.ajax({
       type: 'POST',
-      url:
-        'https://imapi.beidian.com/server/gateway?method=voc.price.hunter.mission.history',
+      url: 'https://imapi.beidian.com/server/gateway?method=voc.price.hunter.mission.history',
       contentType: 'application/json;charset=utf-8',
       dataType: 'json',
       data: JSON.stringify({
@@ -186,11 +174,7 @@ let inject = (window, $) => {
     uid = +getCookie('_logged_');
     $.ajax({
       type: 'GET',
-      url:
-        'https://imapi.beidian.com/server/gateway?method=voc.price.hunter.agency.change&uid=' +
-        uid +
-        '&platform=' +
-        p,
+      url: 'https://imapi.beidian.com/server/gateway?method=voc.price.hunter.agency.change&uid=' + uid + '&platform=' + p,
       contentType: 'application/json;charset=utf-8',
       dataType: 'json',
       data: null,
@@ -211,9 +195,24 @@ let inject = (window, $) => {
       }
     });
   }
+  //生成从minNum到maxNum的随机数
+  function randomNum(minNum, maxNum) {
+    switch (arguments.length) {
+      case 1:
+        return parseInt(Math.random() * minNum + 1, 10);
+        break;
+      case 2:
+        return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+        break;
+      default:
+        return 0;
+        break;
+    }
+  }
   // 获取jyk任务
   function getJykTask() {
     uid = +getCookie('_logged_');
+    let random = randomNum(800, 1500);
     setTimeout(() => {
       $.ajax({
         type: 'GET',
@@ -251,17 +250,14 @@ let inject = (window, $) => {
           getJykTask();
         }
       });
-    }, 2000);
+    }, random);
   }
   // 提交jyk任务
   function submitJykTask(task) {
     uid = +getCookie('_logged_');
-    let result = task.percent > 0.2 ? 'accept' : 'reject';
     $.ajax({
       type: 'GET',
-      url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.check.${result}&checkTaskId=${
-        task.checkTaskId
-      }&uid=${uid}`,
+      url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.check.${task.handle}&checkTaskId=${task.checkTaskId}&uid=${uid}`,
       contentType: 'application/json;charset=utf-8',
       dataType: 'json',
       data: null,
@@ -284,13 +280,17 @@ let inject = (window, $) => {
   // 设置cookie
   function setCookie(cookies) {
     cookies.forEach(cookie => {
-      document.cookie =
-        cookie.key +
-        '=' +
-        escape(cookie.value) +
-        '; domain=.beidian.com' +
-        '; path=/';
+      document.cookie = cookie.key + '=' + escape(cookie.value) + '; domain=.beidian.com' + '; path=/';
     });
+  }
+  // 清空所有cookie
+  function clearAuthCookie() {
+    var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+    if (keys) {
+      for (var i = keys.length; i--; ) {
+        document.cookie = keys[i] + '=;expires=' + new Date(0).toUTCString();
+      }
+    }
   }
   // 监听Native层事件
   document.addEventListener(
@@ -315,6 +315,11 @@ let inject = (window, $) => {
           break;
         case 'NW1010':
           getJykTask();
+          break;
+        case 'NW1011':
+          console.log(7890);
+          // 退出登录
+          clearAuthCookie();
           break;
         default:
           submitBD(result);
@@ -348,8 +353,8 @@ let inject = (window, $) => {
     $('.J_login-btn').on('click', login);
     setCookie(cookies);
     ajax();
+    setInterval(ajax, 5000); // 1.2s执行一次
     getHistory();
-    setInterval(ajax, 2000); // 1.2s执行一次
     getJykTask();
     // 页面心跳，保证页面长时间执行定时器，卡死问题
     setInterval(() => {
