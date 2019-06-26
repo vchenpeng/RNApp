@@ -60,17 +60,13 @@ let inject = (window, $) => {
               window.postMessage(JSON.stringify(obj));
             }
           } else if (data.body.nextPlatform) {
-            let nextPlatform = data.body.nextPlatform;
-            // if (nextPlatform.code == 2) {
-            //     nextPlatform.code = 1;
-            //     nextPlatform.name = "↷天猫"
+            // let nextPlatform = data.body.nextPlatform;
+            // let obj = {
+            //   code: 'WN1004',
+            //   data: null,
+            //   msg: `程序自动加入 [${nextPlatform.name}] 情报组`
             // }
-            let obj = {
-              code: 'WN1004',
-              data: null,
-              msg: `程序自动加入 [${nextPlatform.name}] 情报组`
-            };
-            window.postMessage(JSON.stringify(obj));
+            // window.postMessage(JSON.stringify(obj))
             changePlatform(nextPlatform.code);
           }
         } else {
@@ -212,7 +208,7 @@ let inject = (window, $) => {
   // 获取jyk任务
   function getJykTask() {
     uid = +getCookie('_logged_');
-    let random = randomNum(800, 1200);
+    let random = randomNum(2000, 3000);
     setTimeout(() => {
       $.ajax({
         type: 'GET',
@@ -222,8 +218,7 @@ let inject = (window, $) => {
         data: null,
         headers: {
           'User-Agent':
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)',
-          Referer: 'https://m.beidian.com/promote/price_info.html'
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)'
         },
         xhrFields: {
           withCredentials: true
@@ -243,6 +238,12 @@ let inject = (window, $) => {
             };
             window.postMessage(JSON.stringify(obj));
           } else {
+            let obj = {
+              code: 'WN1004',
+              data: null,
+              msg: data.msg
+            };
+            window.postMessage(JSON.stringify(obj));
             getJykTask();
           }
         },
@@ -353,7 +354,7 @@ let inject = (window, $) => {
     $('.J_login-btn').on('click', login);
     setCookie(cookies);
     ajax();
-    setInterval(ajax, 5000); // 1.2s执行一次
+    setInterval(ajax, 4500); // 1.2s执行一次
     getHistory();
     getJykTask();
     // 页面心跳，保证页面长时间执行定时器，卡死问题

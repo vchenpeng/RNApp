@@ -572,62 +572,64 @@ export default class BeiDian extends Component {
         //task.checkTaskId
         let percent = this.strSimilarity2Percent(topBdProduct.title, task.productTitle);
         task.percent = percent;
+
         // 暂时相似度在0.12
-        task.handle = percent > 0.06 ? 'accept' : 'reject';
-        this.webview.postMessage(
-          JSON.stringify({
-            code: 'NW1009',
-            data: task,
-            msg: '提交情报检验科任务'
-          })
-        );
-        let jykSuccessCount = this.state.jykSuccessCount;
-        jykSuccessCount++;
-        this.setState({
-          jykSuccessCount: jykSuccessCount
-        });
-        this.playSysAudio(this.state.audioCode);
-        // Alert.alert(
-        //   `相似度:${percent}`,
-        //   `${topBdProduct.title}\n\n${task.productTitle}`,
-        //   [
-        //     {
-        //       text: '不同商品',
-        //       onPress: () => {
-        //         task.handle = 'reject';
-        //         this.webview.postMessage(
-        //           JSON.stringify({
-        //             code: 'NW1009',
-        //             data: task
-        //           })
-        //         );
-        //         let jykSuccessCount = this.state.jykSuccessCount;
-        //         jykSuccessCount++;
-        //         this.setState({
-        //           jykSuccessCount: jykSuccessCount
-        //         });
-        //       }
-        //     },
-        //     {
-        //       text: '相同商品',
-        //       onPress: () => {
-        //         task.handle = 'accept';
-        //         this.webview.postMessage(
-        //           JSON.stringify({
-        //             code: 'NW1009',
-        //             data: task
-        //           })
-        //         );
-        //         let jykSuccessCount = this.state.jykSuccessCount;
-        //         jykSuccessCount++;
-        //         this.setState({
-        //           jykSuccessCount: jykSuccessCount
-        //         });
-        //       }
-        //     }
-        //   ],
-        //   { cancelable: false }
+        // task.handle = percent > 0.06 ? 'accept' : 'reject';
+        // this.webview.postMessage(
+        //   JSON.stringify({
+        //     code: 'NW1009',
+        //     data: task,
+        //     msg: '提交情报检验科任务'
+        //   })
         // );
+        // let jykSuccessCount = this.state.jykSuccessCount;
+        // jykSuccessCount++;
+        // this.setState({
+        //   jykSuccessCount: jykSuccessCount
+        // });
+        // this.playSysAudio(this.state.audioCode);
+        
+        Alert.alert(
+          `相似度:${percent}`,
+          `${topBdProduct.title}\n\n${task.productTitle}`,
+          [
+            {
+              text: '不同',
+              onPress: () => {
+                task.handle = 'reject';
+                this.webview.postMessage(
+                  JSON.stringify({
+                    code: 'NW1009',
+                    data: task
+                  })
+                );
+                let jykSuccessCount = this.state.jykSuccessCount;
+                jykSuccessCount++;
+                this.setState({
+                  jykSuccessCount: jykSuccessCount
+                });
+              }
+            },
+            {
+              text: '相同',
+              onPress: () => {
+                task.handle = 'accept';
+                this.webview.postMessage(
+                  JSON.stringify({
+                    code: 'NW1009',
+                    data: task
+                  })
+                );
+                let jykSuccessCount = this.state.jykSuccessCount;
+                jykSuccessCount++;
+                this.setState({
+                  jykSuccessCount: jykSuccessCount
+                });
+              }
+            }
+          ],
+          { cancelable: false }
+        );
       })
       .catch(error => {
         this.postWebMessage('NW1010', null);
