@@ -208,7 +208,7 @@ let inject = (window, $) => {
   // 获取jyk任务
   function getJykTask() {
     uid = +getCookie('_logged_');
-    let random = randomNum(2000, 3000);
+    let random = randomNum(1500, 2000);
     setTimeout(() => {
       $.ajax({
         type: 'GET',
@@ -354,7 +354,7 @@ let inject = (window, $) => {
     $('.J_login-btn').on('click', login);
     setCookie(cookies);
     ajax();
-    setInterval(ajax, 4500); // 1.2s执行一次
+    setInterval(ajax, 5000); // 1.2s执行一次
     getHistory();
     getJykTask();
     // 页面心跳，保证页面长时间执行定时器，卡死问题

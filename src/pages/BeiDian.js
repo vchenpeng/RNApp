@@ -555,6 +555,9 @@ export default class BeiDian extends Component {
       });
     return token;
   }
+  trim(str) {
+    return str.replace(/\s+/g, '');
+  }
   // 获取BD商品
   getBdProduct(task) {
     let url = `https://im.beidian.com/service/intelligence/product?iid=${task.iid}`;
@@ -572,64 +575,97 @@ export default class BeiDian extends Component {
         //task.checkTaskId
         let percent = this.strSimilarity2Percent(topBdProduct.title, task.productTitle);
         task.percent = percent;
+        // 声音提示
+        this.playSysAudio(this.state.audioCode);
 
-        // 暂时相似度在0.12
-        // task.handle = percent > 0.06 ? 'accept' : 'reject';
-        // this.webview.postMessage(
-        //   JSON.stringify({
-        //     code: 'NW1009',
-        //     data: task,
-        //     msg: '提交情报检验科任务'
-        //   })
-        // );
-        // let jykSuccessCount = this.state.jykSuccessCount;
-        // jykSuccessCount++;
-        // this.setState({
-        //   jykSuccessCount: jykSuccessCount
-        // });
-        // this.playSysAudio(this.state.audioCode);
-        
-        Alert.alert(
-          `相似度:${percent}`,
-          `${topBdProduct.title}\n\n${task.productTitle}`,
-          [
-            {
-              text: '不同',
-              onPress: () => {
-                task.handle = 'reject';
-                this.webview.postMessage(
-                  JSON.stringify({
-                    code: 'NW1009',
-                    data: task
-                  })
-                );
-                let jykSuccessCount = this.state.jykSuccessCount;
-                jykSuccessCount++;
-                this.setState({
-                  jykSuccessCount: jykSuccessCount
-                });
-              }
-            },
-            {
-              text: '相同',
-              onPress: () => {
-                task.handle = 'accept';
-                this.webview.postMessage(
-                  JSON.stringify({
-                    code: 'NW1009',
-                    data: task
-                  })
-                );
-                let jykSuccessCount = this.state.jykSuccessCount;
-                jykSuccessCount++;
-                this.setState({
-                  jykSuccessCount: jykSuccessCount
-                });
-              }
-            }
-          ],
-          { cancelable: false }
+        let taskBrandName = this.trim(task.brandName);
+        let bdBrandName = '';
+        let list = topBdProduct.detail.filter(x => x.type == 'features' && Array.isArray(x.features));
+        if (list.length > 0) {
+          let features = list[0]['features'];
+          let props = features.filter(y => y.prop_name == '品牌');
+          if (props.length > 0 && !!props[0]['prop_value']) {
+            bdBrandName = this.trim(props[0]['prop_value']);
+          }
+        }
+        // 品牌相似度
+        let brandPercent = 0;
+        let bdBrandPools = bdBrandName.split('/');
+        let taskBrandPools = taskBrandName.split('/');
+        if (bdBrandPools.length > 0 && taskBrandPools.length > 0) {
+          let result = [];
+          bdBrandPools.forEach(a => {
+            let arr = taskBrandPools.map(b => {
+              return this.strSimilarity2Percent(a, b);
+            });
+            result = result.concat(arr);
+          });
+          brandPercent = Math.max(...result);
+        } else {
+          brandPercent = 0;
+        }
+        // 暂时品牌相似度大于0.3,商品相似度大于0.12;
+        task.handle = brandPercent > 0.2 && percent > 0.08 ? 'accept' : 'reject';
+        this.webview.postMessage(
+          JSON.stringify({
+            code: 'NW1009',
+            data: task,
+            msg: '提交情报检验科的任务'
+          })
         );
+        let jykSuccessCount = this.state.jykSuccessCount;
+        jykSuccessCount++;
+        this.setState({
+          jykSuccessCount: jykSuccessCount
+        });
+
+        // 手动提交情报
+        /*if (brandPercent > 0.2 && percent > 0.1) {
+          task.handle = 'accept';
+          this.postWebMessage('NW1009', task);
+          let jykSuccessCount = this.state.jykSuccessCount;
+          jykSuccessCount++;
+          this.setState({
+            jykSuccessCount: jykSuccessCount
+          });
+        } else {
+          Alert.alert(
+            `商品比较`,
+            `
+${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
+
+[${bdBrandName}]${topBdProduct.title}
+
+[${taskBrandName}]${task.productTitle}`,
+            [
+              {
+                text: '不同商品',
+                onPress: () => {
+                  task.handle = 'reject';
+                  this.postWebMessage('NW1009', task);
+                  let jykSuccessCount = this.state.jykSuccessCount;
+                  jykSuccessCount++;
+                  this.setState({
+                    jykSuccessCount: jykSuccessCount
+                  });
+                }
+              },
+              {
+                text: '相同商品',
+                onPress: () => {
+                  task.handle = 'accept';
+                  this.postWebMessage('NW1009', task);
+                  let jykSuccessCount = this.state.jykSuccessCount;
+                  jykSuccessCount++;
+                  this.setState({
+                    jykSuccessCount: jykSuccessCount
+                  });
+                }
+              }
+            ],
+            { cancelable: false }
+          );
+        }*/
       })
       .catch(error => {
         this.postWebMessage('NW1010', null);
