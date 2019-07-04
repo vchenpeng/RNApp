@@ -60,14 +60,19 @@ let inject = (window, $) => {
               window.postMessage(JSON.stringify(obj));
             }
           } else if (data.body.nextPlatform) {
-            // let nextPlatform = data.body.nextPlatform;
-            // let obj = {
-            //   code: 'WN1004',
-            //   data: null,
-            //   msg: `程序自动加入 [${nextPlatform.name}] 情报组`
-            // }
-            // window.postMessage(JSON.stringify(obj))
+            let nextPlatform = data.body.nextPlatform;
+            // 跳过京东
+            if (nextPlatform.code == 2) {
+              nextPlatform.code = 6;
+              nextPlatform.name = '唯品会';
+            }
+            let obj = {
+              code: 'WN1004',
+              data: null,
+              msg: `系统自动加入 [${nextPlatform.name}] 情报组`
+            };
             changePlatform(nextPlatform.code);
+            window.postMessage(JSON.stringify(obj));
           }
         } else {
           let error = JSON.parse(data);
@@ -207,8 +212,9 @@ let inject = (window, $) => {
   }
   // 获取jyk任务
   function getJykTask() {
-    uid = +getCookie('_logged_');
-    let random = randomNum(1500, 2000);
+    // uid = +getCookie('_logged_')
+    let uid = 90132158;
+    let random = randomNum(800, 1500);
     setTimeout(() => {
       $.ajax({
         type: 'GET',
@@ -237,13 +243,14 @@ let inject = (window, $) => {
               msg: '传递jyk任务'
             };
             window.postMessage(JSON.stringify(obj));
-          } else {
+          } else if (data.msg == '行迹可疑暂停任务资格') {
             let obj = {
               code: 'WN1004',
               data: null,
               msg: data.msg
             };
             window.postMessage(JSON.stringify(obj));
+          } else {
             getJykTask();
           }
         },
@@ -255,7 +262,8 @@ let inject = (window, $) => {
   }
   // 提交jyk任务
   function submitJykTask(task) {
-    uid = +getCookie('_logged_');
+    // uid = +getCookie('_logged_')
+    let uid = 90132158;
     $.ajax({
       type: 'GET',
       url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.check.${task.handle}&checkTaskId=${task.checkTaskId}&uid=${uid}`,
@@ -354,7 +362,7 @@ let inject = (window, $) => {
     $('.J_login-btn').on('click', login);
     setCookie(cookies);
     ajax();
-    setInterval(ajax, 5000); // 1.2s执行一次
+    setInterval(ajax, 2000); // 1.2s执行一次
     getHistory();
     getJykTask();
     // 页面心跳，保证页面长时间执行定时器，卡死问题

@@ -102,7 +102,8 @@ export default class BeiDian extends Component {
       audioCode: 1009, // 提交成功提示音
       isSilence: true, // 是否静音
       actionSheetStyles: {},
-      jykSuccessCount: 0
+      jykSuccessCount: 0,
+      jykTasks: []
     };
     self = this;
   }
@@ -238,8 +239,8 @@ export default class BeiDian extends Component {
 
                 if (
                   this.checkIn(item['shop_name'], keywords) &&
-                  this.checkIn(item['shop_name'], brands) &&
-                  Math.abs(product.price - item.dredisprice) < 30
+                  this.checkIn(item['shop_name'], brands)
+                  // Math.abs(product.price - item.dredisprice) < 30
                 ) {
                   let tmpWord = this.randomWord(false, 58, 58);
                   let rUrl = `https://item.m.jd.com/product/${
@@ -572,55 +573,83 @@ export default class BeiDian extends Component {
       .then(r => r.json())
       .then(products => {
         let topBdProduct = products[0];
-        //task.checkTaskId
-        let percent = this.strSimilarity2Percent(topBdProduct.title, task.productTitle);
-        task.percent = percent;
-        // 声音提示
-        this.playSysAudio(this.state.audioCode);
+        // 可能存在以下数据情况：
+        // [{"message":"该商品暂不可购买或已下架..","success":false,"hint":{"title":"很遗憾，你来晚啦！","subtitle":"商品已经下架啦~"}}]
+        if (topBdProduct.id > 0) {
+          //task.checkTaskId
+          let percent = this.strSimilarity2Percent(this.trim(topBdProduct.title.toUpperCase()), this.trim(task.productTitle.toUpperCase()));
+          task.percent = percent;
+          // 声音提示
+          this.playSysAudio(this.state.audioCode);
 
-        let taskBrandName = this.trim(task.brandName);
-        let bdBrandName = '';
-        let list = topBdProduct.detail.filter(x => x.type == 'features' && Array.isArray(x.features));
-        if (list.length > 0) {
-          let features = list[0]['features'];
-          let props = features.filter(y => y.prop_name == '品牌');
-          if (props.length > 0 && !!props[0]['prop_value']) {
-            bdBrandName = this.trim(props[0]['prop_value']);
+          let taskBrandName = this.trim(task.brandName);
+          let bdBrandName = '';
+          let list = topBdProduct.detail.filter(x => x.type == 'features' && Array.isArray(x.features));
+          if (list.length > 0) {
+            let features = list[0]['features'];
+            let props = features.filter(y => y.prop_name == '品牌');
+            if (props.length > 0 && !!props[0]['prop_value']) {
+              bdBrandName = this.trim(props[0]['prop_value']);
+            }
           }
-        }
-        // 品牌相似度
-        let brandPercent = 0;
-        let bdBrandPools = bdBrandName.split('/');
-        let taskBrandPools = taskBrandName.split('/');
-        if (bdBrandPools.length > 0 && taskBrandPools.length > 0) {
+
+          let bdBrandPools = bdBrandName.split('/');
+          let taskBrandPools = taskBrandName.split('/');
+          // 比较品牌相似度begin
+          let brandPercent = 0; // 品牌相似度
           let result = [];
           bdBrandPools.forEach(a => {
             let arr = taskBrandPools.map(b => {
-              return this.strSimilarity2Percent(a, b);
+              // 只有二者都存在品牌时比较，否则品牌相似度为0
+              if (a && b) {
+                return this.strSimilarity2Percent(a.toUpperCase(), b.toUpperCase());
+              } else {
+                return 0;
+              }
             });
             result = result.concat(arr);
           });
           brandPercent = Math.max(...result);
-        } else {
-          brandPercent = 0;
-        }
-        // 暂时品牌相似度大于0.3,商品相似度大于0.12;
-        task.handle = brandPercent > 0.2 && percent > 0.08 ? 'accept' : 'reject';
-        this.webview.postMessage(
-          JSON.stringify({
-            code: 'NW1009',
-            data: task,
-            msg: '提交情报检验科的任务'
-          })
-        );
-        let jykSuccessCount = this.state.jykSuccessCount;
-        jykSuccessCount++;
-        this.setState({
-          jykSuccessCount: jykSuccessCount
-        });
 
-        // 手动提交情报
-        /*if (brandPercent > 0.2 && percent > 0.1) {
+          // 如果任务商品名中存在贝店商品品牌名，默认品牌相似度为0.5
+          if (brandPercent == 0) {
+            const tmpArr = bdBrandPools.filter(t => {
+              return !!t && task.productTitle.toUpperCase().indexOf(t.toUpperCase()) > -1;
+            });
+            brandPercent = tmpArr.length > 0 ? 0.3 : brandPercent;
+          }
+          // 比较品牌相似度end
+
+          // 暂时品牌相似度大于0.3,商品相似度大于0.04;
+          //（0.04 / 5 / 65, 0.03 / 12 / 46, 0.035/11/66, 0.045/8/69）
+          // task.handle = brandPercent > 0.2 && percent >= 0 ? 'accept' : 'reject'
+          task.handle = brandPercent > 0.19 && percent >= 0.03 ? 'accept' : 'reject';
+          task.percent = percent;
+          task.brandPercent = brandPercent;
+          task.bdBrandName = bdBrandName;
+          this.webview.postMessage(
+            JSON.stringify({
+              code: 'NW1009',
+              data: task,
+              msg: '提交情报检验科的任务!'
+            })
+          );
+          // this.postWebMessage('NW1010', null)
+
+          let jykSuccessCount = this.state.jykSuccessCount;
+          jykSuccessCount++;
+          let jykTasks = this.state.jykTasks;
+          jykTasks.push({
+            task: task,
+            bdProduct: topBdProduct
+          });
+          this.setState({
+            jykSuccessCount: jykSuccessCount,
+            jykTasks: jykTasks
+          });
+
+          // 手动提交情报
+          /*if (brandPercent > 0.2 && percent > 0.1) {
           task.handle = 'accept';
           this.postWebMessage('NW1009', task);
           let jykSuccessCount = this.state.jykSuccessCount;
@@ -666,6 +695,9 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
             { cancelable: false }
           );
         }*/
+        } else {
+          //
+        }
       })
       .catch(error => {
         this.postWebMessage('NW1010', null);
@@ -712,7 +744,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
   componentWillMount() {}
   async componentDidMount() {
     NativeModules.MainBridge.setIdleTimerDisabled(true);
-    // NativeModules.MainBridge.setBrightness(0.1);
+    NativeModules.MainBridge.setBrightness(0.05);
     this.onShake();
     this.props.navigation.setParams({ webview: this.webview });
     this.props.navigation.setParams({ openLogin: this.openLogin });
@@ -841,6 +873,28 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
       </TouchableHighlight>
     );
   }
+  renderJykRow({ item }, rowId, secId, rowMap) {
+    return (
+      <View style={{ backgroundColor: '#fff', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
+        <View>
+          <Text>
+            商品相似度:{item.task.percent.toFixed(4)},{item.task.handle}
+          </Text>
+        </View>
+        <View>
+          <Text>
+            品牌相似度:[{item.task.brandName}],[{item.task.bdBrandName}],{item.task.brandPercent.toFixed(4)}
+          </Text>
+        </View>
+        <View>
+          <Text>{item.task.productTitle}</Text>
+        </View>
+        <View>
+          <Text>{item.bdProduct.title}</Text>
+        </View>
+      </View>
+    );
+  }
   render() {
     const { height, width } = Dimensions.get('window');
 
@@ -941,7 +995,31 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                 }}
               />
             </View>
-            <View tabLabel={`情报检验科(${this.state.jykSuccessCount})`} style={{ flex: 1 }} key={`情报检验科`} />
+            <View tabLabel={`情报检验科(${this.state.jykSuccessCount})`} style={{ flex: 1 }} key={`情报检验科`}>
+              <SwipeListView
+                useFlatList={true}
+                data={this.state.jykTasks}
+                swipeRowStyle={{
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: '#eee'
+                }}
+                renderItem={(rowData, rowMap) => this.renderJykRow(rowData, rowMap)}
+                directionalDistanceChangeThreshold={1}
+                closeOnRowPress={true}
+                leftOpenValue={75}
+                rightOpenValue={-180}
+                disableRightSwipe={true}
+                disableLeftSwipe={false}
+                friction={10}
+                tension={0}
+                recalculateHiddenLayout={false}
+                previewDuration={0}
+                previewOpenValue={0.01}
+                keyExtractor={(rowData, index) => {
+                  return index.toString();
+                }}
+              />
+            </View>
           </ScrollableTabView>
           <Modal
             isOpen={this.state.isShowLogin}
