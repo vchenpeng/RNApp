@@ -15,7 +15,8 @@ import {
   StyleSheet,
   StatusBar,
   Alert,
-  AsyncStorage
+  AsyncStorage,
+  Animated
 } from 'react-native';
 import Modal from '../components/ModalBox';
 import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view';
@@ -102,8 +103,11 @@ export default class BeiDian extends Component {
       audioCode: 1009, // 提交成功提示音
       isSilence: true, // 是否静音
       actionSheetStyles: {},
-      jykSuccessCount: 0,
-      jykTasks: []
+      jykAcceptCount: 0,
+      jykRejectCount: 0,
+      jykTasks: [],
+      jykTaskStatus: 1,
+      networkActivityIndicatorVisible: false
     };
     self = this;
   }
@@ -580,7 +584,7 @@ export default class BeiDian extends Component {
           let percent = this.strSimilarity2Percent(this.trim(topBdProduct.title.toUpperCase()), this.trim(task.productTitle.toUpperCase()));
           task.percent = percent;
           // 声音提示
-          this.playSysAudio(this.state.audioCode);
+          this.playSysAudio(1114);
 
           let taskBrandName = this.trim(task.brandName);
           let bdBrandName = '';
@@ -627,6 +631,30 @@ export default class BeiDian extends Component {
           task.percent = percent;
           task.brandPercent = brandPercent;
           task.bdBrandName = bdBrandName;
+
+          let jykTasks = this.state.jykTasks;
+          jykTasks.push({
+            task: task,
+            bdProduct: topBdProduct,
+            submitTime: new Date().getTime()
+          });
+          // jyk任务分开统计
+          if (task.handle == 'accept') {
+            let jykAcceptCount = this.state.jykAcceptCount;
+            jykAcceptCount++;
+            this.setState({
+              jykAcceptCount: jykAcceptCount,
+              jykTasks: jykTasks
+            });
+          } else {
+            let jykRejectCount = this.state.jykRejectCount;
+            jykRejectCount++;
+            this.setState({
+              jykRejectCount: jykRejectCount,
+              jykTasks: jykTasks
+            });
+          }
+          // 提交检验科任务
           this.webview.postMessage(
             JSON.stringify({
               code: 'NW1009',
@@ -634,28 +662,15 @@ export default class BeiDian extends Component {
               msg: '提交情报检验科的任务!'
             })
           );
-          // this.postWebMessage('NW1010', null)
-
-          let jykSuccessCount = this.state.jykSuccessCount;
-          jykSuccessCount++;
-          let jykTasks = this.state.jykTasks;
-          jykTasks.push({
-            task: task,
-            bdProduct: topBdProduct
-          });
-          this.setState({
-            jykSuccessCount: jykSuccessCount,
-            jykTasks: jykTasks
-          });
 
           // 手动提交情报
           /*if (brandPercent > 0.2 && percent > 0.1) {
           task.handle = 'accept';
           this.postWebMessage('NW1009', task);
-          let jykSuccessCount = this.state.jykSuccessCount;
-          jykSuccessCount++;
+          let jykAcceptCount = this.state.jykAcceptCount;
+          jykAcceptCount++;
           this.setState({
-            jykSuccessCount: jykSuccessCount
+            jykAcceptCount: jykAcceptCount
           });
         } else {
           Alert.alert(
@@ -672,10 +687,10 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                 onPress: () => {
                   task.handle = 'reject';
                   this.postWebMessage('NW1009', task);
-                  let jykSuccessCount = this.state.jykSuccessCount;
-                  jykSuccessCount++;
+                  let jykAcceptCount = this.state.jykAcceptCount;
+                  jykAcceptCount++;
                   this.setState({
-                    jykSuccessCount: jykSuccessCount
+                    jykAcceptCount: jykAcceptCount
                   });
                 }
               },
@@ -684,10 +699,10 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                 onPress: () => {
                   task.handle = 'accept';
                   this.postWebMessage('NW1009', task);
-                  let jykSuccessCount = this.state.jykSuccessCount;
-                  jykSuccessCount++;
+                  let jykAcceptCount = this.state.jykAcceptCount;
+                  jykAcceptCount++;
                   this.setState({
-                    jykSuccessCount: jykSuccessCount
+                    jykAcceptCount: jykAcceptCount
                   });
                 }
               }
@@ -696,7 +711,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
           );
         }*/
         } else {
-          //
+          // 没有搜到对应贝店商品
         }
       })
       .catch(error => {
@@ -775,6 +790,14 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
         })
       );
     });
+  }
+  toggleJykTaskStatus() {
+    let jykTaskStatus = +!this.state.jykTaskStatus;
+    this.setState({
+      jykTaskStatus: jykTaskStatus
+    });
+    let data = [{ key: 'jykTaskStatus', value: jykTaskStatus }];
+    this.postWebMessage('NW1012', data);
   }
   getUrlParam(url, name) {
     var reg = new RegExp('(^|\\?|&)' + name + '=([^&]*)(\\s|&|$)', 'i');
@@ -875,7 +898,13 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
   }
   renderJykRow({ item }, rowId, secId, rowMap) {
     return (
-      <View style={{ backgroundColor: '#fff', borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
+      <View
+        style={{
+          backgroundColor: item.task.handle == 'reject' ? `#FF4500` : item.task.percent < 0.1 ? `#FFD700` : `#FFFFFF`,
+          borderBottomColor: '#ccc',
+          borderBottomWidth: 1
+        }}
+      >
         <View>
           <Text>
             商品相似度:{item.task.percent.toFixed(4)},{item.task.handle}
@@ -901,7 +930,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#f2f4f6' }}>
         <View style={{ flex: 1, backgroundColor: '#f2f4f6' }}>
-          <StatusBar barStyle="light-content" />
+          <StatusBar barStyle="light-content" networkActivityIndicatorVisible={this.state.networkActivityIndicatorVisible} />
 
           <ScrollableTabView
             style={{ marginTop: 0 }}
@@ -995,7 +1024,11 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                 }}
               />
             </View>
-            <View tabLabel={`情报检验科(${this.state.jykSuccessCount})`} style={{ flex: 1 }} key={`情报检验科`}>
+            <View
+              tabLabel={`检验科(${this.state.jykAcceptCount}+${this.state.jykRejectCount}=${this.state.jykAcceptCount + this.state.jykRejectCount})`}
+              style={{ flex: 1 }}
+              key={`情报检验科`}
+            >
               <SwipeListView
                 useFlatList={true}
                 data={this.state.jykTasks}
@@ -1056,7 +1089,11 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                 Promise.all([AsyncStorage.getItem('JSESSIONID'), AsyncStorage.getItem('UID')]).then(values => {
                   let token = values[0] || '';
                   let uid = values[1] || '0';
-                  let cookies = [{ key: 'JSESSIONID', value: token }, { key: '_logged_', value: uid }];
+                  let cookies = [
+                    { key: 'JSESSIONID', value: token },
+                    { key: '_logged_', value: uid },
+                    { key: 'jykTaskStatus', value: `${this.state.jykTaskStatus}` }
+                  ];
                   let obj = { code: 'NW1001', data: cookies, msg: '加载完毕~' };
                   this.webview.postMessage(JSON.stringify(obj));
                 });
@@ -1140,7 +1177,6 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                   case 'WN1008':
                     let taskInfo = result.data;
                     this.getBdProduct(taskInfo);
-                    break;
                   default:
                     break;
                 }
@@ -1152,9 +1188,9 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
           ref={o => (this.ActionSheet = o)}
           title={'设置'}
           message={'开启静音模式后，所有提示不再提醒'}
-          options={[`${!this.state.isSilence ? '静音' : '提醒'}模式`, '任务平台', '登录']}
-          cancelButtonIndex={2}
-          destructiveButtonIndex={2}
+          options={[`${!this.state.isSilence ? '静音' : '提醒'}模式`, '任务平台', `${this.state.jykTaskStatus == 1 ? '关闭' : '开启'}检验科`, '登录']}
+          cancelButtonIndex={3}
+          destructiveButtonIndex={3}
           tintColor={'#000'}
           onPress={index => {
             if (index == 0) {
@@ -1162,6 +1198,8 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
             } else if (index == 1) {
               this.changePlatform();
             } else if (index == 2) {
+              this.toggleJykTaskStatus();
+            } else if (index == 3) {
               this.logoutBD();
             }
           }}

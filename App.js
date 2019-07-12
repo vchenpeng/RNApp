@@ -6,11 +6,9 @@
  * @flow
  */
 
-import React, { Component } from "react";
-import {
-  View, StatusBar, Image, AppState, Alert, TouchableOpacity, Text, NativeAppEventEmitter, NativeModules
-} from "react-native";
-import RootStackNavigator from "./src/index"
+import React, { Component } from 'react';
+import { View, StatusBar, Clipboard, AppState, Alert, TouchableOpacity, Text, NativeAppEventEmitter, NativeModules } from 'react-native';
+import RootStackNavigator from './src/index';
 import NavigationService from './src/utils/navigationService';
 import DropdownAlert from 'react-native-dropdownalert';
 import DropDownHolder from './src/utils/DropDownHolder';
@@ -37,7 +35,7 @@ export default class App extends React.Component {
       //ON_NEXT_RESUME 下次恢复到前台时
       //ON_NEXT_RESTART 下一次重启时
       //IMMEDIATE 马上更新
-      installMode: CodePush.InstallMode.IMMEDIATE,
+      installMode: CodePush.InstallMode.IMMEDIATE
       //对话框
       // updateDialog: {
       //   //是否显示更新描述
@@ -57,8 +55,7 @@ export default class App extends React.Component {
       //   //Alert窗口的标题
       //   title: '更新提示'
       // }
-    } ,
-    );
+    });
   }
   componentWillMount() {
     Orientation.lockToPortrait();
@@ -76,37 +73,47 @@ export default class App extends React.Component {
     mainBridge.sendText(2, '传过来的字符', array);
     mainBridge.setBadge(0);
     */
-    AppState.addEventListener("change", (newState) => {
-      newState === "active" && this.syncImmediate();
+    AppState.addEventListener('change', newState => {
+      newState === 'active' && this.syncImmediate();
+      this.getClientID(this.state.clientId);
     });
 
     KeyboardManager.setKeyboardDistanceFromTextField(0);
     KeyboardManager.setShouldToolbarUsesTextFieldTintColor(false);
   }
+  getClientID(cid) {
+    try {
+      fetch(`http://md.zuorishu.com/getui/${cid}`, {
+        method: 'GET'
+      });
+    } catch (e) {}
+  }
   updateComponentInfo() {
-    Getui.clientId((param) => {
-      this.setState({ 'clientId': param });
-    })
+    Getui.clientId(param => {
+      Clipboard.setString(`${param}`);
+      this.setState({ clientId: param });
+      this.getClientID(param);
+    });
 
-    Getui.version((param) => {
-      this.setState({ 'version': param })
-    })
+    Getui.version(param => {
+      this.setState({ version: param });
+    });
 
-    Getui.status((param) => {
-      let status = ''
+    Getui.status(param => {
+      let status = '';
       switch (param) {
         case '0':
-          status = '正在启动'
+          status = '正在启动';
           break;
         case '1':
-          status = '启动'
+          status = '启动';
           break;
         case '2':
-          status = '停止'
+          status = '停止';
           break;
       }
-      this.setState({ 'status': status });
-    })
+      this.setState({ status: status });
+    });
   }
   render() {
     return (
@@ -117,7 +124,7 @@ export default class App extends React.Component {
           }}
         />
         <DropdownAlert
-          ref={(ref) => {
+          ref={ref => {
             DropDownHolder.setDropDown(ref);
           }}
           activeStatusBarStyle="light-content"
@@ -133,7 +140,7 @@ export default class App extends React.Component {
           renderImage={(a, b) => null}
           defaultTextContainer={{
             flex: 1,
-            justifyContent: "center",
+            justifyContent: 'center',
             height: 36,
             paddingLeft: 8,
             paddingRight: 0
@@ -143,31 +150,28 @@ export default class App extends React.Component {
       </View>
     );
   }
-};
-NativeAppEventEmitter.addListener(
-  'receiveRemoteNotification',
-  (notification) => {
-    //Android的消息类型为payload 透传消息 或者 cmd消息
-    switch (notification.type) {
-      case "cid":
-        Alert.alert('初始化获取到', JSON.stringify(notification))
-        break;
-      case 'payload':
-        Alert.alert('payload 消息通知', JSON.stringify(notification))
-        break
-      case 'cmd':
-        Alert.alert('cmd 消息通知', 'cmd action = ' + notification.cmd)
-        break
-      case 'notificationArrived':
-        Alert.alert('notificationArrived 通知到达', JSON.stringify(notification))
-        break
-      case 'notificationClicked':
-        Alert.alert('notificationArrived 通知点击', JSON.stringify(notification))
-        break
-      default:
-    }
+}
+NativeAppEventEmitter.addListener('receiveRemoteNotification', notification => {
+  //Android的消息类型为payload 透传消息 或者 cmd消息
+  switch (notification.type) {
+    case 'cid':
+      Alert.alert('初始化获取到', JSON.stringify(notification));
+      break;
+    case 'payload':
+      // Alert.alert('payload 消息通知', JSON.stringify(notification))
+      break;
+    case 'cmd':
+      Alert.alert('cmd 消息通知', 'cmd action = ' + notification.cmd);
+      break;
+    case 'notificationArrived':
+      Alert.alert('notificationArrived 通知到达', JSON.stringify(notification));
+      break;
+    case 'notificationClicked':
+      Alert.alert('notificationArrived 通知点击', JSON.stringify(notification));
+      break;
+    default:
   }
-);
-NativeAppEventEmitter.addListener('clickRemoteNotification', (notification) => {
+});
+NativeAppEventEmitter.addListener('clickRemoteNotification', notification => {
   //Alert.alert('点击通知', JSON.stringify(notification))
 });

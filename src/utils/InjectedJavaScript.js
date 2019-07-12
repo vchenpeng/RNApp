@@ -2,6 +2,7 @@ let inject = (window, $) => {
   const themeColor = '#2ca146';
   let pid = 0;
   let uid = 0; //91286199
+  let isJykFast = false;
   function getCookie(name) {
     var strcookie = document.cookie; //获取cookie字符串
     var arrcookie = strcookie.split('; '); //分割
@@ -61,7 +62,7 @@ let inject = (window, $) => {
             }
           } else if (data.body.nextPlatform) {
             let nextPlatform = data.body.nextPlatform;
-            // 跳过京东
+            // 跳过京东,进入下一个平台“唯品会”
             if (nextPlatform.code == 2) {
               nextPlatform.code = 6;
               nextPlatform.name = '唯品会';
@@ -212,58 +213,77 @@ let inject = (window, $) => {
   }
   // 获取jyk任务
   function getJykTask() {
-    // uid = +getCookie('_logged_')
-    let uid = 90132158;
-    let random = randomNum(800, 1500);
-    setTimeout(() => {
-      $.ajax({
-        type: 'GET',
-        url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.detail.get&uid=${uid}`,
-        contentType: 'application/json;charset=utf-8',
-        dataType: 'json',
-        data: null,
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)'
-        },
-        xhrFields: {
-          withCredentials: true
-        },
-        beforeSend: (xhr, settings) => {},
-        success: data => {
-          console.log(data);
-          if (data.success) {
-            // let checkTaskId = data.body.checkTaskId;
-            // let iid = data.body.iid;
-            // submitJykTask(checkTaskId);
-            let task = data.body;
-            let obj = {
-              code: 'WN1008',
-              data: task,
-              msg: '传递jyk任务'
-            };
-            window.postMessage(JSON.stringify(obj));
-          } else if (data.msg == '行迹可疑暂停任务资格') {
-            let obj = {
-              code: 'WN1004',
-              data: null,
-              msg: data.msg
-            };
-            window.postMessage(JSON.stringify(obj));
-          } else {
+    uid = +getCookie('_logged_');
+    let jykTaskStatus = +getCookie('jykTaskStatus');
+    // 开启了检验科才刷任务0:关闭,1:开启
+    if (jykTaskStatus == 1) {
+      // let uid = 90132158;
+      let hour = new Date().getHours();
+      let random = null;
+      // 早上6点前慢速
+      if (hour < 6) {
+        random = randomNum(3000, 5000);
+      } else {
+        if (isJykFast) {
+          random = randomNum(0, 50);
+        } else {
+          random = randomNum(700, 1000);
+        }
+      }
+      setTimeout(() => {
+        $.ajax({
+          type: 'GET',
+          url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.detail.get&uid=${uid}`,
+          contentType: 'application/json;charset=utf-8',
+          dataType: 'json',
+          data: null,
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)'
+          },
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: (xhr, settings) => {},
+          success: data => {
+            console.log(data);
+            if (data.success) {
+              isJykFast = true;
+              // let checkTaskId = data.body.checkTaskId;
+              // let iid = data.body.iid;
+              // submitJykTask(checkTaskId);
+              let task = data.body;
+              let obj = {
+                code: 'WN1008',
+                data: task,
+                msg: '传递jyk任务'
+              };
+              window.postMessage(JSON.stringify(obj));
+            } else if (data.msg == '行迹可疑暂停任务资格') {
+              let obj = {
+                code: 'WN1004',
+                data: null,
+                msg: data.msg
+              };
+              window.postMessage(JSON.stringify(obj));
+            } else {
+              isJykFast = false;
+              getJykTask();
+            }
+          },
+          error: error => {
+            isJykFast = false;
             getJykTask();
           }
-        },
-        error: error => {
-          getJykTask();
-        }
-      });
-    }, random);
+        });
+      }, random);
+    }
   }
   // 提交jyk任务
   function submitJykTask(task) {
-    // uid = +getCookie('_logged_')
-    let uid = 90132158;
+    uid = +getCookie('_logged_');
+    // let uid = 90132158;
+    task.handle = 'accept';
     $.ajax({
       type: 'GET',
       url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.check.${task.handle}&checkTaskId=${task.checkTaskId}&uid=${uid}`,
@@ -330,6 +350,11 @@ let inject = (window, $) => {
           // 退出登录
           clearAuthCookie();
           break;
+        case 'NW1012':
+          // 切换是否开启情报检验科
+          setCookie(result.data);
+          getJykTask();
+          break;
         default:
           submitBD(result);
           break;
@@ -362,7 +387,8 @@ let inject = (window, $) => {
     $('.J_login-btn').on('click', login);
     setCookie(cookies);
     ajax();
-    setInterval(ajax, 2000); // 1.2s执行一次
+    const hour = new Date().getHours();
+    setInterval(ajax, hour < 6 ? 5000 : 1500); // 1.2s执行一次
     getHistory();
     getJykTask();
     // 页面心跳，保证页面长时间执行定时器，卡死问题
