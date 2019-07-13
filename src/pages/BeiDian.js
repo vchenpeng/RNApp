@@ -534,7 +534,7 @@ export default class BeiDian extends Component {
       credentials: 'include'
     })
       .then(async response => {
-        let body = JSON.parse(response._bodyText);
+        let body = await response.json();
         if (body.success) {
           const uid = body.data || 0;
           Clipboard.setString(JSON.stringify(response.headers));
@@ -759,7 +759,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
   componentWillMount() {}
   async componentDidMount() {
     NativeModules.MainBridge.setIdleTimerDisabled(true);
-    NativeModules.MainBridge.setBrightness(0.05);
+    // NativeModules.MainBridge.setBrightness(0.05);
     this.onShake();
     this.props.navigation.setParams({ webview: this.webview });
     this.props.navigation.setParams({ openLogin: this.openLogin });

@@ -3,6 +3,7 @@ package com.rnapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.jadsonlourenco.RNShakeEvent.RNShakeEventPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.cubicphuse.RCTTorch.RCTTorchPackage;
@@ -38,6 +39,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNBackgroundFetchPackage(),
             new RNShakeEventPackage(),
             new RNCWebViewPackage(),
             new RCTTorchPackage(),

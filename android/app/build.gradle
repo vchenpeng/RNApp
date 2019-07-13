@@ -138,6 +138,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-background-fetch')
     compile project(':react-native-shake-event')
     compile project(':react-native-webview')
     compile project(':react-native-torch')

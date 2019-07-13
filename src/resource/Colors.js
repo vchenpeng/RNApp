@@ -10,7 +10,8 @@ const colors = {
     // theme_color: '#3bafda',
     // theme_color:'#ABC327',
     // theme_color: '#22222a',
-    theme_color: '#2ca146', // 微信绿
+    // theme_color: '#2ca146', // 微信绿
+    theme_color: '#0088CC',
     //通用颜色
     white_fff: '#fff',
     black_000: '#000',
