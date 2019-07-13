@@ -1,5 +1,5 @@
 let inject = (window, $) => {
-  const themeColor = '#2ca146';
+  const themeColor = '#0088CC';
   let pid = 0;
   let uid = 0; //91286199
   let isJykFast = false;
@@ -222,7 +222,7 @@ let inject = (window, $) => {
       let random = null;
       // 早上6点前慢速
       if (hour < 6) {
-        random = randomNum(3000, 5000);
+        random = randomNum(1000, 3000);
       } else {
         if (isJykFast) {
           random = randomNum(0, 50);
@@ -388,7 +388,7 @@ let inject = (window, $) => {
     setCookie(cookies);
     ajax();
     const hour = new Date().getHours();
-    setInterval(ajax, hour < 6 ? 5000 : 1500); // 1.2s执行一次
+    setInterval(ajax, hour < 6 ? 2000 : 1500); // 1.2s执行一次
     getHistory();
     getJykTask();
     // 页面心跳，保证页面长时间执行定时器，卡死问题

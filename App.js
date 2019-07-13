@@ -17,7 +17,8 @@ import Getui from 'react-native-getui';
 import CodePush from 'react-native-code-push';
 import Orientation from 'react-native-orientation';
 import KeyboardManager, { PreviousNextView } from 'react-native-keyboard-manager';
-import BackgroundFetch from 'react-native-background-fetch';
+// import BackgroundFetch from 'react-native-background-fetch';
+
 
 export default class App extends React.Component {
   constructor(props) {
@@ -80,7 +81,7 @@ export default class App extends React.Component {
 
     KeyboardManager.setKeyboardDistanceFromTextField(0);
     KeyboardManager.setShouldToolbarUsesTextFieldTintColor(false);
-    this.initBackgroundFetch();
+    // this.initBackgroundFetch();
   }
   initBackgroundFetch() {
     // Configure it.
