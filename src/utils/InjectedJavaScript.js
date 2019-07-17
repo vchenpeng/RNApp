@@ -220,16 +220,26 @@ let inject = (window, $) => {
       // let uid = 90132158;
       let hour = new Date().getHours();
       let random = null;
-      // 早上6点前慢速
+      // 早上6点前慢速（原）
       if (hour < 6) {
         random = randomNum(1000, 3000);
       } else {
         if (isJykFast) {
-          random = randomNum(0, 50);
+          random = randomNum(0, 10);
         } else {
           random = randomNum(700, 1000);
         }
       }
+      // 早上6点前慢速（新）
+      // if (hour < 6 && false) {
+      //   random = randomNum(1000, 3000);
+      // } else {
+      //   if (isJykFast) {
+      //     random = randomNum(2000, 3000);
+      //   } else {
+      //     random = randomNum(3000, 5000);
+      //   }
+      // }
       setTimeout(() => {
         $.ajax({
           type: 'GET',

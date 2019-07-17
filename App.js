@@ -19,7 +19,6 @@ import Orientation from 'react-native-orientation';
 import KeyboardManager, { PreviousNextView } from 'react-native-keyboard-manager';
 // import BackgroundFetch from 'react-native-background-fetch';
 
-
 export default class App extends React.Component {
   constructor(props) {
     super(props);
