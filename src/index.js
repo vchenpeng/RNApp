@@ -15,6 +15,8 @@ import SignIn from './pages/SignInScreen'
 import AuthLoading from './pages/AuthLoadingScreen'
 // import SyanImagePicker from 'react-native-syan-image-picker';
 import BeiDian from './pages/BeiDian'
+import BeiDianNew from './pages/BeiDianNew'
+import Map from './pages/Map'
 
 Tabs.navigationOptions = ({ navigation }) => {
   let { routeName } = navigation.state.routes[navigation.state.index]
@@ -103,7 +105,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                 //         return;
                 //     }
                 // });
-                NavigationService.navigate('Web', { url: 'http://mobile.ant.design/kitchen-sink/' })
+                NavigationService.navigate('BeiDianNew', {})
               }}
             >
               <AntDesignIcon name="search1" size={24} color="white" style={{ marginRight: 15 }} />
@@ -180,6 +182,12 @@ const RootStackNavigator = createStackNavigator(
     },
     BeiDian: {
       screen: BeiDian
+    },
+    BeiDianNew: {
+      screen: BeiDianNew
+    },
+    Map: {
+      screen: Map
     }
   },
   {

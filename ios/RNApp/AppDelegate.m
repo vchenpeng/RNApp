@@ -10,6 +10,7 @@
 #import <React/RCTRootView.h>
 #import "RNSplashScreen.h"
 #import "Orientation.h"
+#import <AMapFoundationKit/AMapFoundationKit.h>
 
 //首先导入头文件信息
 #import <ifaddrs.h>
@@ -19,6 +20,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  [AMapServices sharedServices].apiKey = @"a6950555667d349ea3879a17abe56804";
   // 接入个推
 	[GeTuiSdk startSdkWithAppId:kGtAppId appKey:kGtAppKey appSecret:kGtAppSecret delegate:self];
  // APNs
@@ -34,7 +36,7 @@
     jsCodeLocation = [CodePush bundleURL];
   }else{
     BOOL isContain = [ip hasPrefix:@"192.168.1."];
-    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"192.168.1.3":@"192.168.1.3")];
+    [[RCTBundleURLProvider sharedSettings] setJsLocation:(isContain?@"127.0.0.1":@"127.0.0.1")];
     
     jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
   }

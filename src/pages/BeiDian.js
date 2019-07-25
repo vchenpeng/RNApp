@@ -42,7 +42,16 @@ export default class BeiDian extends Component {
   static navigationOptions = ({ navigation }) => {
     let { params } = navigation.state
     return {
-      title: params && params.title ? params.title : '贝店情报局',
+      headerTitle: (
+        <View style={styles.headerTitleContainer}>
+          <Text style={styles.titleText}>{params && params.title ? params.title : '贝店情报局'}</Text>
+          <Text style={styles.subtitleText}>
+            情报局:{(params && params.products ? params.products.length : 0).toString()},检验科:
+            {(params ? params.jykAcceptCount + params.jykRejectCount : 0).toString()},余额:￥
+            {(params && params.accountOverview ? params.accountOverview.balance : 0).toFixed(2)}
+          </Text>
+        </View>
+      ),
       headerTitleStyle: {
         fontSize: 18,
         fontWeight: '400',
@@ -106,7 +115,12 @@ export default class BeiDian extends Component {
       jykAcceptCount: 0,
       jykRejectCount: 0,
       jykTasks: [],
-      jykTaskStatus: 0
+      jykTaskStatus: 1,
+      authInfo: {
+        jsSessionID: null,
+        uid: null
+      },
+      accountOverview: null
     }
     self = this
   }
@@ -140,6 +154,30 @@ export default class BeiDian extends Component {
     self.playSysAudio(1001)
     nextPlatformIndex += 1
     nextPlatformIndex = nextPlatformIndex > 4 ? 0 : nextPlatformIndex
+  }
+  getAccountOverview() {
+    const token = this.state.authInfo.jsSessionID
+    const uid = this.state.authInfo.uid
+    const url = `https://imapi.beidian.com/server/gateway?method=voc.ia.account.overview&uid=${uid}`
+    return fetch(url, {
+      method: 'GET',
+      headers: {
+        cookie: `JSESSIONID=${token};  _logged_=${uid};`
+      },
+      credentials: 'include'
+    })
+      .then(r => r.json())
+      .then(response => {
+        if (response.success) {
+          this.props.navigation.setParams({ accountOverview: response.body })
+          this.setState({
+            accountOverview: response.body
+          })
+        }
+      })
+      .catch(error => {
+        return null
+      })
   }
   searchWPH(product) {
     const url = `https://m.vip.com/server.html?rpc&method=SearchRpc.getSearchList&f=www`
@@ -188,7 +226,7 @@ export default class BeiDian extends Component {
                   let productUrl = item['product_url']
                   let tmpWord = this.randomWord(false, 40, 40)
                   let chlParam = encodeURIComponent('share:' + this.randomWord(false, 10, 10))
-                  let rUrl = `https://m.vip.com${productUrl}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=`
+                  let rUrl = `https://m.vip.com${productUrl}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=&percent=${percent}`
 
                   let itemProduct = {
                     index: i,
@@ -545,6 +583,12 @@ export default class BeiDian extends Component {
           let token = cookie.split(';')[0].split('=')[1]
           await AsyncStorage.setItem('JSESSIONID', token)
           await AsyncStorage.setItem('UID', `${uid}`)
+          this.setState({
+            authInfo: {
+              jsSessionID: token,
+              uid: `${uid}`
+            }
+          })
           DropDownHolder.alert('登录成功', '', 'info')
           this.postWebMessage('NW1007', [{ key: 'JSESSIONID', value: token }, { key: '_logged_', value: `${uid}` }])
           return token
@@ -764,15 +808,25 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
     this.props.navigation.setParams({ openLogin: this.openLogin })
     this.props.navigation.setParams({ showOptions: this.showOptions })
     this.props.navigation.setParams({ changePlatform: this.changePlatform })
+    this.props.navigation.setParams({ jykAcceptCount: this.state.jykAcceptCount })
+    this.props.navigation.setParams({ jykRejectCount: this.state.jykRejectCount })
+    this.props.navigation.setParams({ accountOverview: this.state.accountOverview })
     // TODO初始化web参数
-    // let jsSessionID = await AsyncStorage.getItem('JSESSIONID', token);
-    // let UID = await AsyncStorage.getItem('UID', `${uid}`);
-    // if (jsSessionID) {
-    //   await AsyncStorage.setItem('JSESSIONID', '');
-    // }
-    // if (UID) {
-    //   await AsyncStorage.setItem('UID', '');
-    // }
+    Promise.all([AsyncStorage.getItem('JSESSIONID'), AsyncStorage.getItem('UID')]).then(values => {
+      let token = values[0] || ''
+      let uid = values[1] || '0'
+      this.setState(
+        {
+          authInfo: {
+            jsSessionID: token,
+            uid: uid
+          }
+        },
+        () => {
+          this.getAccountOverview()
+        }
+      )
+    })
   }
   componentWillUnmount() {
     NativeModules.MainBridge.setIdleTimerDisabled(false)
@@ -1020,14 +1074,11 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                     msg: '请求历史记录'
                   }
                   self.webview.postMessage(JSON.stringify(obj))
+                  this.getAccountOverview()
                 }}
               />
             </View>
-            <View
-              tabLabel={`检验科(${this.state.jykAcceptCount}+${this.state.jykRejectCount}=${this.state.jykAcceptCount + this.state.jykRejectCount})`}
-              style={{ flex: 1 }}
-              key={`情报检验科`}
-            >
+            <View tabLabel={`情报检验科`} style={{ flex: 1 }} key={`情报检验科`}>
               <SwipeListView
                 useFlatList={true}
                 data={this.state.jykTasks}
@@ -1081,7 +1132,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
               scrollEnabled={false}
               bounces={false}
               useWebkit={true}
-              cacheEnabled={true}
+              cacheEnabled={false}
               geolocationEnabled={false}
               onLoadEnd={() => {
                 // 检测SessionID,如果存在直接设置
@@ -1163,6 +1214,8 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                         this.props.navigation.setParams({ products: products })
                         this.webview.postMessage(JSON.stringify(returnObj))
                         this.playSysAudio(this.state.audioCode)
+                      } else {
+                        this.postWebMessage('NW1013', {})
                       }
                     }
                     break
@@ -1194,6 +1247,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                       jykAcceptCount: jykAcceptCount,
                       jykTasks: jykTasks
                     })
+                    this.props.navigation.setParams({ jykAcceptCount: jykAcceptCount })
                     this.playSysAudio(1114)
                     // 提交检验科任务
                     this.webview.postMessage(
@@ -1203,6 +1257,9 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                         msg: '提交情报检验科任务'
                       })
                     )
+                    break
+                  case 'WN1010':
+                  // 运行监测
                   default:
                     break
                 }
@@ -1308,5 +1365,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingVertical: 10,
     width: Dimensions.get('window').width / 4
+  },
+  // aa
+  headerTitleContainer: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  titleText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '300'
+  },
+  subtitleText: {
+    color: '#fff',
+    fontSize: 10,
+    marginTop: 3,
+    fontWeight: '300'
   }
 })
