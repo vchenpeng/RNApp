@@ -15,8 +15,8 @@ import {
   StyleSheet,
   StatusBar,
   Alert,
-  AsyncStorage,
-  Animated
+  Animated,
+  AsyncStorage
 } from 'react-native'
 import Modal from '../components/ModalBox'
 import ScrollableTabView, { DefaultTabBar, ScrollableTabBar } from 'react-native-scrollable-tab-view'
@@ -41,6 +41,10 @@ export default class BeiDian extends Component {
   //接收上一个页面传过来的title显示出来
   static navigationOptions = ({ navigation }) => {
     let { params } = navigation.state
+    let rotateZ = (params.animatedValue || new Animated.Value(0)).interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '720deg']
+    })
     return {
       headerTitle: (
         <View style={styles.headerTitleContainer}>
@@ -64,21 +68,23 @@ export default class BeiDian extends Component {
         borderBottomWidth: 0
       },
       headerRight: (
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
               navigation.state.params.changePlatform.call(self)
             }}
           >
-            <AntDesignIcon name="retweet" size={24} color="white" style={{ marginRight: 10 }} />
+            <Animated.View style={{ width: 20, height: 20, marginRight: 10, transform: [{ rotateZ: rotateZ }] }}>
+              <AntDesignIcon name="loading1" size={20} color="white" style={{}} />
+            </Animated.View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               navigation.state.params.showOptions()
             }}
           >
-            <AntDesignIcon name="iconfontdesktop" size={24} color="white" style={{ marginRight: 15 }} />
-            <View
+            <AntDesignIcon name="iconfontdesktop" size={24} color="white" style={{ width: 24, height: 24, marginRight: 15 }} />
+            {/* <View
               style={{
                 position: 'absolute',
                 right: 12,
@@ -92,7 +98,7 @@ export default class BeiDian extends Component {
               }}
             >
               <Text style={{ fontSize: 10, color: '#fff' }}>{(params && params.products ? params.products.length : 0).toString()}</Text>
-            </View>
+            </View> */}
           </TouchableOpacity>
         </View>
       )
@@ -122,7 +128,34 @@ export default class BeiDian extends Component {
       },
       accountOverview: null
     }
+    this.animatedValue = new Animated.Value(0)
+    this.rotateAnimated = Animated.timing(this.animatedValue, {
+      toValue: 1,
+      duration: 2000,
+      easing: Easing.linear,
+      useNativeDriver: false
+    })
+    this.activePool = []
     self = this
+  }
+  startAnimated() {
+    this.activePool.shift()
+    this.animatedValue.setValue(0)
+    this.rotateAnimated.start(() => {
+      if (this.activePool.length > 0) {
+        this.startAnimated()
+      }
+    })
+  }
+  // 激活动画
+  activeAnimate(...args) {
+    let params = args || [1]
+    if (this.activePool.length == 0) {
+      this.activePool.push(...params)
+      this.startAnimated()
+    } else {
+      this.activePool.push(...params)
+    }
   }
   setLoginModalStatus(flag) {
     self.setState({ isShowLogin: flag })
@@ -148,7 +181,7 @@ export default class BeiDian extends Component {
     let obj = {
       code: 'NW1003',
       data: code,
-      msg: `手动切换至${codeName}平台`
+      msg: `手动切换至${codeName}平台.`
     }
     this.webview.postMessage(JSON.stringify(obj))
     self.playSysAudio(1001)
@@ -804,6 +837,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
     NativeModules.MainBridge.setIdleTimerDisabled(true)
     // NativeModules.MainBridge.setBrightness(0.05);
     this.onShake()
+    this.props.navigation.setParams({ animatedValue: this.animatedValue })
     this.props.navigation.setParams({ webview: this.webview })
     this.props.navigation.setParams({ openLogin: this.openLogin })
     this.props.navigation.setParams({ showOptions: this.showOptions })
@@ -811,6 +845,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
     this.props.navigation.setParams({ jykAcceptCount: this.state.jykAcceptCount })
     this.props.navigation.setParams({ jykRejectCount: this.state.jykRejectCount })
     this.props.navigation.setParams({ accountOverview: this.state.accountOverview })
+    this.startAnimated()
     // TODO初始化web参数
     Promise.all([AsyncStorage.getItem('JSESSIONID'), AsyncStorage.getItem('UID')]).then(values => {
       let token = values[0] || ''
@@ -984,7 +1019,6 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
       <SafeAreaView style={{ flex: 1, backgroundColor: '#f2f4f6' }}>
         <View style={{ flex: 1, backgroundColor: '#f2f4f6' }}>
           <StatusBar barStyle="light-content" />
-
           <ScrollableTabView
             style={{ marginTop: 0 }}
             initialPage={0}
@@ -1027,13 +1061,24 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                 closeOnRowPress={true}
                 renderHiddenItem={(data, rowMap) => (
                   <View style={styles.rowBack}>
-                    <Text />
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      style={[styles.backRightBtn, { backgroundColor: '#696969' }]}
+                      onPress={() => {
+                        let { item } = data
+                        Clipboard.setString(JSON.stringify(item))
+                        rowMap[data.item.id.toString()].closeRow()
+                      }}
+                    >
+                      <Text style={styles.backTextWhite}>黑名单</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity
                       activeOpacity={1}
                       style={[styles.backRightBtn, styles.backRightBtnLeft]}
-                      onPress={() => {
+                      onPress={async () => {
                         let { item } = data
                         Clipboard.setString(item.title)
+                        // let blackList = await AsyncStorage.getItem('BlackList')
                         rowMap[data.item.id.toString()].closeRow()
                       }}
                     >
@@ -1052,9 +1097,9 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                     </TouchableOpacity>
                   </View>
                 )}
-                leftOpenValue={75}
+                leftOpenValue={90}
                 rightOpenValue={-180}
-                disableRightSwipe={true}
+                disableRightSwipe={false}
                 disableLeftSwipe={false}
                 friction={10}
                 tension={0}
@@ -1206,7 +1251,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                           break
                       }
                       // 弹框提示对应商品
-                      DropDownHolder.alert('', `[${tName}]${productInfo.title}`, 'info')
+                      // DropDownHolder.alert('', `[${tName}]${productInfo.title}`, 'info')
                       if (returnObj.url !== null) {
                         let products = this.state.products
                         products.push(returnObj)
@@ -1214,8 +1259,10 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                         this.props.navigation.setParams({ products: products })
                         this.webview.postMessage(JSON.stringify(returnObj))
                         this.playSysAudio(this.state.audioCode)
+                        this.activeAnimate(1, 1, 1, 1, 1, 1, 1)
                       } else {
                         this.postWebMessage('NW1013', {})
+                        this.activeAnimate(1)
                       }
                     }
                     break
@@ -1259,7 +1306,9 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                     )
                     break
                   case 'WN1010':
-                  // 运行监测
+                    // 运行监测
+                    this.activeAnimate(1)
+                    break
                   default:
                     break
                 }

@@ -105,7 +105,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                 //         return;
                 //     }
                 // });
-                NavigationService.navigate('BeiDianNew', {})
+                NavigationService.navigate('Map', {})
               }}
             >
               <AntDesignIcon name="search1" size={24} color="white" style={{ marginRight: 15 }} />
