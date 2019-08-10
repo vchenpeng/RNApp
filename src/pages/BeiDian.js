@@ -45,6 +45,7 @@ export default class BeiDian extends Component {
       inputRange: [0, 1],
       outputRange: ['0deg', '720deg']
     })
+    let activeStatus = params.activeStatus
     return {
       headerTitle: (
         <View style={styles.headerTitleContainer}>
@@ -75,7 +76,7 @@ export default class BeiDian extends Component {
             }}
           >
             <Animated.View style={{ width: 20, height: 20, marginRight: 10, transform: [{ rotateZ: rotateZ }] }}>
-              <AntDesignIcon name="loading1" size={20} color="white" style={{}} />
+              <AntDesignIcon name="loading1" size={20} color="#FFF" style={{ opacity: activeStatus == 1 ? 1 : 0.5 }} />
             </Animated.View>
           </TouchableOpacity>
           <TouchableOpacity
@@ -136,14 +137,18 @@ export default class BeiDian extends Component {
       useNativeDriver: false
     })
     this.activePool = []
+    this.activeStatus = 0
     self = this
   }
   startAnimated() {
-    this.activePool.shift()
+    let tmp = this.activePool.shift()
     this.animatedValue.setValue(0)
+    this.props.navigation.setParams({ activeStatus: tmp })
     this.rotateAnimated.start(() => {
       if (this.activePool.length > 0) {
         this.startAnimated()
+      } else {
+        this.props.navigation.setParams({ activeStatus: 0 })
       }
     })
   }
@@ -842,6 +847,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
     // NativeModules.MainBridge.setBrightness(0.05);
     this.onShake()
     this.props.navigation.setParams({ animatedValue: this.animatedValue })
+    this.props.navigation.setParams({ activeStatus: this.activeStatus })
     this.props.navigation.setParams({ webview: this.webview })
     this.props.navigation.setParams({ openLogin: this.openLogin })
     this.props.navigation.setParams({ showOptions: this.showOptions })
@@ -849,7 +855,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
     this.props.navigation.setParams({ jykAcceptCount: this.state.jykAcceptCount })
     this.props.navigation.setParams({ jykRejectCount: this.state.jykRejectCount })
     this.props.navigation.setParams({ accountOverview: this.state.accountOverview })
-    this.startAnimated()
+    // this.startAnimated()
     // TODO初始化web参数
     Promise.all([AsyncStorage.getItem('JSESSIONID'), AsyncStorage.getItem('UID')]).then(values => {
       let token = values[0] || ''
@@ -909,10 +915,12 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
         activeOpacity={0.85}
         underlayColor="#000000"
         onPress={() => {
-          NavigationService.navigate('Web', {
-            url: item.outerUrl,
-            title: item.title
-          })
+          // alert(JSON.stringify(item))
+          // https://m.beidian.com/detail/detail.html
+          // NavigationService.navigate('Web', {
+          //   url: `https://m.beidian.com/detail/detail.html?iid=${item.pid}`,
+          //   title: item.title
+          // })
         }}
       >
         <View style={{ backgroundColor: '#fff' }}>
@@ -1093,17 +1101,20 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                       style={[styles.backRightBtn, styles.backRightBtnRight]}
                       onPress={() => {
                         let { item } = data
-                        Clipboard.setString(item.outerUrl)
                         rowMap[data.item.id.toString()].closeRow()
+                        NavigationService.navigate('Web', {
+                          url: item.outerUrl,
+                          title: item.title
+                        })
                       }}
                     >
-                      <Text style={styles.backTextWhite}>复制链接</Text>
+                      <Text style={styles.backTextWhite}>打开外链</Text>
                     </TouchableOpacity>
                   </View>
                 )}
                 leftOpenValue={90}
                 rightOpenValue={-180}
-                disableRightSwipe={false}
+                disableRightSwipe={true}
                 disableLeftSwipe={false}
                 friction={10}
                 tension={0}
@@ -1311,7 +1322,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                     break
                   case 'WN1010':
                     // 运行监测
-                    this.activeAnimate(1)
+                    this.activeAnimate(0)
                     break
                   default:
                     break
