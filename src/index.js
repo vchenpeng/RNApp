@@ -56,7 +56,7 @@ Tabs.navigationOptions = ({ navigation }) => {
                         .catch(error => {
                             AlertIOS.alert('验证失败');
                         });*/
-                navigation.navigate('BeiDian')
+                NavigationService.navigate('BeiDian', {})
               }}
             >
               <AntDesignIcon name="calendar" size={24} color="white" style={{ marginRight: 15 }} />

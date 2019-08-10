@@ -71,7 +71,7 @@ export default class BeiDian extends Component {
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
-              navigation.state.params.changePlatform.call(self)
+              // navigation.state.params.changePlatform.call(self)
             }}
           >
             <Animated.View style={{ width: 20, height: 20, marginRight: 10, transform: [{ rotateZ: rotateZ }] }}>
@@ -269,9 +269,13 @@ export default class BeiDian extends Component {
                   pools.push(itemProduct)
                 }
               }
-              let sortPools = pools.sort((x, y) => {
-                return y.percent - x.percent
-              })
+              let sortPools = pools
+                .filter(x => {
+                  return x.percent > this.state.lowest
+                })
+                .sort((x, y) => {
+                  return y.percent - x.percent
+                })
               if (sortPools.length > 0) {
                 returnUrl = sortPools[0].returnUrl
               } else {
@@ -376,18 +380,14 @@ export default class BeiDian extends Component {
     return fetch(url, {
       method: 'GET',
       headers: {
-        referer: 'https://list.tmall.com/search_product.htm?q=444&type=p&vmarket=&spm=875.7931836%2FB.a2227oh.d100&from=mallfp..pc_1_searchbutton'
+        referer: 'https://list.tmall.com/search_product.htm'
       },
       credentials: 'include'
     })
-      .then(response => {
+      .then(async response => {
         let returnUrl = null
         try {
-          let dataStr = response._bodyInit
-            .replace(/\\n/g, '')
-            .replace(/\\"/g, '"')
-            .replace(/\)"/g, '')
-          let tmInfo = JSON.parse(dataStr)
+          let tmInfo = await response.json()
           let item = tmInfo['item']
           if (item && item.length > 0) {
             let pools = []
@@ -411,7 +411,7 @@ export default class BeiDian extends Component {
               } else {
                 let brands = product.brandName.split('/')
                 if (this.checkIn(item[i]['shop_name'], keywords) && this.checkIn(item[i]['shop_name'], brands)) {
-                  let rUrl = `https:${item[i].url}`
+                  let rUrl = `https:${item[i].url}&percent=${percent}`
                   let itemProduct = {
                     index: i,
                     percent: percent,
@@ -423,9 +423,13 @@ export default class BeiDian extends Component {
                 }
               }
             }
-            let sortPools = pools.sort((x, y) => {
-              return y.percent - x.percent
-            })
+            let sortPools = pools
+              .filter(x => {
+                return x.percent > this.state.lowest
+              })
+              .sort((x, y) => {
+                return y.percent - x.percent
+              })
             if (sortPools.length > 0) {
               returnUrl = sortPools[0].returnUrl
             } else {

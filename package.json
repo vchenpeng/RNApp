@@ -10,7 +10,8 @@
     "release-react": "code-push release-react RNApp ios",
     "code-push-staging": "code-push release RNApp ./ios/bundle/ 1.0.0 --deploymentName Staging --description '\n1.近期更新频繁，请谅解\n2.程序优化了' --mandatory true",
     "code-push-production": "code-push release RNApp ./ios/bundle/ 1.0.0 --deploymentName Production --description '\n1.近期更新频繁，请谅解\n2.程序优化了' --mandatory true",
-    "dev": "node_modules/react-native/scripts/launchPackager.command;"
+    "dev": "node_modules/react-native/scripts/launchPackager.command;",
+    "build": "npm run bundle-ios && code-push-production"
   },
   "dependencies": {
     "@babel/runtime": "^7.1.2",

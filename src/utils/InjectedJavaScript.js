@@ -43,15 +43,15 @@ const inject = (window, $) => {
           if (data.body.productInfo) {
             // 天猫专卖或者专营不会出现出现重复商品信息
             if (pid == data.body.productInfo.pid && !(data.body.productInfo.platform == 13 || data.body.productInfo.platform == 12)) {
-              let obj = {
-                code: 'WN1001',
-                data: data.body.productInfo,
-                msg: `出现重复商品信息`
-              }
               setTimeout(() => {
                 ajax()
               }, 2000)
-              window.postMessage(JSON.stringify(obj))
+              // let obj = {
+              //   code: 'WN1001',
+              //   data: data.body.productInfo,
+              //   msg: `出现重复商品信息`
+              // }
+              // window.postMessage(JSON.stringify(obj))
             } else {
               pid = data.body.productInfo.pid
               let productInfo = data.body.productInfo
