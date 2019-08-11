@@ -33,6 +33,7 @@ import InjectedJavaScript from '../utils/InjectedJavaScript'
 import abr from '../utils/abr'
 import RNShakeEvent from 'react-native-shake-event'
 import { ActionSheetCustom as ActionSheet } from '../components/ActionSheet/index'
+import Secret from '../utils/secret'
 
 let self
 let nextPlatformIndex = 0 // 天猫
@@ -255,6 +256,7 @@ export default class BeiDian extends Component {
           if (wphInfoData) {
             let products = wphInfoData['products']
             if (products && products.length > 0) {
+              let trace = Secret.Encrypt(`${product.iid}`)
               let pools = []
               for (let i = 0; i < products.length; i++) {
                 let item = products[i]
@@ -264,7 +266,7 @@ export default class BeiDian extends Component {
                   let productUrl = item['product_url']
                   let tmpWord = this.randomWord(false, 40, 40)
                   let chlParam = encodeURIComponent('share:' + this.randomWord(false, 10, 10))
-                  let rUrl = `https://m.vip.com${productUrl}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=&percent=${percent}`
+                  let rUrl = `https://m.vip.com${productUrl}?msns=iphone-6.36-link&st=p-url&cid=${tmpWord}&chl_param=${chlParam}&abtid=13&uid=&percent=${percent}&trace=${trace}`
 
                   let itemProduct = {
                     index: i,
@@ -395,6 +397,7 @@ export default class BeiDian extends Component {
           let tmInfo = await response.json()
           let item = tmInfo['item']
           if (item && item.length > 0) {
+            let trace = Secret.Encrypt(`${product.iid}`)
             let pools = []
             for (let i = 0; i < item.length; i++) {
               let percent = this.strSimilarity2Percent(product.title, item[i]['title'])
@@ -403,7 +406,7 @@ export default class BeiDian extends Component {
                 // if (item[i]["shop_name"] == product.taskShopName && this.checkIn(item[i]["shop_name"], keywords) && this.checkIn(item[i]["shop_name"], brands)
                 //     && Math.abs(product.price - item[i].price) < 30) {
                 if (item[i]['shop_name'] == product.taskShopName && percent > this.state.lowest) {
-                  let rUrl = `https:${item[i].url}&percent=${percent}`
+                  let rUrl = `https:${item[i].url}&percent=${percent}&trace=${trace}`
                   let itemProduct = {
                     index: i,
                     percent: percent,
@@ -416,7 +419,7 @@ export default class BeiDian extends Component {
               } else {
                 let brands = product.brandName.split('/')
                 if (this.checkIn(item[i]['shop_name'], keywords) && this.checkIn(item[i]['shop_name'], brands)) {
-                  let rUrl = `https:${item[i].url}&percent=${percent}`
+                  let rUrl = `https:${item[i].url}&percent=${percent}&trace=${trace}`
                   let itemProduct = {
                     index: i,
                     percent: percent,
@@ -904,6 +907,8 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
   }
   renderRow({ item }, rowId, secId, rowMap) {
     let percent = this.getUrlParam(item.outerUrl, 'percent')
+    // 贝店商品追踪 AES加密iid
+    let trace = this.getUrlParam(item.outerUrl, 'trace')
     let itemStatusName = ''
     if (percent) {
       itemStatusName = (+percent * 100).toFixed(2) + `%`
@@ -915,12 +920,13 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
         activeOpacity={0.85}
         underlayColor="#000000"
         onPress={() => {
-          // alert(JSON.stringify(item))
-          // https://m.beidian.com/detail/detail.html
-          // NavigationService.navigate('Web', {
-          //   url: `https://m.beidian.com/detail/detail.html?iid=${item.pid}`,
-          //   title: item.title
-          // })
+          if (!!trace) {
+            const traceVal = Secret.Decrypt(trace)
+            NavigationService.navigate('Web', {
+              url: `https://m.beidian.com/detail/detail.html?iid=${traceVal}`,
+              title: item.title
+            })
+          }
         }}
       >
         <View style={{ backgroundColor: '#fff' }}>
