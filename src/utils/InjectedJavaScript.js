@@ -42,7 +42,7 @@ const inject = (window, $) => {
           // 存在productInfo时
           if (data.body.productInfo) {
             // 天猫专卖或者专营不会出现出现重复商品信息
-            if (pid == data.body.productInfo.pid && !(data.body.productInfo.platform == 13 || data.body.productInfo.platform == 12)) {
+            if (pid == data.body.productInfo.pid) {
               setTimeout(() => {
                 ajax()
               }, 2000)
@@ -66,16 +66,16 @@ const inject = (window, $) => {
           } else if (data.body.nextPlatform) {
             let nextPlatform = data.body.nextPlatform
             // 跳过京东,进入下一个平台“唯品会”
-            if (nextPlatform.code == 2) {
-              nextPlatform.code = 6
-              nextPlatform.name = '唯品会'
-            }
+            // if (nextPlatform.code == 2) {
+            //   nextPlatform.code = 6
+            //   nextPlatform.name = '唯品会'
+            // }
 
             setTimeout(() => {
               let obj = {
                 code: 'WN1010',
                 data: null,
-                msg: `系统自动加入 [${nextPlatform.name}] 情报组.`
+                msg: `系统自动加入 [${nextPlatform.name}] 情报组`
               }
               window.postMessage(JSON.stringify(obj))
               changePlatform(nextPlatform.code)
@@ -101,7 +101,6 @@ const inject = (window, $) => {
         }
       },
       error: error => {
-        console.log(error)
         setTimeout(() => {
           ajax()
         }, 2000)
@@ -110,17 +109,20 @@ const inject = (window, $) => {
   }
   // 提交价格情报
   function submitBD(params) {
+    let gmtCreate = params.gmtCreate
+    let submitTimestamp = gmtCreate + 1000 * 15 - new Date().getTime()
     setTimeout(() => {
+      let reqParams = {
+        uid: uid,
+        outerUrl: params.url,
+        id: params.id
+      }
       $.ajax({
         type: 'POST',
         url: 'https://imapi.beidian.com/server/gateway?method=voc.pricetask.submitMission',
         contentType: 'application/json;charset=utf-8',
         dataType: 'json',
-        data: JSON.stringify({
-          uid: uid,
-          outerUrl: params.url,
-          id: params.id
-        }),
+        data: JSON.stringify(reqParams),
         headers: {
           'User-Agent':
             'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)',
@@ -131,13 +133,22 @@ const inject = (window, $) => {
         },
         success: data => {
           if (data.success) {
-            console.log('提交成功')
-            if (data.msg == '请仔细查找链接哈') {
-              setTimeout(() => {
-                submitBD(params)
-              }, 5000)
-            } else {
+            if (data.body == true) {
               getHistory()
+              ajax()
+            } else {
+              let obj = {
+                code: 'WN1011',
+                data: {
+                  type: 'info',
+                  time: new Date().getTime(),
+                  msg: `${JSON.stringify(reqParams)}
+                  ${JSON.stringify(data)}
+                  `
+                },
+                msg: `记录日志`
+              }
+              window.postMessage(JSON.stringify(obj))
               ajax()
             }
           } else {
@@ -146,12 +157,22 @@ const inject = (window, $) => {
           }
         },
         error: error => {
-          console.log('提交出错', error)
+          let obj = {
+            code: 'WN1011',
+            data: {
+              type: 'error',
+              time: new Date().getTime(),
+              msg: JSON.stringify(error)
+            },
+            msg: `记录日志`
+          }
+          window.postMessage(JSON.stringify(obj))
+
           ajax()
         },
         complete: () => {}
       })
-    }, 14000)
+    }, submitTimestamp)
   }
   // 获取提交列表
   function getHistory() {
@@ -211,7 +232,6 @@ const inject = (window, $) => {
       },
       beforeSend: (xhr, settings) => {},
       success: data => {
-        console.log(data)
         ajax()
       },
       error: error => {
@@ -311,9 +331,10 @@ const inject = (window, $) => {
       uid = +getCookie('_logged_')
       // let uid = 90132158;
       task.handle = 'accept'
+      let url = `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.check.${task.handle}&checkTaskId=${task.checkTaskId}&uid=${uid}`
       $.ajax({
         type: 'GET',
-        url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.check.${task.handle}&checkTaskId=${task.checkTaskId}&uid=${uid}`,
+        url: url,
         contentType: 'application/json;charset=utf-8',
         dataType: 'json',
         data: null,
@@ -326,8 +347,36 @@ const inject = (window, $) => {
           withCredentials: true
         },
         beforeSend: (xhr, settings) => {},
-        success: data => {},
-        error: error => {},
+        success: data => {
+          if (data.success && data.body == null && data.msg == null) {
+            console.log('jyk success')
+          } else {
+            let obj = {
+              code: 'WN1011',
+              data: {
+                type: 'info',
+                time: new Date().getTime(),
+                msg: `${url}
+                ${JSON.stringify(data)}
+                `
+              },
+              msg: `记录日志`
+            }
+            window.postMessage(JSON.stringify(obj))
+          }
+        },
+        error: error => {
+          let obj = {
+            code: 'WN1011',
+            data: {
+              type: 'error',
+              time: new Date().getTime(),
+              msg: JSON.stringify(error)
+            },
+            msg: `记录日志`
+          }
+          window.postMessage(JSON.stringify(obj))
+        },
         complete: () => {
           getJykTask()
         }
@@ -391,8 +440,10 @@ const inject = (window, $) => {
             ajax()
           }, 2000)
           break
+        case 'NW1014':
+          submitBD(result.data)
+          break
         default:
-          submitBD(result)
           break
       }
     },
@@ -430,9 +481,9 @@ const inject = (window, $) => {
       getJykTask()
     }, 1000)
     // 页面心跳，保证页面长时间执行定时器，卡死问题
-    setInterval(() => {
-      window.location.reload()
-    }, 1000 * 60 * 15)
+    // setInterval(() => {
+    //   window.location.reload()
+    // }, 1000 * 60 * 15)
   }
 }
 

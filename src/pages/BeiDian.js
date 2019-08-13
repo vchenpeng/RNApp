@@ -73,7 +73,7 @@ export default class BeiDian extends Component {
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
-              // navigation.state.params.changePlatform.call(self)
+              navigation.state.params.openLogs.call(self)
             }}
           >
             <Animated.View style={{ width: 20, height: 20, marginRight: 10, transform: [{ rotateZ: rotateZ }] }}>
@@ -112,11 +112,12 @@ export default class BeiDian extends Component {
     this.state = {
       refreshing: false,
       isShowLogin: false,
+      isShowLogs: false,
       id: null,
       pid: 91286199,
       products: [],
       historys: [],
-      lowest: 0.25,
+      lowest: 0.2,
       audioCode: 1009, // 提交成功提示音
       isSilence: true, // 是否静音
       actionSheetStyles: {},
@@ -128,7 +129,8 @@ export default class BeiDian extends Component {
         jsSessionID: null,
         uid: null
       },
-      accountOverview: null
+      accountOverview: null,
+      logs: []
     }
     this.animatedValue = new Animated.Value(0)
     this.rotateAnimated = Animated.timing(this.animatedValue, {
@@ -169,6 +171,9 @@ export default class BeiDian extends Component {
   openLogin() {
     this.setState({ isShowLogin: !this.state.isShowLogin })
   }
+  openLogs() {
+    this.setState({ isShowLogs: !this.state.isShowLogs })
+  }
   checkIn(str, arr) {
     let result = false
     for (let i = 0; i < arr.length; i++) {
@@ -187,7 +192,7 @@ export default class BeiDian extends Component {
     let obj = {
       code: 'NW1003',
       data: code,
-      msg: `手动切换至${codeName}平台.`
+      msg: `手动切换至${codeName}平台`
     }
     this.webview.postMessage(JSON.stringify(obj))
     self.playSysAudio(1001)
@@ -853,6 +858,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
     this.props.navigation.setParams({ activeStatus: this.activeStatus })
     this.props.navigation.setParams({ webview: this.webview })
     this.props.navigation.setParams({ openLogin: this.openLogin })
+    this.props.navigation.setParams({ openLogs: this.openLogs })
     this.props.navigation.setParams({ showOptions: this.showOptions })
     this.props.navigation.setParams({ changePlatform: this.changePlatform })
     this.props.navigation.setParams({ jykAcceptCount: this.state.jykAcceptCount })
@@ -1030,9 +1036,25 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
       </View>
     )
   }
+  renderLogItem(item) {
+    return (
+      <View
+        style={{
+          borderBottomColor: '#ccc',
+          borderBottomWidth: 1
+        }}
+      >
+        <View style={{ backgroundColor: item.type == 'error' ? `#F00` : `#FFF` }}>
+          <Text style={{ flexWrap: 'wrap' }}>{`【${tool.formatDateTmp(item.time)}】${item.msg}`}</Text>
+        </View>
+      </View>
+    )
+  }
   render() {
     const { height, width } = Dimensions.get('window')
-
+    let logs = this.state.logs.map(x => {
+      return this.renderLogItem(x)
+    })
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#f2f4f6' }}>
         <View style={{ flex: 1, backgroundColor: '#f2f4f6' }}>
@@ -1255,6 +1277,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                       let returnObj = {
                         id: productInfo.id,
                         uid: productInfo.uid,
+                        gmtCreate: productInfo.gmtCreate * 1000,
                         url: null
                       }
                       let tName = productInfo.taskShopName || this.switchPlatformName(productInfo.platform)
@@ -1274,11 +1297,22 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                       // 弹框提示对应商品
                       // DropDownHolder.alert('', `[${tName}]${productInfo.title}`, 'info')
                       if (returnObj.url !== null) {
+                        let allLogs = this.state.logs
+                        allLogs.unshift({
+                          type: 'info',
+                          time: new Date().getTime(),
+                          msg: JSON.stringify(productInfo)
+                        })
+                        this.setState({
+                          logs: allLogs
+                        })
+
                         let products = this.state.products
                         products.push(returnObj)
                         this.setState({ products: products })
                         this.props.navigation.setParams({ products: products })
-                        this.webview.postMessage(JSON.stringify(returnObj))
+                        // this.webview.postMessage(JSON.stringify(returnObj))
+                        this.postWebMessage('NW1014', returnObj)
                         this.playSysAudio(this.state.audioCode)
                         this.activeAnimate(1, 1, 1, 1, 1, 1, 1)
                       } else {
@@ -1330,11 +1364,33 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                     // 运行监测
                     this.activeAnimate(0)
                     break
+                  // 记录日志
+                  case 'WN1011':
+                    let allLogs = this.state.logs
+                    allLogs.unshift(result.data)
+                    this.setState({
+                      logs: allLogs
+                    })
+                    break
                   default:
                     break
                 }
               }}
             />
+          </Modal>
+          <Modal
+            isOpen={this.state.isShowLogs}
+            keyboardTopOffset={0}
+            startOpen={false}
+            backdrop={false}
+            coverScreen={false}
+            swipeToClose={false}
+            useNativeDriver={false}
+            position={'top'}
+            animationDuration={200}
+            easing={Easing.elastic(0)}
+          >
+            <ScrollView style={{ flex: 1 }}>{logs}</ScrollView>
           </Modal>
         </View>
         <ActionSheet
