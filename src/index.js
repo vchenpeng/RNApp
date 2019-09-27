@@ -17,6 +17,7 @@ import AuthLoading from './pages/AuthLoadingScreen'
 import BeiDian from './pages/BeiDian'
 import BeiDianNew from './pages/BeiDianNew'
 import Map from './pages/Map'
+import Punch from './pages/Punch'
 
 Tabs.navigationOptions = ({ navigation }) => {
   let { routeName } = navigation.state.routes[navigation.state.index]
@@ -117,6 +118,17 @@ Tabs.navigationOptions = ({ navigation }) => {
     case 'Mine':
       navigationOptions = {
         headerTitle: '我的',
+        headerLeft: (
+          <View>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Punch')
+              }}
+            >
+              <AntDesignIcon name="bars" size={24} color="white" style={{ marginLeft: 15 }} />
+            </TouchableOpacity>
+          </View>
+        ),
         headerRight: (
           <View>
             <TouchableOpacity
@@ -188,6 +200,9 @@ const RootStackNavigator = createStackNavigator(
     },
     Map: {
       screen: Map
+    },
+    Punch: {
+      screen: Punch
     }
   },
   {

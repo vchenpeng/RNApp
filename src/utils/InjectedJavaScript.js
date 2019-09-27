@@ -27,7 +27,7 @@ const inject = (window, $) => {
     uid = +getCookie('_logged_')
     $.ajax({
       type: 'GET',
-      url: 'https://imapi.beidian.com/server/gateway?method=voc.price.hunter.mission.change&uid=' + uid + '&pid=' + pid,
+      url: 'https://imapi.beidian.com/server/gateway?method=voc.price.hunter.mission.change&uid=' + uid + '&pid=' + pid || 0,
       data: null,
       headers: {
         'User-Agent':
@@ -40,7 +40,7 @@ const inject = (window, $) => {
       success: data => {
         if (data.success) {
           // 存在productInfo时
-          if (data.body.productInfo) {
+          if (data.body.productInfo && data.body.productInfo.id != null) {
             // 天猫专卖或者专营不会出现出现重复商品信息
             if (pid == data.body.productInfo.pid) {
               setTimeout(() => {
@@ -66,10 +66,10 @@ const inject = (window, $) => {
           } else if (data.body.nextPlatform) {
             let nextPlatform = data.body.nextPlatform
             // 跳过京东,进入下一个平台“唯品会”
-            // if (nextPlatform.code == 2) {
-            //   nextPlatform.code = 6
-            //   nextPlatform.name = '唯品会'
-            // }
+            if (nextPlatform.code == 2) {
+              nextPlatform.code = 6
+              nextPlatform.name = '唯品会'
+            }
 
             setTimeout(() => {
               let obj = {
@@ -275,11 +275,11 @@ const inject = (window, $) => {
       //   }
       // }
       $.ajax({
-        type: 'GET',
-        url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.detail.get&uid=${uid}`,
+        type: 'POST',
+        url: `https://imapi.beidian.com/server/gateway?method=voc.agentcheck.task.detail.get`,
         contentType: 'application/json;charset=utf-8',
         dataType: 'json',
-        data: null,
+        data: JSON.stringify({}),
         headers: {
           'User-Agent':
             'Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16C50 Hybrid/1.0.1 Beidian/3.25.01 (iPhone)'
@@ -476,7 +476,7 @@ const inject = (window, $) => {
     // $('.J_login-btn').on('click', login);
     setCookie(cookies)
     setTimeout(() => {
-      ajax()
+      changePlatform(6)
       getHistory()
       getJykTask()
     }, 1000)

@@ -124,7 +124,7 @@ export default class BeiDian extends Component {
       jykAcceptCount: 0,
       jykRejectCount: 0,
       jykTasks: [],
-      jykTaskStatus: 1,
+      jykTaskStatus: 0,
       authInfo: {
         jsSessionID: null,
         uid: null
@@ -312,8 +312,19 @@ export default class BeiDian extends Component {
       method: 'GET',
       credentials: 'include'
     })
+      .then(r => r.text())
       .then(response => {
-        let jdInfo = eval(response._bodyInit)
+        let jdInfo = eval(response)
+
+        let allLogs = this.state.logs
+        allLogs.push({
+          type: 'info',
+          time: new Date().getTime(),
+          msg: JSON.stringify(jdInfo)
+        })
+        this.setState({
+          logs: allLogs
+        })
 
         let returnUrl = null
         try {
@@ -325,17 +336,13 @@ export default class BeiDian extends Component {
               let pools = []
               for (let i = 0; i < paragraph.length; i++) {
                 let item = paragraph[i]
-                let percent = this.strSimilarity2Percent(product.title, item.warename)
+                let percent = this.strSimilarity2Percent(product.title, item.Content.warename)
 
-                if (
-                  this.checkIn(item['shop_name'], keywords) &&
-                  this.checkIn(item['shop_name'], brands)
-                  // Math.abs(product.price - item.dredisprice) < 30
-                ) {
-                  let tmpWord = this.randomWord(false, 58, 58)
+                if (this.checkIn(item['shop_name'], keywords) && this.checkIn(item['shop_name'], brands)) {
+                  let trace = Secret.Encrypt(`${product.iid}`)
                   let rUrl = `https://item.m.jd.com/product/${
                     item['wareid']
-                  }.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&ShareTm=UR/2rpYRZHzD0mzmwsDuvGGPkIUrDcVrAxQdUUhlOLIkXbxrj1ZJgr5i53aW6ltlDIKjFz1Y74ACszYuDntDe5vNDWsdw%2BHFGFYU00pXwsfNKpsYE/${tmpWord}`
+                  }.html?utm_source=iosapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=CopyURL&ad_od=share&percent=${percent}&trace=${trace}`
 
                   let itemProduct = {
                     index: i,
@@ -361,11 +368,20 @@ export default class BeiDian extends Component {
         return returnUrl
       })
       .catch(error => {
+        let allLogs = this.state.logs
+        allLogs.unshift({
+          type: 'info',
+          time: new Date().getTime(),
+          msg: 'err:' + JSON.stringify(error)
+        })
+        this.setState({
+          logs: allLogs
+        })
         return null
       })
   }
   handleJD(jdInfo) {
-    return jdInfo
+    return JSON.parse(jdInfo)
   }
   searchTM(product) {
     // 12专营店
@@ -1298,7 +1314,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                       // DropDownHolder.alert('', `[${tName}]${productInfo.title}`, 'info')
                       if (returnObj.url !== null) {
                         let allLogs = this.state.logs
-                        allLogs.unshift({
+                        allLogs.push({
                           type: 'info',
                           time: new Date().getTime(),
                           msg: JSON.stringify(productInfo)
@@ -1367,7 +1383,7 @@ ${brandPercent.toFixed(3)} · ${percent.toFixed(3)}
                   // 记录日志
                   case 'WN1011':
                     let allLogs = this.state.logs
-                    allLogs.unshift(result.data)
+                    allLogs.push(result.data)
                     this.setState({
                       logs: allLogs
                     })
