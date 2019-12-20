@@ -126,10 +126,12 @@ export default class Punch extends Component {
       })
       .catch(error => console.error(error))
   }
+  login () {
+    
+  }
   componentDidMount() {
     this.fetchPunchList()
   }
-
   renderRow({ item }) {
     return (
       <TouchableHighlight
@@ -143,7 +145,7 @@ export default class Punch extends Component {
           <ListItem
             style={[styles.item, { flexDirection: 'column' }]}
             containerStyle={{
-              backgroundColor: '#fff',
+              backgroundColor: '#ffffff',
               padding: 0,
               margin: 0,
               borderBottomWidth: 0,

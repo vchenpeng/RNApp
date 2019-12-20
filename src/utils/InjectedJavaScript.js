@@ -1,5 +1,5 @@
 const inject = (window, $) => {
-  const themeColor = '#0088CC'
+  const themeColor = '#2ca146'
   let pid = 0
   let uid = 0 //91286199
   let isJykFast = false
@@ -464,7 +464,7 @@ const inject = (window, $) => {
   }
   function init(cookies) {
     insertCSS(
-      `html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn{background-color: ${themeColor};}.login .msg-pin-btn{border: 1px solid ${themeColor};color:${themeColor};}`
+      `html{-webkit-user-select:none;}body{cursor:default;-webkit-tap-highlight-color:rgba(255,0,0,0.5) !important;}.login .login-btn.active{background-color: ${themeColor};}.login .msg-pin-btn.active{border: 1px solid ${themeColor};background-color: ${themeColor};}`
     )
     $('.msg-pin-input')
       .attr('type', 'number')
