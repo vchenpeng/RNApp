@@ -36,7 +36,7 @@ export default class Market extends Component {
                 activeOpacity={0.85}
                 underlayColor='#000'
                 onPress={() => {
-                    // NavigationService.navigate('MarketDetail', { title: item.title, key: item.key });
+                    NavigationService.navigate('Web', { title: item.title, url: item.url });
                 }} >
                 <View style={{ backgroundColor: '#fff' }}>
                     <ListItem

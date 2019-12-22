@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, AlertIOS, TouchableOpacity } from 'react-native'
+import { View, Text, AlertIOS, TouchableOpacity, Alert } from 'react-native'
 import TouchID from 'react-native-touch-id'
 import AntDesignIcon from 'react-native-vector-icons/AntDesign'
 import EntypoIcon from 'react-native-vector-icons/Entypo'
@@ -18,6 +18,7 @@ import BeiDian from './pages/BeiDian'
 import BeiDianNew from './pages/BeiDianNew'
 import Map from './pages/Map'
 import Punch from './pages/Punch'
+import SmsDetail from './pages/SmsDetail'
 
 Tabs.navigationOptions = ({ navigation }) => {
   let { routeName } = navigation.state.routes[navigation.state.index]
@@ -121,11 +122,26 @@ Tabs.navigationOptions = ({ navigation }) => {
         headerLeft: (
           <View>
             <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('Punch')
+              onPress={function() {
+                Alert.prompt('提示', '请输入访问秘钥', [
+                  {
+                    text: '取消',
+                    onPress: function() {
+                      console.log('取消按钮点击')
+                    }
+                  },
+                  {
+                    text: '确认',
+                    onPress: function (text) {
+                      if (text == '.') {
+                        navigation.navigate('Punch')
+                      }
+                    }
+                  }
+                ])
               }}
             >
-              <AntDesignIcon name="bars" size={24} color="white" style={{ marginLeft: 15 }} />
+              <AntDesignIcon name="calendar" size={24} color="white" style={{ marginLeft: 15 }} />
             </TouchableOpacity>
           </View>
         ),
@@ -203,6 +219,9 @@ const RootStackNavigator = createStackNavigator(
     },
     Punch: {
       screen: Punch
+    },
+    SmsDetail: {
+      screen: SmsDetail
     }
   },
   {

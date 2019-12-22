@@ -13,7 +13,7 @@ import {
   NativeModules
 } from 'react-native'
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements'
-import AntDesignIcon from 'react-native-vector-icons/AntDesign'
+import EntypoIcon from 'react-native-vector-icons/Entypo'
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
 import NavigationService from '../utils/navigationService'
 import tool from '../utils/tool'
@@ -36,7 +36,7 @@ export default class Punch extends Component {
             this.handlePunch()
           }}
         >
-          <AntDesignIcon name="check" size={24} color="white" style={{ marginRight: 15 }} />
+          <EntypoIcon name="controller-record" size={24} color="white" style={{ marginRight: 15 }} />
         </TouchableOpacity>
       </View>
     )
@@ -44,10 +44,40 @@ export default class Punch extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      refreshing: false
+      refreshing: false,
+      token: ''
     }
   }
-
+  auth() {
+    const url = 'http://oa.sandload.cn:8080/jc6/oauth/token'
+    let params = `grant_type=password&username=FM00449&password=877235336C47AC9F6FBD2A5AFB7FEC5C438D3E7F&client_id=m1&client_secret=s1`
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        Host: 'oa.sandload.cn:8080',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Origin: 'file://',
+        Connection: 'keep-alive',
+        Accept: 'application/json',
+        'User-Agent':
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148,tag=jhwebview,appid=c4b85efd-5ad0-4161-8249-cacd037ed15c,versionCode=5.0.0,versionwebview=5.0.0,from=IOS,deviceid=40D9CF9A-0BDD-409E-8C84-6C46B03EDBDE,haveAliPaySDK=1,haveWeixinPaySDK=1,havePaypalSDK=1,haveCCPSelectPeopleForH5=1,haveYjpaySDK=1,haveMiniProgram=1 (4446756864) (4471294464) (4447204352) (4571982848) (4571847168) (4571847168) (4463237120) (4479812608) (4572061696) (4572011520) (4572274176) (4572077568)',
+        Authorization: 'Bearer 8cd7fc25-a772-4a6f-934a-e854f254541e',
+        'Accept-Language': 'zh-cn',
+        'Accept-Encoding': 'gzip, deflate'
+      },
+      body: params
+    })
+      .then(response => response.json())
+      .then(response => {
+        if (!!response.access_token) {
+          this.setState({
+            token: response.access_token
+          })
+          this.fetchPunchList()
+        }
+      })
+      .catch(error => console.error(error))
+  }
   fetchPunchList() {
     const url = 'http://oa.sandload.cn:8080/jc6/api/Attendance/OwnSiteNoteList'
     let params = {
@@ -71,7 +101,7 @@ export default class Punch extends Component {
         Accept: 'application/json',
         'User-Agent':
           'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148,tag=jhwebview,appid=c4b85efd-5ad0-4161-8249-cacd037ed15c,versionCode=5.0.0,versionwebview=5.0.0,from=IOS,deviceid=40D9CF9A-0BDD-409E-8C84-6C46B03EDBDE,haveAliPaySDK=1,haveWeixinPaySDK=1,havePaypalSDK=1,haveCCPSelectPeopleForH5=1,haveYjpaySDK=1,haveMiniProgram=1 (4446756864) (4471294464) (4447204352) (4571982848) (4571847168) (4571847168) (4463237120) (4479812608) (4572061696) (4572011520) (4572274176) (4572077568)',
-        Authorization: 'Bearer 8cd7fc25-a772-4a6f-934a-e854f254541e',
+        Authorization: `Bearer ${this.state.token}`,
         'Accept-Language': 'zh-cn',
         'Accept-Encoding': 'gzip, deflate'
       },
@@ -114,7 +144,7 @@ export default class Punch extends Component {
         Accept: 'application/json',
         'User-Agent':
           'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148,tag=jhwebview,appid=c4b85efd-5ad0-4161-8249-cacd037ed15c,versionCode=5.0.0,versionwebview=5.0.0,from=IOS,deviceid=40D9CF9A-0BDD-409E-8C84-6C46B03EDBDE,haveAliPaySDK=1,haveWeixinPaySDK=1,havePaypalSDK=1,haveCCPSelectPeopleForH5=1,haveYjpaySDK=1,haveMiniProgram=1 (4446756864) (4471294464) (4447204352) (4571982848) (4571847168) (4571847168) (4463237120) (4479812608) (4572061696) (4572011520) (4572274176) (4572077568)',
-        Authorization: 'Bearer 8cd7fc25-a772-4a6f-934a-e854f254541e',
+        Authorization: `Bearer ${this.state.token}`,
         'Accept-Language': 'zh-cn',
         'Accept-Encoding': 'gzip, deflate'
       },
@@ -122,15 +152,13 @@ export default class Punch extends Component {
     })
       .then(response => response.json())
       .then(response => {
-        alert(JSON.stringify(response))
+        Alert.alert('', JSON.stringify(response))
       })
       .catch(error => console.error(error))
   }
-  login () {
-    
-  }
+  login() {}
   componentDidMount() {
-    this.fetchPunchList()
+    this.auth()
   }
   renderRow({ item }) {
     return (

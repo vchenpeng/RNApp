@@ -4,6 +4,7 @@ import {
   Image,
   View,
   StyleSheet,
+  Clipboard,
   FlatList,
   Dimensions,
   StatusBar,
@@ -15,34 +16,71 @@ import {
 import { Header, List, ListItem, Avatar, CheckBox } from 'react-native-elements'
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
 import NavigationService from '../utils/navigationService'
-
+import EntypoIcon from 'react-native-vector-icons/Entypo'
 import DropDownHolder from '../utils/DropDownHolder'
 import abr from '../utils/abr'
 
 export default class Mine extends Component {
+  static navigationOptions = ({ navigation }) => {
+    const { params } = navigation.state
+    return {
+      title: params ? params.title : null,
+      headerRight: (
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              let phone = params.phone
+              Alert.alert('手机号', phone, [
+                {
+                  text: '复制',
+                  onPress: () => {
+                    Clipboard.setString(phone)
+                  }
+                }
+              ])
+            }}
+          >
+            <EntypoIcon name="dots-three-horizontal" size={24} color="white" style={{ marginRight: 15 }} />
+          </TouchableOpacity>
+        </View>
+      ),
+      gesturesEnabled: true
+    }
+  }
   constructor(props) {
     super(props)
     this.state = {
+      phone: null,
       pageIndex: 1,
       list: [],
       refreshing: false
     }
   }
-
+  matchReg(str) {
+    let reg = /<\/?.+?\/?>/g
+    return (str || '').replace(reg, '')
+  }
   fetchMarketList() {
+    var reg = new RegExp('<div class="col-xs-12 col-md-8" style="color:#666464;">(.)*</div>', 'gi')
+    //(?<=<div class="mobile_hide"[^>]*\>).*?(?=\<\/div>)
+    var sendReg = new RegExp(`(<div class="mobile_hide"[^>]*\>)(.)*(?=\<\/div><div class="mobile_show message_head">)`, 'gi')
+    var codeReg = new RegExp(`(<span class="btn1" data-clipboard-text=".*"><b>)(.)*(<\/b>\<\/span>)`, 'gi')
+    const phone = this.phone
     const pageIndex = this.state.pageIndex
-    const url = `https://yunduanxin.net/China-Phone-Number/Page/${pageIndex}`
+    const url = `https://yunduanxin.net/info/86${phone}/list_${pageIndex}.html`
     fetch(url)
       .then(response => response.text())
       .then(response => {
+        let list = response.match(reg)
+        let sendNumberList = response.match(sendReg)
+        let codeList = response.match(codeReg)
         let originList = this.state.list
-        let list = response.match(/(\+86 )\d+/g)
         list = list.map((x, i) => {
           return {
-            index: i,
-            title: x.substr(4),
-            avatar: 'https://yunduanxin.net/img/flags/normal/cn.png',
-            subtitle: '在线'
+            index: `${i}`,
+            code: this.matchReg(codeList[i]),
+            sendNumber: this.matchReg(sendNumberList[i]),
+            content: this.matchReg(x)
           }
         })
         if (pageIndex > 1) {
@@ -59,6 +97,10 @@ export default class Mine extends Component {
       })
   }
   componentDidMount() {
+    let phone = this.props.navigation.state.params.phone
+    this.phone = phone
+    Clipboard.setString(`${phone}`)
+    this.props.navigation.setParams({ title: phone })
     this.fetchMarketList()
   }
 
@@ -68,9 +110,17 @@ export default class Mine extends Component {
         activeOpacity={0.85}
         underlayColor="#000"
         onPress={() => {
-          // let url = `https://yunduanxin.net/info/86${item.title}/`;
-          NavigationService.navigate('SmsDetail', { phone: item.title })
-          // NavigationService.navigate('SmsDetail', { title: item.title, key: item.key });
+          Alert.alert('验证码', item.code, [
+            {
+              text: '复制',
+              onPress: () => {
+                Clipboard.setString(item.code)
+              }
+            }
+          ])
+          //   let url = `https://yunduanxin.net/info/86${item.title}/`
+          //   NavigationService.navigate('Web', { url: url, title: item.title })
+          // NavigationService.navigate('MarketDetail', { title: item.title, key: item.key });
         }}
       >
         <View style={{ backgroundColor: '#fff' }}>
@@ -83,23 +133,24 @@ export default class Mine extends Component {
               borderBottomWidth: 0,
               paddingTop: 10,
               paddingBottom: 10,
-              paddingLeft: 10
+              paddingLeft: 0
             }}
             key={item.index}
-            avatar={
-              <Avatar width={60} height={40} avatarStyle={{ borderRadius: 0, backgroundColor: '#fff', margin: 20 }} source={{ uri: item.avatar }} />
-            }
-            titleStyle={{ fontSize: 14 }}
-            subtitleStyle={{ fontSize: 12 }}
+            // avatar={
+            //   <Avatar width={60} height={40} avatarStyle={{ borderRadius: 0, backgroundColor: '#fff', margin: 20 }} source={{ uri: item.avatar }} />
+            // }
+            titleStyle={{ fontSize: 16, marginLeft: 0, fontWeight: 500 }}
+            subtitleStyle={{ fontSize: 12, marginLeft: 0 }}
             titleContainerStyle={{
               height: 20,
-              marginLeft: 10,
-              marginRight: 10,
+              marginLeft: 0,
+              marginRight: 0,
               justifyContent: 'center'
             }}
-            subtitleContainerStyle={{ justifyContent: 'center', marginLeft: 10, height: 20 }}
-            title={item.title}
-            subtitle={item.subtitle}
+            subtitleContainerStyle={{ justifyContent: 'center', marginLeft: 0 }}
+            subtitleNumberOfLines={3}
+            title={item.sendNumber}
+            subtitle={item.content}
             // rightTitle={0}
             rightTitleStyle={[
               {
@@ -197,22 +248,21 @@ export default class Mine extends Component {
           renderHiddenItem={(data, rowMap) => (
             <View style={styles.rowBack}>
               <Text></Text>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 activeOpacity={1}
                 style={[styles.backRightBtn, styles.backRightBtnLeft]}
-                onPress={_ => this.closeRow(rowMap, data.item.title)}
+                onPress={_ => this.closeRow(rowMap, data.item.index)}
               >
                 <Text style={styles.backTextWhite}>关闭</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity
                 activeOpacity={1}
                 style={[styles.backRightBtn, styles.backRightBtnRight]}
                 onPress={_ => {
-                  this.getSmsCode(data.item)
-                  this.closeRow(rowMap, data.item.title)
+                  this.closeRow(rowMap, data.item.index)
                 }}
               >
-                <Text style={styles.backTextWhite}>发送</Text>
+                <Text style={styles.backTextWhite}>关闭</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -225,7 +275,7 @@ export default class Mine extends Component {
           previewDuration={0}
           previewOpenValue={0.01}
           keyExtractor={(rowData, index) => {
-            return rowData.title.toString()
+            return rowData.index.toString()
           }}
           refreshing={this.state.refreshing}
           onRefresh={() => {
