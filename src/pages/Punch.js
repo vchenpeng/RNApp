@@ -18,39 +18,43 @@ import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
 import NavigationService from '../utils/navigationService'
 import tool from '../utils/tool'
 
+let self
 export default class Punch extends Component {
   //接收上一个页面传过来的title显示出来
-  static navigationOptions = ({ navigation }) => ({
-    headerTitle: '',
-    headerTitleStyle: {
-      fontSize: 18,
-      fontWeight: '400',
-      alignSelf: 'center',
-      color: '#fff'
-    },
-    headerMode: 'screen',
-    headerRight: (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            this.handlePunch()
-          }}
-        >
-          <EntypoIcon name="controller-record" size={24} color="white" style={{ marginRight: 15 }} />
-        </TouchableOpacity>
-      </View>
-    )
-  })
+  static navigationOptions = ({ navigation }) => {
+    return {
+      headerTitle: '',
+      headerTitleStyle: {
+        fontSize: 18,
+        fontWeight: '400',
+        alignSelf: 'center',
+        color: '#fff'
+      },
+      headerMode: 'screen',
+      headerRight: (
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.state.params.handlePunch.call(self)
+            }}
+          >
+            <EntypoIcon name="controller-record" size={24} color="white" style={{ marginRight: 15 }} />
+          </TouchableOpacity>
+        </View>
+      )
+    }
+  }
   constructor(props) {
     super(props)
     this.state = {
       refreshing: false,
       token: ''
     }
+    self = this
   }
   auth() {
     const url = 'http://oa.sandload.cn:8080/jc6/oauth/token'
-    let params = `grant_type=password&username=FM00449&password=877235336C47AC9F6FBD2A5AFB7FEC5C438D3E7F&client_id=m1&client_secret=s1`
+    let params = `grant_type=password&username=FM00449&password=DEB818F1E51B8BDC68D7F777991617BD96073506&client_id=m1&client_secret=s1`
     fetch(url, {
       method: 'POST',
       headers: {
@@ -112,16 +116,19 @@ export default class Punch extends Component {
         let list = []
         if (response.mes == 'ok') {
           list = response.ownNoteInfos
+          this.setState({
+            list: list
+          })
+        } else {
+          Alert.alert(JSON.stringify(response))
         }
-        this.setState({
-          list: list
-        })
+
         this.setState({ refreshing: false })
       })
-      .catch(error => console.error(error))
+      .catch(error => console.info(error))
   }
   handlePunch() {
-    const url = 'http://oa.sandload.cn:8080/jc6/api/Attendance/WriteSiteNote'
+    let url = 'http://oa.sandload.cn:8080/jc6/api/Attendance/WriteSiteNote'
     let params = {
       sysCurTime: tool.formatDateTime(+new Date()),
       mark: '',
@@ -158,6 +165,7 @@ export default class Punch extends Component {
   }
   login() {}
   componentDidMount() {
+    this.props.navigation.setParams({ handlePunch: this.handlePunch })
     this.auth()
   }
   renderRow({ item }) {

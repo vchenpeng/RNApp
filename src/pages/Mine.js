@@ -31,16 +31,17 @@ export default class Mine extends Component {
 
   fetchMarketList() {
     const pageIndex = this.state.pageIndex
-    const url = `https://yunduanxin.net/China-Phone-Number/Page/${pageIndex}`
+    // https://www.yinsiduanxin.com/dl/2.html
+    const url = `https://www.yinsiduanxin.com/dl/${pageIndex}.html`
     fetch(url)
       .then(response => response.text())
       .then(response => {
         let originList = this.state.list
-        let list = response.match(/(\+86 )\d+/g)
+        let list = response.match(/\/message\/\d{11}(.html)/g)
         list = list.map((x, i) => {
           return {
             index: i,
-            title: x.substr(4),
+            title: x.substr(9, 11),
             avatar: 'https://yunduanxin.net/img/flags/normal/cn.png',
             subtitle: '在线'
           }

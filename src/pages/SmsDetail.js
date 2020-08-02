@@ -56,29 +56,36 @@ export default class Mine extends Component {
       refreshing: false
     }
   }
-  matchReg(str) {
+  matchReg(text) {
     let reg = /<\/?.+?\/?>/g
-    return (str || '').replace(reg, '')
+    return (text || '').replace(reg, '')
   }
   fetchMarketList() {
-    var reg = new RegExp('<div class="col-xs-12 col-md-8" style="color:#666464;">(.)*</div>', 'gi')
+    var reg = new RegExp('<td style="">(.)*</td>', 'gi')
     //(?<=<div class="mobile_hide"[^>]*\>).*?(?=\<\/div>)
-    var sendReg = new RegExp(`(<div class="mobile_hide"[^>]*\>)(.)*(?=\<\/div><div class="mobile_show message_head">)`, 'gi')
-    var codeReg = new RegExp(`(<span class="btn1" data-clipboard-text=".*"><b>)(.)*(<\/b>\<\/span>)`, 'gi')
+    var sendReg = new RegExp(`(<td style="text-align:center;">(.)*</td>)`, 'gi')
+    // var codeReg = new RegExp(`(<span class="btn1" data-clipboard-text=".*"><b>)(.)*(<\/b>\<\/span>)`, 'gi')
     const phone = this.phone
     const pageIndex = this.state.pageIndex
-    const url = `https://yunduanxin.net/info/86${phone}/list_${pageIndex}.html`
+    //https://www.yinsiduanxin.com/message/16533907254/2.html
+    const url = `https://www.yinsiduanxin.com/message/${phone}/${pageIndex}.html`
     fetch(url)
       .then(response => response.text())
       .then(response => {
         let list = response.match(reg)
         let sendNumberList = response.match(sendReg)
-        let codeList = response.match(codeReg)
+        // let codeList = response.match(codeReg)
         let originList = this.state.list
         list = list.map((x, i) => {
+          let code = '';
+          let mayBeCodes = x.match(/\d+/) || []
+          mayBeCodes = mayBeCodes.filter(x => x.length > 3)
+          if (Array.isArray(mayBeCodes) && mayBeCodes.length > 0) {
+            code = mayBeCodes[0]
+          }
           return {
             index: `${i}`,
-            code: this.matchReg(codeList[i]),
+            code: code,
             sendNumber: this.matchReg(sendNumberList[i]),
             content: this.matchReg(x)
           }
